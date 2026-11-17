@@ -1,0 +1,35 @@
+name: Sincronizzazione Serale Garmin
+
+on:
+  schedule:
+    - cron: '0 21 * * *' # 22:00 ora italiana
+  workflow_dispatch: # Permette il lancio manuale dal sito
+
+jobs:
+  aggiorna-dati:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codice
+        uses: actions/checkout@v3
+
+      - name: Configura Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Installa librerie
+        run: pip install garminconnect python-dotenv
+
+      - name: Esegui Script del Coach
+        env:
+          GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+        run: python script_motore.py
+
+      - name: Salva e aggiorna Dashboard
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "RunCoach Bot"
+          git add dati.json
+          git commit -m "Aggiornamento automatico Garmin e usura scarpe" || echo "Nessun cambiamento"
+          git push
