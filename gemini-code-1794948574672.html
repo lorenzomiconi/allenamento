@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RunCoach Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-6">
+    <div class="max-w-5xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-blue-600 text-white p-6 rounded-lg shadow-lg">
+            <div>
+                <h1 class="text-3xl font-bold">RunCoach Pro</h1>
+                <p class="text-sm mt-1">Dashboard Allenamento & Performance</p>
+            </div>
+            <div class="text-right">
+                <p class="text-lg font-semibold" id="atleta-stats">-- kg | -- cm</p>
+                <p class="text-sm">BMI: <span id="atleta-bmi">--</span></p>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Box Scarpe -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-4 border-b pb-2">Stato Scarpe</h2>
+                <ul class="space-y-3">
+                    <li class="flex justify-between">
+                        <span class="font-semibold text-green-700">Mizuno Neo Zen</span>
+                        <span id="scarpa-mizuno">-- km residui</span>
+                    </li>
+                    <li class="flex justify-between">
+                        <span class="font-semibold text-red-600">Adidas Evo SL</span>
+                        <span id="scarpa-adidas">-- km totali</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Box Gare -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-bold mb-4 border-b pb-2">Prossimi Obiettivi</h2>
+                <ul id="lista-gare" class="space-y-3">
+                    <!-- Popolato via JS -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Box Calendario -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-bold mb-4 border-b pb-2">Piano Settimanale</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-left">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-600">
+                            <th class="p-3">Data</th>
+                            <th class="p-3">Allenamento</th>
+                            <th class="p-3">Km</th>
+                            <th class="p-3">Stato</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabella-allenamenti" class="divide-y">
+                        <!-- Popolato via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        fetch('dati.json')
+            .then(response => response.json())
+            .then(data => {
+                // Atleta
+                document.getElementById('atleta-stats').textContent = `${data.atleta.peso_kg} kg | ${data.atleta.altezza_cm} cm`;
+                document.getElementById('atleta-bmi').textContent = data.atleta.bmi;
+
+                // Scarpe
+                document.getElementById('scarpa-mizuno').textContent = `${data.scarpe.mizuno_neo_zen.km_residui} km residui`;
+                document.getElementById('scarpa-adidas').textContent = `${data.scarpe.adidas_evo_sl.km_totali_percorsi} km totali`;
+
+                // Gare
+                const gareHtml = data.gare.map(g => `<li class="flex justify-between"><span>${g.nome}</span><span class="font-mono text-sm">${g.data}</span></li>`).join('');
+                document.getElementById('lista-gare').innerHTML = gareHtml;
+
+                // Allenamenti
+                const allenamentiHtml = data.allenamenti_settimana.map(a => `
+                    <tr>
+                        <td class="p-3 font-mono text-sm">${a.data}</td>
+                        <td class="p-3 font-semibold">${a.tipo}</td>
+                        <td class="p-3">${a.km_previsti} km</td>
+                        <td class="p-3"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs uppercase">${a.stato.replace('_', ' ')}</span></td>
+                    </tr>
+                `).join('');
+                document.getElementById('tabella-allenamenti').innerHTML = allenamentiHtml;
+            });
+    </script>
+</body>
+</html>

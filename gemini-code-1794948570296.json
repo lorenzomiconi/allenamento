@@ -1,0 +1,49 @@
+{
+  "atleta": {
+    "peso_kg": 69.0,
+    "altezza_cm": 170,
+    "bmi": 23.88
+  },
+  "scarpe": {
+    "mizuno_neo_zen": {
+      "km_residui": 142,
+      "ruolo": "Corse facili e recupero"
+    },
+    "adidas_evo_sl": {
+      "km_totali_percorsi": 130,
+      "ruolo": "Gare e lavori di qualità"
+    }
+  },
+  "gare": [
+    {
+      "nome": "Test 10 km",
+      "data": "2027-02-14",
+      "tipo": "Test intermedio"
+    },
+    {
+      "nome": "Mezza Maratona Obiettivo",
+      "data": "2027-04-18",
+      "tipo": "Gara Principale"
+    }
+  ],
+  "allenamenti_settimana": [
+    {
+      "data": "2026-11-19",
+      "tipo": "Corsa facile + allunghi",
+      "km_previsti": 9.0,
+      "stato": "da_fare"
+    },
+    {
+      "data": "2026-11-20",
+      "tipo": "Forza B (Stabilità)",
+      "km_previsti": 0.0,
+      "stato": "da_fare"
+    },
+    {
+      "data": "2026-11-21",
+      "tipo": "Lungo facile",
+      "km_previsti": 12.0,
+      "stato": "da_fare"
+    }
+  ]
+}
