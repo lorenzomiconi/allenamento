@@ -83,7 +83,7 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-900" id="page-title">Panoramica & Readiness</h2>
-                    <p class="text-sm text-slate-500" id="page-subtitle">Monitoraggio condizione, carico settimanale e prevenzione infortuni</p>
+                    <p class="text-sm text-slate-500" id="page-subtitle">Monitoraggio condizione, soglia Garmin e prevenzione infortuni</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <span id="sync-badge" class="text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold transition-all">
@@ -99,49 +99,60 @@
             <div id="tab-panoramica" class="space-y-6">
                 
                 <!-- KPI CARDS -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-xs font-semibold uppercase text-slate-400">Volume Sett. Corrente</p>
-                                <h3 class="text-2xl font-bold text-slate-900 mt-1" id="kpi-km-sett">0 / 29 km</h3>
+                                <p class="text-[11px] font-semibold uppercase text-slate-400">Corsa Sett. Corrente</p>
+                                <h3 class="text-xl font-bold text-slate-900 mt-1" id="kpi-km-sett">0 / 29 km</h3>
                             </div>
-                            <span class="p-2.5 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-route"></i></span>
+                            <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-route"></i></span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-2">Settimana 16–22 Nov (Inizio Base)</p>
+                        <p class="text-[11px] text-slate-500 mt-2">Sett. 16–22 Nov (Base)</p>
                     </div>
 
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-emerald-300 transition" onclick="switchTab('scarpe')">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-cyan-300 transition" onclick="switchTab('diario')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-xs font-semibold uppercase text-slate-400" id="kpi-shoe1-name">Mizuno Neo Zen</p>
-                                <h3 class="text-2xl font-bold text-emerald-600 mt-1" id="kpi-shoe1-rem">142 km</h3>
+                                <p class="text-[11px] font-semibold uppercase text-slate-400">Km Rulli Totali</p>
+                                <h3 class="text-xl font-bold text-cyan-600 mt-1" id="kpi-rulli-tot">0.0 km</h3>
                             </div>
-                            <span class="p-2.5 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-shoe-prints"></i></span>
+                            <span class="p-2 bg-cyan-50 text-cyan-600 rounded-lg"><i class="fa-solid fa-bicycle"></i></span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-2" id="kpi-shoe1-sub">458 / 600 km · Rimanenti</p>
+                        <p class="text-[11px] text-slate-500 mt-2" id="kpi-rulli-sub">Questa sett: 0.0 km</p>
                     </div>
 
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-blue-300 transition" onclick="switchTab('scarpe')">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-emerald-300 transition" onclick="switchTab('scarpe')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-xs font-semibold uppercase text-slate-400" id="kpi-shoe2-name">Adidas Evo SL</p>
-                                <h3 class="text-2xl font-bold text-blue-600 mt-1" id="kpi-shoe2-rem">520 km</h3>
+                                <p class="text-[11px] font-semibold uppercase text-slate-400" id="kpi-shoe1-name">Mizuno Neo Zen</p>
+                                <h3 class="text-xl font-bold text-emerald-600 mt-1" id="kpi-shoe1-rem">142 km</h3>
                             </div>
-                            <span class="p-2.5 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-bolt"></i></span>
+                            <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-shoe-prints"></i></span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-2" id="kpi-shoe2-sub">130 / 650 km · Rimanenti</p>
+                        <p class="text-[11px] text-slate-500 mt-2" id="kpi-shoe1-sub">458 / 600 km · Rimanenti</p>
                     </div>
 
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-blue-300 transition" onclick="switchTab('scarpe')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-xs font-semibold uppercase text-slate-400">Mezza Maratona (Apr '27)</p>
-                                <h3 class="text-2xl font-bold text-indigo-600 mt-1" id="kpi-cd-21k">-- gg</h3>
+                                <p class="text-[11px] font-semibold uppercase text-slate-400" id="kpi-shoe2-name">Adidas Evo SL</p>
+                                <h3 class="text-xl font-bold text-blue-600 mt-1" id="kpi-shoe2-rem">520 km</h3>
                             </div>
-                            <span class="p-2.5 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-flag-checkered"></i></span>
+                            <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-bolt"></i></span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-2" id="kpi-cd-sub">Test 10k tra -- gg (14 Feb)</p>
+                        <p class="text-[11px] text-slate-500 mt-2" id="kpi-shoe2-sub">130 / 650 km · Rimanenti</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-[11px] font-semibold uppercase text-slate-400">Mezza Maratona '27</p>
+                                <h3 class="text-xl font-bold text-indigo-600 mt-1" id="kpi-cd-21k">-- gg</h3>
+                            </div>
+                            <span class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-flag-checkered"></i></span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-2" id="kpi-cd-sub">Test 10k tra -- gg</p>
                     </div>
                 </div>
 
@@ -184,7 +195,7 @@
                     </button>
                 </div>
 
-                <!-- SEMAFORO READINESS + PROSSIMA SEDUTA -->
+                <!-- SEMAFORO READINESS + PROSSIMA SEDUTA (SINCRONIZZATO CON LA DATA ODIERNA) -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex items-center justify-between mb-4">
@@ -224,10 +235,13 @@
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
                         <div>
-                            <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2">
-                                <i class="fa-solid fa-forward text-blue-600"></i> Prossime Sedute Piano
-                            </h3>
-                            <div id="upcoming-list" class="space-y-3"></div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-calendar-day text-blue-600"></i> Prossime Sedute Piano
+                                </h3>
+                                <span class="text-[11px] font-mono text-slate-400" id="upcoming-today-lbl">--</span>
+                            </div>
+                            <div id="upcoming-list" class="space-y-2.5"></div>
                         </div>
                         <button onclick="switchTab('diario')" class="mt-4 w-full text-center text-xs font-semibold text-blue-600 hover:text-blue-800 py-2 border border-blue-200 rounded-lg hover:bg-blue-50 transition">
                             Apri Diario Completo <i class="fa-solid fa-arrow-right ml-1"></i>
@@ -235,21 +249,28 @@
                     </div>
                 </div>
 
-                <!-- RIEPILOGO SETTIMANALE -->
+                <!-- RIEPILOGO SETTIMANALE (CORSA + KM RULLI + TOTALE) -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-900 mb-4">Riepilogo Chilometraggio Settimanale</h3>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <h3 class="font-bold text-slate-900">Riepilogo Chilometraggio Settimanale (Corsa & Rulli)</h3>
+                        <span class="text-xs font-semibold text-cyan-700 bg-cyan-50 border border-cyan-200 px-3 py-1 rounded-full" id="weekly-rulli-badge">
+                            Totale Rulli Accumulati: 0.0 km
+                        </span>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left">
                             <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
                                 <tr>
                                     <th class="p-3">Settimana</th>
                                     <th class="p-3">Fase</th>
-                                    <th class="p-3">Km Previsti</th>
-                                    <th class="p-3">Km Fatti</th>
-                                    <th class="p-3">Avanzamento</th>
+                                    <th class="p-3">Corsa Prev.</th>
+                                    <th class="p-3">Corsa Fatta</th>
+                                    <th class="p-3 text-cyan-700">Km Rulli</th>
+                                    <th class="p-3">Avanzamento Corsa</th>
                                 </tr>
                             </thead>
                             <tbody id="weekly-summary-body" class="divide-y divide-slate-100"></tbody>
+                            <tfoot id="weekly-summary-foot" class="bg-slate-800 text-white font-semibold text-xs"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -264,7 +285,14 @@
                         <button onclick="filterDiario('nov_base')" id="flt-nov_base" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">16–21 Nov (Inizio Base)</button>
                         <button onclick="filterDiario('storico')" id="flt-storico" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">25 Ott – 8 Nov</button>
                     </div>
-                    <p class="text-xs text-slate-500"><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Ogni seduta sincronizzata salva lo stato e aggiorna i km delle scarpe scelte.</p>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200" id="diario-tot-corsa">
+                            Totale Corsa: 0.0 km
+                        </span>
+                        <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200" id="diario-tot-rulli">
+                            <i class="fa-solid fa-bicycle mr-1"></i> Totale Km Rulli: 0.0 km
+                        </span>
+                    </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -274,8 +302,9 @@
                                 <tr>
                                     <th class="p-3.5">Data</th>
                                     <th class="p-3.5">Attività & Dettaglio</th>
-                                    <th class="p-3.5">Km Prev.</th>
-                                    <th class="p-3.5">Km Fatti / Passo</th>
+                                    <th class="p-3.5">Corsa Prev.</th>
+                                    <th class="p-3.5">Corsa Fatta</th>
+                                    <th class="p-3.5 text-cyan-300">Km Rulli</th>
                                     <th class="p-3.5">Scarpe</th>
                                     <th class="p-3.5">Stato</th>
                                     <th class="p-3.5 text-right">Azioni Coach</th>
@@ -384,7 +413,7 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-slate-900 mb-3">Zone Dinamiche (Calibrate su Soglia 187 bpm · 4'23"/km · 360 W)</h3>
+                        <h3 class="font-bold text-slate-900 mb-3" id="zones-table-title">Zone Dinamiche (Calibrate su Soglia Garmin)</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
@@ -445,7 +474,7 @@
         </div>
     </main>
 
-    <!-- MODALE MODIFICA RAPIDA SOGLIA GARMIN (DA PANORAMICA) -->
+    <!-- MODALE MODIFICA RAPIDA SOGLIA GARMIN -->
     <div id="modal-threshold" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Aggiorna Soglia Corrente Garmin</h3>
@@ -555,7 +584,7 @@
         </div>
     </div>
 
-    <!-- MODALE REGISTRA / COMPLETA ALLENAMENTO -->
+    <!-- MODALE REGISTRA / COMPLETA ALLENAMENTO (CORSA + KM RULLI) -->
     <div id="modal-complete" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Registra Seduta Garmin</h3>
@@ -564,24 +593,28 @@
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Km Fatti</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Fatti</label>
                         <input type="number" step="0.01" id="modal-comp-km" class="w-full border border-slate-300 rounded-lg px-3 py-2">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Passo Medio</label>
-                        <input type="text" id="modal-comp-passo" placeholder="es. 5'35&quot;/km" class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                        <label class="block text-xs font-semibold text-cyan-700 mb-1"><i class="fa-solid fa-bicycle mr-1"></i> Km Rulli Fatti</label>
+                        <input type="number" step="0.1" id="modal-comp-rulli" placeholder="es. 24.5" class="w-full border border-cyan-300 bg-cyan-50/40 rounded-lg px-3 py-2 font-mono font-bold">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Passo Medio (Corsa)</label>
+                        <input type="text" id="modal-comp-passo" placeholder="es. 5'35&quot;/km" class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                    </div>
+                    <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">FC Media (bpm)</label>
                         <input type="number" id="modal-comp-fc" placeholder="es. 138" class="w-full border border-slate-300 rounded-lg px-3 py-2">
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Usate</label>
-                        <select id="modal-comp-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                        </select>
-                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Usate (solo per corsa)</label>
+                    <select id="modal-comp-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                    </select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Note & Sensazioni (Schiena / Polpaccio)</label>
@@ -590,7 +623,7 @@
             </div>
             <div class="flex justify-end gap-2 mt-6">
                 <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
-                <button onclick="saveCompletedWorkout()" class="px-4 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">Salva & Aggiorna Scarpe</button>
+                <button onclick="saveCompletedWorkout()" class="px-4 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">Salva Seduta</button>
             </div>
         </div>
     </div>
@@ -673,7 +706,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Km Previsti</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Previsti</label>
                         <input type="number" step="0.5" id="new-w-km" value="10" class="w-full border border-slate-300 rounded-lg px-3 py-2">
                     </div>
                     <div>
@@ -898,24 +931,24 @@
                 { nome: "Mezza Maratona Obiettivo", data: "2027-04-18", distanza: "21.1 km", tipo: "Gara Principale" }
             ],
             allenamenti_settimana: [
-                { data: "2026-10-25", giorno: "Dom", tipo: "GARA", dettaglio: "Mezza maratona Ortona-Fossacesia Marina, 1h41'38\"", km_previsti: 21.1, km_fatti: 21.21, passo: "4'48\"/km", scarpa: "Adidas Evo SL", stato: "completato", note: "Già fatto" },
-                { data: "2026-10-29", giorno: "Gio", tipo: "Corsa facile", dettaglio: "5 km facili (primo allenamento dopo la gara)", km_previsti: 5.0, km_fatti: 5.0, passo: "5'33\"/km", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Riferimento iniziale scarpe" },
-                { data: "2026-11-02", giorno: "Lun", tipo: "Rulli", dettaglio: "30' Z1 (105-124 bpm)", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "completato", note: "Fatto: 30' rulli" },
-                { data: "2026-11-03", giorno: "Mar", tipo: "Corsa facile", dettaglio: "8 km facili", km_previsti: 8.0, km_fatti: 8.0, passo: "-", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Fatto" },
-                { data: "2026-11-04", giorno: "Mer-Dom", tipo: "Stop / Recupero", dettaglio: "Fermo 4–8 Nov sostituito dal rientro del 9/11", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "saltato", note: "Non recuperare i km saltati" },
-                { data: "2026-11-09", giorno: "Lun", tipo: "Corsa facile", dettaglio: "Corsa facile 125-145 bpm + 800m camminata", km_previsti: 10.0, km_fatti: 10.0, passo: "5'42\"/km", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Ascesa 105m" },
-                { data: "2026-11-10", giorno: "Mar", tipo: "Riposo", dettaglio: "Riposo totale", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "completato", note: "" },
-                { data: "2026-11-11", giorno: "Mer", tipo: "Rulli + Core leggero", dettaglio: "Rulli Z1-Z2 40' (105-145 bpm) + 10' core leggero", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-12", giorno: "Gio", tipo: "Corsa facile", dettaglio: "8 km facili a 125-145 bpm", km_previsti: 8.0, km_fatti: null, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
-                { data: "2026-11-13", giorno: "Ven", tipo: "Riposo + Core leggero", dettaglio: "20' core leggero e mobilità (solo se schiena OK)", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-14", giorno: "Sab", tipo: "Corsa facile", dettaglio: "10 km facili a 125-145 bpm, senza guardare il passo", km_previsti: 10.0, km_fatti: null, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
-                { data: "2026-11-15", giorno: "Dom", tipo: "Rulli", dettaglio: "Z1-Z2 60' (fino a 90' se stai bene)", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-16", giorno: "Lun", tipo: "Forza A + Rulli", dettaglio: "Forza A gambe e core (30-35', 2 serie) + Rulli Z1 20-30'", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "Settimana 1 Forza" },
-                { data: "2026-11-17", giorno: "Mar", tipo: "Corsa facile", dettaglio: "8 km facili a 125-145 bpm", km_previsti: 8.0, km_fatti: null, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
-                { data: "2026-11-18", giorno: "Mer", tipo: "Rulli", dettaglio: "Z2 40' (125-145 bpm), recupero attivo", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-19", giorno: "Gio", tipo: "Corsa facile + Allunghi", dettaglio: "9 km a 125-145 bpm + 4-5 allunghi da 80m negli ultimi 2 km", km_previsti: 9.0, km_fatti: null, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
-                { data: "2026-11-20", giorno: "Ven", tipo: "Forza B", dettaglio: "Forza B stabilità e core (30') — niente carichi pesanti", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-21", giorno: "Sab", tipo: "Lungo facile", dettaglio: "12 km facili a 125-145 bpm, passo regolare (primo lungo base)", km_previsti: 12.0, km_fatti: null, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" }
+                { data: "2026-10-25", giorno: "Dom", tipo: "GARA", dettaglio: "Mezza maratona Ortona-Fossacesia Marina, 1h41'38\"", km_previsti: 21.1, km_fatti: 21.21, km_rulli: 0, passo: "4'48\"/km", scarpa: "Adidas Evo SL", stato: "completato", note: "Già fatto" },
+                { data: "2026-10-29", giorno: "Gio", tipo: "Corsa facile", dettaglio: "5 km facili (primo allenamento dopo la gara)", km_previsti: 5.0, km_fatti: 5.0, km_rulli: 0, passo: "5'33\"/km", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Riferimento iniziale scarpe" },
+                { data: "2026-11-02", giorno: "Lun", tipo: "Rulli", dettaglio: "30' Z1 (105-124 bpm)", km_previsti: 0, km_fatti: 0, km_rulli: null, passo: "-", scarpa: "-", stato: "completato", note: "Fatto: 30' rulli (inserisci i km se vuoi)" },
+                { data: "2026-11-03", giorno: "Mar", tipo: "Corsa facile", dettaglio: "8 km facili", km_previsti: 8.0, km_fatti: 8.0, km_rulli: 0, passo: "-", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Fatto" },
+                { data: "2026-11-04", giorno: "Mer-Dom", tipo: "Stop / Recupero", dettaglio: "Fermo 4–8 Nov sostituito dal rientro del 9/11", km_previsti: 0, km_fatti: 0, km_rulli: 0, passo: "-", scarpa: "-", stato: "saltato", note: "Non recuperare i km saltati" },
+                { data: "2026-11-09", giorno: "Lun", tipo: "Corsa facile", dettaglio: "Corsa facile 125-145 bpm + 800m camminata", km_previsti: 10.0, km_fatti: 10.0, km_rulli: 0, passo: "5'42\"/km", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Ascesa 105m" },
+                { data: "2026-11-10", giorno: "Mar", tipo: "Riposo", dettaglio: "Riposo totale", km_previsti: 0, km_fatti: 0, km_rulli: 0, passo: "-", scarpa: "-", stato: "completato", note: "" },
+                { data: "2026-11-11", giorno: "Mer", tipo: "Rulli + Core leggero", dettaglio: "Rulli Z1-Z2 40' (105-145 bpm) + 10' core leggero", km_previsti: 0, km_fatti: 0, km_rulli: null, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
+                { data: "2026-11-12", giorno: "Gio", tipo: "Corsa facile", dettaglio: "8 km facili a 125-145 bpm", km_previsti: 8.0, km_fatti: null, km_rulli: 0, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
+                { data: "2026-11-13", giorno: "Ven", tipo: "Riposo + Core leggero", dettaglio: "20' core leggero e mobilità (solo se schiena OK)", km_previsti: 0, km_fatti: 0, km_rulli: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
+                { data: "2026-11-14", giorno: "Sab", tipo: "Corsa facile", dettaglio: "10 km facili a 125-145 bpm, senza guardare il passo", km_previsti: 10.0, km_fatti: null, km_rulli: 0, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
+                { data: "2026-11-15", giorno: "Dom", tipo: "Rulli", dettaglio: "Z1-Z2 60' (fino a 90' se stai bene)", km_previsti: 0, km_fatti: 0, km_rulli: null, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
+                { data: "2026-11-16", giorno: "Lun", tipo: "Forza A + Rulli", dettaglio: "Forza A gambe e core (30-35', 2 serie) + Rulli Z1 20-30'", km_previsti: 0, km_fatti: 0, km_rulli: null, passo: "-", scarpa: "-", stato: "da_fare", note: "Settimana 1 Forza" },
+                { data: "2026-11-17", giorno: "Mar", tipo: "Corsa facile", dettaglio: "8 km facili a 125-145 bpm", km_previsti: 8.0, km_fatti: null, km_rulli: 0, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
+                { data: "2026-11-18", giorno: "Mer", tipo: "Rulli", dettaglio: "Z2 40' (125-145 bpm), recupero attivo", km_previsti: 0, km_fatti: 0, km_rulli: null, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
+                { data: "2026-11-19", giorno: "Gio", tipo: "Corsa facile + Allunghi", dettaglio: "9 km a 125-145 bpm + 4-5 allunghi da 80m negli ultimi 2 km", km_previsti: 9.0, km_fatti: null, km_rulli: 0, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
+                { data: "2026-11-20", giorno: "Ven", tipo: "Forza B", dettaglio: "Forza B stabilità e core (30') — niente carichi pesanti", km_previsti: 0, km_fatti: 0, km_rulli: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
+                { data: "2026-11-21", giorno: "Sab", tipo: "Lungo facile", dettaglio: "12 km facili a 125-145 bpm, passo regolare (primo lungo base)", km_previsti: 12.0, km_fatti: null, km_rulli: 0, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" }
             ],
             forza: [
                 {
@@ -973,6 +1006,20 @@
 
         let db = null;
 
+        function getLocalTodayISO() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function addDaysISO(isoStr, days) {
+            const [y, m, d] = isoStr.split('-').map(Number);
+            const dt = new Date(y, m - 1, d + days);
+            return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+        }
+
         function normalizeDb(raw) {
             const merged = structuredClone(DEFAULT_DB);
             if (!raw || typeof raw !== 'object') return merged;
@@ -988,7 +1035,12 @@
             }
             if (raw.pb) merged.pb = { ...merged.pb, ...raw.pb };
             if (Array.isArray(raw.gare) && raw.gare.length) merged.gare = raw.gare;
-            if (Array.isArray(raw.allenamenti_settimana) && raw.allenamenti_settimana.length) merged.allenamenti_settimana = raw.allenamenti_settimana;
+            if (Array.isArray(raw.allenamenti_settimana) && raw.allenamenti_settimana.length) {
+                merged.allenamenti_settimana = raw.allenamenti_settimana.map(item => ({
+                    km_rulli: null,
+                    ...item
+                }));
+            }
             if (Array.isArray(raw.regole) && raw.regole.length) merged.regole = raw.regole;
 
             if (Array.isArray(raw.scarpe) && raw.scarpe.length) {
@@ -1117,7 +1169,7 @@
 
             const titles = {
                 panoramica: ["Panoramica & Readiness", "Monitoraggio condizione, soglia Garmin e prevenzione infortuni"],
-                diario: ["Diario & Coach Dinamico", "Piano giornaliero fino al 21 Novembre e rimodulazione automatica"],
+                diario: ["Diario & Coach Dinamico", "Piano giornaliero, Km Rulli e rimodulazione automatica"],
                 gare: ["Gare, Soglia & Zone Ritmo", "Soglia Garmin (FC/Passo/Watt), obiettivi 10k e Mezza Maratona"],
                 forza: ["Forza Gambe & Upper Body", "Schede progressive con illustrazioni esercizi e tracciamento carichi"],
                 scarpe: ["Parco Scarpe & Regole", "Gestione libera km percorsi/rimanenti e protocollo sicurezza"]
@@ -1131,6 +1183,28 @@
             }
         }
 
+        function updateTotalsUI() {
+            const totRulli = db.allenamenti_settimana.reduce((sum, a) => sum + (Number(a.km_rulli) || 0), 0);
+            const totCorsa = db.allenamenti_settimana.reduce((sum, a) => sum + (Number(a.km_fatti) || 0), 0);
+
+            const settBase = db.allenamenti_settimana.filter(a => a.data >= "2026-11-16" && a.data <= "2026-11-22");
+            const kmPrevBase = settBase.reduce((s, a) => s + (Number(a.km_previsti) || 0), 0);
+            const kmFattiBase = settBase.reduce((s, a) => s + (Number(a.km_fatti) || 0), 0);
+            const rulliSettBase = settBase.reduce((s, a) => s + (Number(a.km_rulli) || 0), 0);
+
+            document.getElementById('kpi-km-sett').textContent = `${kmFattiBase} / ${kmPrevBase} km`;
+            document.getElementById('kpi-rulli-tot').textContent = `${totRulli.toFixed(1)} km`;
+            document.getElementById('kpi-rulli-sub').textContent = `Sett. corrente: ${rulliSettBase.toFixed(1)} km`;
+
+            const weeklyBadge = document.getElementById('weekly-rulli-badge');
+            if (weeklyBadge) weeklyBadge.textContent = `Totale Rulli Accumulati: ${totRulli.toFixed(1)} km`;
+
+            const dCorsa = document.getElementById('diario-tot-corsa');
+            const dRulli = document.getElementById('diario-tot-rulli');
+            if (dCorsa) dCorsa.textContent = `Totale Corsa: ${totCorsa.toFixed(1)} km`;
+            if (dRulli) dRulli.innerHTML = `<i class="fa-solid fa-bicycle mr-1"></i> Totale Km Rulli: ${totRulli.toFixed(1)} km`;
+        }
+
         function renderAll() {
             const bmi = (db.atleta.peso_kg / Math.pow(db.atleta.altezza_cm / 100, 2)).toFixed(2);
             db.atleta.bmi = parseFloat(bmi);
@@ -1140,10 +1214,8 @@
             document.getElementById('lbl-base-fc').textContent = db.atleta.fc_riposo || 60;
             document.getElementById('nutr-weight-lbl').textContent = db.atleta.peso_kg;
 
-            // Soglia Panoramica & Tab Gare
             renderThresholdDisplays();
 
-            // KPI Scarpe
             if (db.scarpe[0]) {
                 const s1 = db.scarpe[0];
                 const rem1 = Math.max(0, +(s1.vita_utile - s1.km_percorsi).toFixed(1));
@@ -1163,13 +1235,9 @@
             const d10k = Math.max(0, Math.ceil((new Date("2027-02-14") - today) / (1000 * 60 * 60 * 24)));
             const d21k = Math.max(0, Math.ceil((new Date("2027-04-18") - today) / (1000 * 60 * 60 * 24)));
             document.getElementById('kpi-cd-21k').textContent = `${d21k} gg`;
-            document.getElementById('kpi-cd-sub').textContent = `Test 10k tra ${d10k} gg (14 Feb)`;
+            document.getElementById('kpi-cd-sub').textContent = `Test 10k tra ${d10k} gg`;
 
-            const settBase = db.allenamenti_settimana.filter(a => a.data >= "2026-11-16" && a.data <= "2026-11-22");
-            const kmPrevBase = settBase.reduce((s, a) => s + (a.km_previsti || 0), 0);
-            const kmFattiBase = settBase.reduce((s, a) => s + (a.km_fatti || 0), 0);
-            document.getElementById('kpi-km-sett').textContent = `${kmFattiBase} / ${kmPrevBase} km`;
-
+            updateTotalsUI();
             updateReadiness(false);
             renderUpcoming();
             renderWeeklySummary();
@@ -1221,7 +1289,7 @@
         function archiveThresholdSnapshot() {
             db.soglia.storico = db.soglia.storico || [];
             db.soglia.storico.unshift({
-                data: db.soglia.data_rilevamento || new Date().toISOString().slice(0, 10),
+                data: db.soglia.data_rilevamento || getLocalTodayISO(),
                 fc_bpm: db.soglia.fc_bpm,
                 passo: db.soglia.passo,
                 potenza_w: db.soglia.potenza_w,
@@ -1294,22 +1362,58 @@
             }
         }
 
+        // SINCRONIZZATO CON IL GIORNO ODIERNO (OGGI, DOMANI, TRA 2 GIORNI)
         function renderUpcoming() {
-            const next = db.allenamenti_settimana.filter(a => a.stato === 'da_fare').slice(0, 3);
+            const oggiIso = getLocalTodayISO();
+            const domaniIso = addDaysISO(oggiIso, 1);
+            const dopoDomaniIso = addDaysISO(oggiIso, 2);
+
+            document.getElementById('upcoming-today-lbl').textContent = `Oggi: ${oggiIso}`;
+
+            // Prende esattamente le sedute di oggi, domani e fra 2 giorni
+            const windowItems = db.allenamenti_settimana
+                .map((a, idx) => ({ ...a, idx }))
+                .filter(a => a.data >= oggiIso && a.data <= dopoDomaniIso);
+
             const container = document.getElementById('upcoming-list');
-            if (!next.length) {
-                container.innerHTML = `<p class="text-xs text-slate-400">Tutte le sedute in programma sono completate!</p>`;
+            if (!windowItems.length) {
+                container.innerHTML = `<p class="text-xs text-slate-400">Nessuna seduta programmata per oggi (${oggiIso}) e i prossimi 2 giorni. Aggiungi il blocco successivo dal pulsante "+ Nuova Seduta".</p>`;
                 return;
             }
-            container.innerHTML = next.map(a => `
-                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
-                    <div>
-                        <div class="text-xs font-mono text-slate-400">${a.data} (${a.giorno})</div>
-                        <div class="font-semibold text-sm text-slate-800">${a.tipo}</div>
+
+            container.innerHTML = windowItems.map(a => {
+                let dayTag = `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-700">TRA 2 GIORNI</span>`;
+                let cardStyle = "bg-slate-50 border-slate-200";
+                if (a.data === oggiIso) {
+                    dayTag = `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-blue-600 text-white">OGGI</span>`;
+                    cardStyle = "bg-blue-50/70 border-blue-300 ring-1 ring-blue-200";
+                } else if (a.data === domaniIso) {
+                    dayTag = `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-100 text-indigo-700">DOMANI</span>`;
+                }
+
+                const statusIcon = a.stato === 'completato'
+                    ? `<i class="fa-solid fa-circle-check text-emerald-600 ml-1" title="Completato"></i>`
+                    : (a.stato === 'saltato' ? `<i class="fa-solid fa-circle-xmark text-rose-500 ml-1" title="Saltato"></i>` : '');
+
+                const targetBadge = a.km_previsti > 0
+                    ? `${a.km_previsti} km`
+                    : (Number(a.km_rulli) > 0 ? `${a.km_rulli} km rulli` : 'Cross/Forza');
+
+                return `
+                    <div onclick="openCompleteModal(${a.idx})" class="p-3 rounded-lg border ${cardStyle} flex justify-between items-center cursor-pointer hover:shadow-xs transition" title="Clicca per registrare i dati di questa seduta">
+                        <div class="min-w-0 pr-2">
+                            <div class="flex items-center gap-1.5 mb-0.5">
+                                ${dayTag}
+                                <span class="text-[11px] font-mono text-slate-500">${a.data} (${a.giorno})</span>
+                                ${statusIcon}
+                            </div>
+                            <div class="font-bold text-sm text-slate-900 truncate">${a.tipo}</div>
+                            <div class="text-[11px] text-slate-500 truncate">${a.dettaglio || ''}</div>
+                        </div>
+                        <span class="shrink-0 text-xs font-bold px-2.5 py-1 rounded bg-white border border-slate-200 text-blue-700">${targetBadge}</span>
                     </div>
-                    <span class="text-xs font-bold px-2.5 py-1 rounded bg-blue-100 text-blue-700">${a.km_previsti > 0 ? a.km_previsti + ' km' : 'Cross/Forza'}</span>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function renderWeeklySummary() {
@@ -1319,10 +1423,17 @@
                 { label: "9 Nov – 15 Nov", fase: "Settimana Rientro", da: "2026-11-09", a: "2026-11-15" },
                 { label: "16 Nov – 22 Nov", fase: "Inizio Base", da: "2026-11-16", a: "2026-11-22" }
             ];
+
+            let grandPrev = 0, grandFatti = 0, grandRulli = 0;
+
             document.getElementById('weekly-summary-body').innerHTML = weeks.map(w => {
                 const items = db.allenamenti_settimana.filter(x => x.data >= w.da && x.data <= w.a);
-                const prev = items.reduce((s, x) => s + (x.km_previsti || 0), 0);
-                const fatti = items.reduce((s, x) => s + (x.km_fatti || 0), 0);
+                const prev = items.reduce((s, x) => s + (Number(x.km_previsti) || 0), 0);
+                const fatti = items.reduce((s, x) => s + (Number(x.km_fatti) || 0), 0);
+                const rulli = items.reduce((s, x) => s + (Number(x.km_rulli) || 0), 0);
+                grandPrev += prev;
+                grandFatti += fatti;
+                grandRulli += rulli;
                 const pct = prev > 0 ? Math.min(100, Math.round((fatti / prev) * 100)) : 100;
                 return `
                     <tr>
@@ -1330,6 +1441,7 @@
                         <td class="p-3 text-slate-500">${w.fase}</td>
                         <td class="p-3 font-mono">${prev.toFixed(1)} km</td>
                         <td class="p-3 font-mono font-bold text-blue-600">${fatti.toFixed(1)} km</td>
+                        <td class="p-3 font-mono font-bold text-cyan-700">${rulli.toFixed(1)} km</td>
                         <td class="p-3 w-40">
                             <div class="w-full bg-slate-200 rounded-full h-2">
                                 <div class="bg-blue-600 h-2 rounded-full" style="width:${pct}%"></div>
@@ -1338,6 +1450,21 @@
                     </tr>
                 `;
             }).join('');
+
+            // Include anche eventuali sedute fuori dalle 4 settimane base nel totale generale
+            const allPrev = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_previsti) || 0), 0);
+            const allFatti = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_fatti) || 0), 0);
+            const allRulli = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_rulli) || 0), 0);
+
+            document.getElementById('weekly-summary-foot').innerHTML = `
+                <tr>
+                    <td class="p-3 rounded-bl-lg" colspan="2">TOTALE GENERALE DIARIO</td>
+                    <td class="p-3 font-mono">${allPrev.toFixed(1)} km</td>
+                    <td class="p-3 font-mono text-blue-300">${allFatti.toFixed(1)} km</td>
+                    <td class="p-3 font-mono text-cyan-300">${allRulli.toFixed(1)} km</td>
+                    <td class="p-3 rounded-br-lg text-slate-300">Corsa + Rulli: ${(allFatti + allRulli).toFixed(1)} km</td>
+                </tr>
+            `;
         }
 
         function filterDiario(f) {
@@ -1346,8 +1473,21 @@
             renderDiario();
         }
 
+        function updateRulliKm(idx, rawVal) {
+            const val = rawVal === '' ? null : parseFloat(rawVal);
+            db.allenamenti_settimana[idx].km_rulli = isNaN(val) ? null : val;
+            if (val && val > 0 && db.allenamenti_settimana[idx].stato === 'da_fare') {
+                db.allenamenti_settimana[idx].stato = 'completato';
+            }
+            saveLocal();
+            updateTotalsUI();
+            renderWeeklySummary();
+            renderUpcoming();
+        }
+
         function renderDiario() {
             const currentFilter = db.ui.diarioFilter || 'all';
+            const oggiIso = getLocalTodayISO();
             ['all', 'nov_rientro', 'nov_base', 'storico'].forEach(key => {
                 const btn = document.getElementById('flt-' + key);
                 if (!btn) return;
@@ -1369,10 +1509,17 @@
                 if (a.stato === 'completato') badge = `<span class="px-2 py-1 rounded text-xs font-semibold bg-emerald-100 text-emerald-800">FATTO</span>`;
                 if (a.stato === 'saltato') badge = `<span class="px-2 py-1 rounded text-xs font-semibold bg-rose-100 text-rose-800">SALTATO</span>`;
 
+                const isToday = a.data === oggiIso;
+                const rulliVal = (a.km_rulli !== null && a.km_rulli !== undefined && a.km_rulli !== 0) ? a.km_rulli : '';
+                const isRulliRow = a.tipo.toLowerCase().includes('rulli');
+
                 return `
-                    <tr class="hover:bg-slate-50 transition">
+                    <tr class="${isToday ? 'bg-blue-50/60' : 'hover:bg-slate-50'} transition">
                         <td class="p-3.5 font-mono text-xs whitespace-nowrap">
-                            <div class="font-bold text-slate-800">${a.data}</div>
+                            <div class="font-bold text-slate-800 flex items-center gap-1.5">
+                                ${a.data}
+                                ${isToday ? '<span class="px-1.5 py-0.5 text-[9px] bg-blue-600 text-white rounded font-sans">OGGI</span>' : ''}
+                            </div>
                             <div class="text-slate-400">${a.giorno || ''}</div>
                         </td>
                         <td class="p-3.5">
@@ -1382,8 +1529,14 @@
                         </td>
                         <td class="p-3.5 font-mono font-semibold">${a.km_previsti > 0 ? a.km_previsti + ' km' : '-'}</td>
                         <td class="p-3.5 font-mono text-xs">
-                            ${a.km_fatti !== null && a.km_fatti !== undefined ? `<strong>${a.km_fatti} km</strong>` : '<span class="text-slate-400">--</span>'}
+                            ${a.km_fatti !== null && a.km_fatti !== undefined && a.km_fatti > 0 ? `<strong>${a.km_fatti} km</strong>` : '<span class="text-slate-400">--</span>'}
                             ${a.passo && a.passo !== '-' ? `<div class="text-slate-500">${a.passo}</div>` : ''}
+                        </td>
+                        <td class="p-3.5 whitespace-nowrap">
+                            <div class="flex items-center gap-1">
+                                <input type="number" step="0.1" value="${rulliVal}" oninput="updateRulliKm(${a.idx}, this.value)" placeholder="${isRulliRow ? 'km' : '-'}" class="w-16 text-xs font-mono font-bold text-right border ${isRulliRow ? 'border-cyan-300 bg-cyan-50/50 text-cyan-900' : 'border-slate-200 bg-white text-slate-700'} rounded px-2 py-1 focus:outline-none focus:border-cyan-500">
+                                <span class="text-[11px] text-slate-400">km</span>
+                            </div>
                         </td>
                         <td class="p-3.5 text-xs font-medium">${a.scarpa || '-'}</td>
                         <td class="p-3.5">${badge}</td>
@@ -1456,11 +1609,13 @@
                 <strong>Indice di Resistenza (Passo 21k / Passo 10k): ${ratio}</strong> (Passo 10k: ${secToPace(pace10)} vs Passo 21k: ${secToPace(pace21)}).<br>${profileMsg}
             `;
 
-            // Calcolo Zone su Soglia Corrente Garmin (LTHR 187 bpm, Passo 4'23"/km, Potenza 360 W)
             const s = db.soglia || DEFAULT_DB.soglia;
             const lthr = Number(s.fc_bpm) || 187;
             const ltSec = timeToSec(s.passo || "4:23");
             const ltW = Number(s.potenza_w) || 360;
+
+            const titleEl = document.getElementById('zones-table-title');
+            if (titleEl) titleEl.textContent = `Zone Dinamiche (Calibrate su Soglia ${lthr} bpm · ${s.passo}/km · ${ltW} W)`;
 
             const zones = [
                 {
@@ -1733,6 +1888,7 @@
             document.getElementById('modal-comp-idx').value = idx;
             document.getElementById('modal-comp-subtitle').textContent = `${a.data} — ${a.tipo}`;
             document.getElementById('modal-comp-km').value = a.km_fatti ?? a.km_previsti;
+            document.getElementById('modal-comp-rulli').value = a.km_rulli ?? "";
             document.getElementById('modal-comp-passo').value = a.passo || "";
             document.getElementById('modal-comp-fc').value = "";
             populateShoeSelect('modal-comp-scarpa', a.scarpa);
@@ -1744,6 +1900,8 @@
         function saveCompletedWorkout() {
             const idx = parseInt(document.getElementById('modal-comp-idx').value);
             const km = parseFloat(document.getElementById('modal-comp-km').value) || 0;
+            const rulliRaw = document.getElementById('modal-comp-rulli').value;
+            const kmRulli = rulliRaw === '' ? 0 : (parseFloat(rulliRaw) || 0);
             const passo = document.getElementById('modal-comp-passo').value;
             const fc = document.getElementById('modal-comp-fc').value;
             const scarpa = document.getElementById('modal-comp-scarpa').value;
@@ -1763,6 +1921,7 @@
             }
 
             oldItem.km_fatti = km;
+            oldItem.km_rulli = kmRulli;
             oldItem.passo = passo || "-";
             oldItem.scarpa = scarpa;
             oldItem.stato = 'completato';
@@ -1787,6 +1946,7 @@
             const item = db.allenamenti_settimana[idx];
             item.stato = 'saltato';
             item.km_fatti = 0;
+            item.km_rulli = 0;
 
             const labels = {
                 imprevisto: "Saltato per imprevisto. Km non recuperati.",
@@ -1845,7 +2005,7 @@
 
             db.allenamenti_settimana.push({
                 data, giorno: gName, tipo, dettaglio,
-                km_previsti: km, km_fatti: null, passo: "", scarpa, stato: "da_fare", note: ""
+                km_previsti: km, km_fatti: null, km_rulli: null, passo: "", scarpa, stato: "da_fare", note: ""
             });
             db.allenamenti_settimana.sort((a, b) => a.data.localeCompare(b.data));
             saveLocal();
