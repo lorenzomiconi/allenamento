@@ -270,12 +270,14 @@
                 <!-- TAB 2: DIARIO -->
                 <div id="tab-diario" class="hidden space-y-6">
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="filterDiario('all')" id="flt-all" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white">Tutte le date</button>
-                            <button onclick="filterDiario('nov_rientro')" id="flt-nov_rientro" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">9–15 Nov (Rientro)</button>
-                            <button onclick="filterDiario('nov_base')" id="flt-nov_base" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">16–21 Nov (Inizio Base)</button>
-                            <button onclick="filterDiario('storico')" id="flt-storico" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">25 Ott – 8 Nov</button>
-                        </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                         <label class="text-xs font-semibold text-slate-500 whitespace-nowrap"><i class="fa-solid fa-calendar-days mr-1"></i> Mostra settimana:</label>
+                         <select id="diario-week-select" onchange="filterDiario(this.value)" class="w-full sm:w-auto border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                             <option value="all">Tutte le date (Piano Completo)</option>
+                             <option value="current">Settimana Corrente (Oggi)</option>
+                             <!-- Le settimane verranno generate in automatico qui dal JavaScript -->
+                         </select>
+                     </div>
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200" id="diario-tot-corsa">Totale Corsa: 0.0 km</span>
                             <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200" id="diario-tot-rulli"><i class="fa-solid fa-bicycle mr-1"></i> Totale Km Rulli: 0.0 km</span>
