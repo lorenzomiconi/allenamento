@@ -2,8 +2,8 @@ name: Sincronizzazione Serale Garmin
 
 on:
   schedule:
-    - cron: '0 21 * * *' # 22:00 ora italiana
-  workflow_dispatch: # Permette il lancio manuale dal sito
+    - cron: '0 21 * * *'
+  workflow_dispatch:
 
 jobs:
   aggiorna-dati:
@@ -18,18 +18,12 @@ jobs:
           python-version: '3.10'
 
       - name: Installa librerie
-        run: pip install garminconnect python-dotenv
+        run: pip install garminconnect firebase-admin
 
-      - name: Esegui Script del Coach
+      - name: Esegui Script del Coach su Firebase
         env:
           GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+          FIREBASE_USER_UID: ${{ secrets.FIREBASE_USER_UID }}
         run: python script_motore.py
-
-      - name: Salva e aggiorna Dashboard
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "RunCoach Bot"
-          git add dati.json
-          git commit -m "Aggiornamento automatico Garmin e usura scarpe" || echo "Nessun cambiamento"
-          git push
