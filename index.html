@@ -1052,28 +1052,78 @@
             document.getElementById('weekly-summary-foot').innerHTML = `<tr><td class="p-3 rounded-bl-lg" colspan="2">TOTALE GENERALE DIARIO</td><td class="p-3 font-mono">${allPrev.toFixed(1)} km</td><td class="p-3 font-mono text-blue-300">${allFatti.toFixed(1)} km</td><td class="p-3 font-mono text-cyan-300">${allRulli.toFixed(1)} km</td><td class="p-3 rounded-br-lg text-slate-300">Corsa + Rulli: ${(allFatti + allRulli).toFixed(1)} km</td></tr>`;
         }
 
-        function filterDiario(f) { db.ui.diarioFilter = f; saveLocal(); renderDiario(); }
+function getWeekBoundaries(dateStr) {
+            const d = new Date(dateStr);
+            const day = d.getDay() === 0 ? 7 : d.getDay(); // Domenica = 7
+            const start = new Date(d);
+            start.setDate(d.getDate() - day + 1); // Lunedì
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6); // Domenica
+            return {
+                startIso: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`,
+                endIso: `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`,
+                label: `${start.getDate()} ${start.toLocaleString('it-IT', {month:'short'})} – ${end.getDate()} ${end.toLocaleString('it-IT', {month:'short'})}`
+            };
+        }
 
-        function updateRulliKm(idx, rawVal) {
-            const val = rawVal === '' ? null : parseFloat(rawVal);
-            db.allenamenti_settimana[idx].km_rulli = isNaN(val) ? null : val;
-            if (val && val > 0 && db.allenamenti_settimana[idx].stato === 'da_fare') db.allenamenti_settimana[idx].stato = 'completato';
-            saveLocal(); updateTotalsUI(); renderWeeklySummary(); renderUpcoming();
+        function filterDiario(f) {
+            db.ui.diarioFilter = f;
+            saveLocal();
+            renderDiario();
         }
 
         function renderDiario() {
-            const currentFilter = db.ui.diarioFilter || 'all'; const oggiIso = getLocalTodayISO();
-            ['all', 'nov_rientro', 'nov_base', 'storico'].forEach(key => {
-                const btn = document.getElementById('flt-' + key);
-                if (btn) btn.className = key === currentFilter ? "filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white" : "filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200";
-            });
+            const currentFilter = db.ui.diarioFilter || 'current';
+            const oggiIso = getLocalTodayISO();
+            const thisWeek = getWeekBoundaries(oggiIso);
+            
+            // Popola il selettore (tendina)
+            const selectEl = document.getElementById('diario-week-select');
+            if (selectEl && db.allenamenti_settimana.length > 0) {
+                // Troviamo tutte le settimane uniche presenti nel database
+                const weekMap = new Map();
+                db.allenamenti_settimana.forEach(a => {
+                    if(!a.data) return;
+                    const w = getWeekBoundaries(a.data);
+                    const key = `${w.startIso}_${w.endIso}`;
+                    if(!weekMap.has(key)) weekMap.set(key, w);
+                });
+                
+                // Creiamo le opzioni in ordine decrescente (le più recenti in alto)
+                const sortedWeeks = Array.from(weekMap.values()).sort((a,b) => b.startIso.localeCompare(a.startIso));
+                let optsHTML = `<option value="all">Tutte le date (Piano Completo)</option><option value="current">Settimana Corrente (Oggi)</option>`;
+                sortedWeeks.forEach(w => {
+                    const isFuture = w.startIso > oggiIso;
+                    const tag = isFuture ? ' (Futura)' : '';
+                    optsHTML += `<option value="${w.startIso}_${w.endIso}">Sett: ${w.label}${tag}</option>`;
+                });
+                
+                // Solo se il valore è cambiato rispetto a quello attuale, lo aggiorniamo
+                if (selectEl.innerHTML !== optsHTML) {
+                    selectEl.innerHTML = optsHTML;
+                }
+                
+                // Reimposta il valore selezionato
+                if (currentFilter === 'current') {
+                    selectEl.value = 'current';
+                } else if ([...selectEl.options].some(o => o.value === currentFilter)) {
+                    selectEl.value = currentFilter;
+                } else {
+                    selectEl.value = 'all';
+                }
+            }
 
             const tbody = document.getElementById('diario-tbody');
+            
+            // Filtra le righe da mostrare
             const rows = db.allenamenti_settimana.map((a, idx) => ({ ...a, idx })).filter(a => {
-                if (currentFilter === 'nov_rientro') return a.data >= '2026-11-09' && a.data <= '2026-11-15';
-                if (currentFilter === 'nov_base') return a.data >= '2026-11-16' && a.data <= '2026-11-22';
-                if (currentFilter === 'storico') return a.data <= '2026-11-08';
-                return true;
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'current') {
+                    return a.data >= thisWeek.startIso && a.data <= thisWeek.endIso;
+                }
+                // Filtro per settimana specifica scelta dalla tendina (es "2026-11-23_2026-11-29")
+                const [start, end] = currentFilter.split('_');
+                return a.data >= start && a.data <= end;
             });
 
             if (!rows.length) { tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-sm text-slate-400">Nessuna seduta presente.</td></tr>`; return; }
