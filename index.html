@@ -50,7 +50,7 @@
                     <i class="fa-solid fa-calendar-check w-5"></i> Diario & Coach Dinamico
                 </button>
                 <button onclick="switchTab('gare')" id="btn-gare" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
-                    <i class="fa-solid fa-trophy w-5"></i> Gare, PB & Zone Ritmo
+                    <i class="fa-solid fa-trophy w-5"></i> Gare, Soglia & Zone
                 </button>
                 <button onclick="switchTab('forza')" id="btn-forza" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
                     <i class="fa-solid fa-dumbbell w-5"></i> Forza Gambe & Upper
@@ -143,6 +143,45 @@
                         </div>
                         <p class="text-xs text-slate-500 mt-2" id="kpi-cd-sub">Test 10k tra -- gg (14 Feb)</p>
                     </div>
+                </div>
+
+                <!-- FASCIA SOGLIA CORRENTE GARMIN -->
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-5 rounded-xl shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl shrink-0">
+                            <i class="fa-solid fa-fire-flame-curved"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-base">Soglia Anaerobica Corrente (Garmin)</h3>
+                                <span class="text-[11px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-mono" id="pan-soglia-date">Agg. 2026-11-18</span>
+                            </div>
+                            <p class="text-xs text-slate-400">Valori di riferimento utilizzati per calibrare passo, battiti e Watt delle tue zone.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                        <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
+                            <div class="text-[10px] uppercase text-slate-400">FC Soglia</div>
+                            <div class="font-mono font-bold text-base text-rose-400" id="pan-soglia-fc">187 bpm</div>
+                        </div>
+                        <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
+                            <div class="text-[10px] uppercase text-slate-400">Passo Soglia</div>
+                            <div class="font-mono font-bold text-base text-blue-400" id="pan-soglia-passo">4'23"/km</div>
+                        </div>
+                        <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
+                            <div class="text-[10px] uppercase text-slate-400">Potenza</div>
+                            <div class="font-mono font-bold text-base text-amber-400" id="pan-soglia-w">360 W</div>
+                        </div>
+                        <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
+                            <div class="text-[10px] uppercase text-slate-400">Rapporto W/kg</div>
+                            <div class="font-mono font-bold text-base text-emerald-400" id="pan-soglia-wkg">5.26 W/kg</div>
+                        </div>
+                    </div>
+
+                    <button onclick="openThresholdModal()" class="shrink-0 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition shadow">
+                        <i class="fa-solid fa-pen mr-1"></i> Aggiorna Soglia
+                    </button>
                 </div>
 
                 <!-- SEMAFORO READINESS + PROSSIMA SEDUTA -->
@@ -248,8 +287,61 @@
                 </div>
             </div>
 
-            <!-- ==================== TAB 3: GARE, PB & ZONE RITMO ==================== -->
+            <!-- ==================== TAB 3: GARE, SOGLIA & ZONE RITMO ==================== -->
             <div id="tab-gare" class="hidden space-y-6">
+                
+                <!-- CARD SOGLIA CORRENTE GARMIN (MODIFICABILE DIRETTAMENTE) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-fire-flame-curved text-amber-500"></i> Soglia Corrente Garmin (Modificabile)
+                            </h3>
+                            <p class="text-xs text-slate-500">Aggiorna qui i parametri rilevati dal Garmin: ogni modifica si salva in automatico e ricalcola le Zone di Passo, FC e Potenza.</p>
+                        </div>
+                        <button onclick="archiveThresholdSnapshot()" class="shrink-0 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold px-3 py-2 rounded-lg transition">
+                            <i class="fa-solid fa-clock-rotate-left mr-1"></i> Salva nello storico
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div class="bg-rose-50/60 border border-rose-200/80 p-3.5 rounded-xl">
+                            <label class="text-[11px] font-bold uppercase text-rose-700 block mb-1">FC Soglia (bpm)</label>
+                            <input type="number" id="soglia-fc" value="187" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-rose-200 rounded-lg px-3 py-1.5">
+                            <span class="text-[11px] text-slate-500 mt-1 block">Lactate Threshold HR</span>
+                        </div>
+
+                        <div class="bg-blue-50/60 border border-blue-200/80 p-3.5 rounded-xl">
+                            <label class="text-[11px] font-bold uppercase text-blue-700 block mb-1">Passo Soglia (min:sec)</label>
+                            <input type="text" id="soglia-passo" value="4:23" oninput="saveThresholdInline()" placeholder="4:23" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-blue-200 rounded-lg px-3 py-1.5">
+                            <span class="text-[11px] text-slate-500 mt-1 block">min/km in soglia</span>
+                        </div>
+
+                        <div class="bg-amber-50/60 border border-amber-200/80 p-3.5 rounded-xl">
+                            <label class="text-[11px] font-bold uppercase text-amber-700 block mb-1">Potenza Soglia (W)</label>
+                            <input type="number" id="soglia-w" value="360" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-amber-200 rounded-lg px-3 py-1.5">
+                            <span class="text-[11px] text-slate-500 mt-1 block">Running Power FTP</span>
+                        </div>
+
+                        <div class="bg-emerald-50/60 border border-emerald-200/80 p-3.5 rounded-xl">
+                            <label class="text-[11px] font-bold uppercase text-emerald-700 block mb-1">Potenza Relativa (W/kg)</label>
+                            <input type="number" step="0.01" id="soglia-wkg" value="5.26" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-emerald-200 rounded-lg px-3 py-1.5">
+                            <span class="text-[11px] text-slate-500 mt-1 block" id="soglia-wkg-calc">Su 69 kg: 5.22 W/kg</span>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
+                            <label class="text-[11px] font-bold uppercase text-slate-600 block mb-1">Data Rilevamento</label>
+                            <input type="date" id="soglia-data" value="2026-11-18" onchange="saveThresholdInline()" class="w-full font-mono font-semibold text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-2">
+                            <span class="text-[11px] text-slate-500 mt-1 block">Ultimo test Garmin</span>
+                        </div>
+                    </div>
+
+                    <div id="threshold-history-box" class="mt-4 hidden">
+                        <div class="text-xs font-bold text-slate-600 mb-2">Storico Soglie Rilevate:</div>
+                        <div id="threshold-history-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
@@ -263,7 +355,7 @@
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="font-bold text-slate-900 mb-1">Personal Best (PB) & Previsioni Garmin</h3>
-                        <p class="text-xs text-slate-500 mb-4">Ogni modifica viene salvata automaticamente e ricalcola le zone di ritmo.</p>
+                        <p class="text-xs text-slate-500 mb-4">Ogni modifica viene salvata automaticamente e confrontata con la soglia.</p>
                         <div class="grid grid-cols-3 gap-3 text-xs font-semibold text-slate-500 mb-2">
                             <div>Distanza</div>
                             <div>Tuo PB (mm:ss)</div>
@@ -292,15 +384,15 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-slate-900 mb-3">Zone di Ritmo Dinamiche (Passo / km)</h3>
+                        <h3 class="font-bold text-slate-900 mb-3">Zone Dinamiche (Calibrate su Soglia 187 bpm · 4'23"/km · 360 W)</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
                                     <tr>
                                         <th class="p-2.5">Zona</th>
-                                        <th class="p-2.5">Utilizzo</th>
                                         <th class="p-2.5">Passo Target</th>
                                         <th class="p-2.5">FC Target</th>
+                                        <th class="p-2.5">Potenza (W)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="pace-zones-tbody" class="divide-y divide-slate-100"></tbody>
@@ -353,7 +445,45 @@
         </div>
     </main>
 
-    <!-- MODALE SCHEDA VISIVA ESERCIZIO (INGRANDIMENTO ILLUSTRATIVO) -->
+    <!-- MODALE MODIFICA RAPIDA SOGLIA GARMIN (DA PANORAMICA) -->
+    <div id="modal-threshold" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-900 mb-1">Aggiorna Soglia Corrente Garmin</h3>
+            <p class="text-xs text-slate-500 mb-4">Modifica i valori rilevati dall'orologio: le zone di allenamento si aggiorneranno subito.</p>
+            <div class="space-y-3 text-sm">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">FC Soglia (bpm)</label>
+                        <input type="number" id="m-soglia-fc" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Passo Soglia (min:sec)</label>
+                        <input type="text" id="m-soglia-passo" placeholder="4:23" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Potenza Soglia (W)</label>
+                        <input type="number" id="m-soglia-w" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Rapporto W/kg</label>
+                        <input type="number" step="0.01" id="m-soglia-wkg" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Data Rilevamento</label>
+                    <input type="date" id="m-soglia-data" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
+                <button onclick="saveThresholdModal()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Soglia</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE SCHEDA VISIVA ESERCIZIO -->
     <div id="modal-exercise" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
             <div class="flex justify-between items-start mb-3">
@@ -602,7 +732,7 @@
     <script>
         const STORAGE_KEY = 'runcoach_db_v2';
 
-        // ILLUSTRAZIONI ANATOMICHE CHIARE PER OGNI ESERCIZIO (100% integrate, zero link esterni rotti)
+        // ILLUSTRAZIONI ANATOMICHE PER OGNI ESERCIZIO
         function getExerciseSVG(key, large = false) {
             const cls = large ? "w-72 h-48" : "w-20 h-14 shrink-0";
             const base = `<svg viewBox="0 0 160 110" class="${cls} rounded-lg bg-white border border-slate-200 shadow-xs" fill="none" xmlns="http://www.w3.org/2000/svg">`;
@@ -732,6 +862,14 @@
                 bmi: 23.88,
                 fc_riposo: 60
             },
+            soglia: {
+                fc_bpm: 187,
+                passo: "4:23",
+                potenza_w: 360,
+                potenza_w_kg: 5.26,
+                data_rilevamento: "2026-11-18",
+                storico: []
+            },
             pb: {
                 "5k": "21:30", "10k": "44:45", "21k": "1:41:38",
                 garmin_5k: "21:10", garmin_10k: "44:00", garmin_21k: "1:38:30"
@@ -841,12 +979,18 @@
 
             if (raw.ui) merged.ui = { ...merged.ui, ...raw.ui, readiness: { ...merged.ui.readiness, ...(raw.ui.readiness || {}) } };
             if (raw.atleta) merged.atleta = { ...merged.atleta, ...raw.atleta };
+            if (raw.soglia) {
+                merged.soglia = {
+                    ...merged.soglia,
+                    ...raw.soglia,
+                    storico: Array.isArray(raw.soglia.storico) ? raw.soglia.storico : []
+                };
+            }
             if (raw.pb) merged.pb = { ...merged.pb, ...raw.pb };
             if (Array.isArray(raw.gare) && raw.gare.length) merged.gare = raw.gare;
             if (Array.isArray(raw.allenamenti_settimana) && raw.allenamenti_settimana.length) merged.allenamenti_settimana = raw.allenamenti_settimana;
             if (Array.isArray(raw.regole) && raw.regole.length) merged.regole = raw.regole;
 
-            // Gestione compatibilità scarpe (sia array che vecchio oggetto)
             if (Array.isArray(raw.scarpe) && raw.scarpe.length) {
                 merged.scarpe = raw.scarpe;
             } else if (raw.scarpe && typeof raw.scarpe === 'object') {
@@ -858,7 +1002,6 @@
                 }
             }
 
-            // Preserva i carichi e le spunte degli esercizi salvati dall'utente mantenendo le illustrazioni
             if (Array.isArray(raw.forza) && raw.forza.length) {
                 merged.forza.forEach((scheda, sIdx) => {
                     if (raw.forza[sIdx] && Array.isArray(raw.forza[sIdx].esercizi)) {
@@ -873,7 +1016,6 @@
                 });
             }
 
-            // Normalizza nomi scarpe nel diario
             merged.allenamenti_settimana.forEach(a => {
                 if (a.scarpa === 'Neo Zen') a.scarpa = 'Mizuno Neo Zen';
                 if (a.scarpa === 'Evo SL') a.scarpa = 'Adidas Evo SL';
@@ -899,7 +1041,6 @@
             }
         }
 
-        // Salvataggio garantito anche alla chiusura/cambio finestra
         window.addEventListener('beforeunload', saveLocal);
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') saveLocal();
@@ -908,7 +1049,6 @@
         async function initApp() {
             const savedRaw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('runcoach_db');
             if (savedRaw) {
-                // Priorità assoluta ai dati salvati dall'utente nel browser (non vengono mai sovrascritti alla riapertura)
                 try {
                     db = normalizeDb(JSON.parse(savedRaw));
                     saveLocal();
@@ -917,7 +1057,6 @@
                     saveLocal();
                 }
             } else {
-                // Primo avvio assoluto: carica dati.json da GitHub se presente, altrimenti DEFAULT_DB
                 db = structuredClone(DEFAULT_DB);
                 try {
                     const res = await fetch('dati.json?t=' + Date.now());
@@ -931,7 +1070,6 @@
                 saveLocal();
             }
 
-            // Ripristina i campi input salvati (PB, Garmin, Readiness) e la scheda attiva
             restoreSavedInputs();
             renderAll();
             switchTab(db.ui.activeTab || 'panoramica', false);
@@ -949,6 +1087,13 @@
             document.getElementById('input-fc-riposo').value = r.fc;
             document.getElementById('input-schiena').value = r.schiena;
             document.getElementById('input-polpaccio').value = r.polpaccio;
+
+            const s = db.soglia || DEFAULT_DB.soglia;
+            document.getElementById('soglia-fc').value = s.fc_bpm;
+            document.getElementById('soglia-passo').value = s.passo;
+            document.getElementById('soglia-w').value = s.potenza_w;
+            document.getElementById('soglia-wkg').value = s.potenza_w_kg;
+            document.getElementById('soglia-data').value = s.data_rilevamento || "2026-11-18";
         }
 
         function resetToGitHub() {
@@ -971,9 +1116,9 @@
             activeBtn.classList.add('tab-active');
 
             const titles = {
-                panoramica: ["Panoramica & Readiness", "Monitoraggio condizione, carico settimanale e prevenzione infortuni"],
+                panoramica: ["Panoramica & Readiness", "Monitoraggio condizione, soglia Garmin e prevenzione infortuni"],
                 diario: ["Diario & Coach Dinamico", "Piano giornaliero fino al 21 Novembre e rimodulazione automatica"],
-                gare: ["Gare, PB & Zone di Ritmo", "Obiettivi 10k Febbraio e Mezza Maratona Aprile, passi target e nutrizione"],
+                gare: ["Gare, Soglia & Zone Ritmo", "Soglia Garmin (FC/Passo/Watt), obiettivi 10k e Mezza Maratona"],
                 forza: ["Forza Gambe & Upper Body", "Schede progressive con illustrazioni esercizi e tracciamento carichi"],
                 scarpe: ["Parco Scarpe & Regole", "Gestione libera km percorsi/rimanenti e protocollo sicurezza"]
             };
@@ -994,6 +1139,9 @@
             document.getElementById('side-fc').textContent = `${db.atleta.fc_riposo || 60} bpm`;
             document.getElementById('lbl-base-fc').textContent = db.atleta.fc_riposo || 60;
             document.getElementById('nutr-weight-lbl').textContent = db.atleta.peso_kg;
+
+            // Soglia Panoramica & Tab Gare
+            renderThresholdDisplays();
 
             // KPI Scarpe
             if (db.scarpe[0]) {
@@ -1030,6 +1178,88 @@
             recalcZones();
             renderStrength();
             renderShoesAndRules();
+        }
+
+        function renderThresholdDisplays() {
+            const s = db.soglia || DEFAULT_DB.soglia;
+            const formattedPace = s.passo.includes(':') ? s.passo.replace(':', "'") + '"/km' : s.passo;
+            document.getElementById('pan-soglia-fc').textContent = `${s.fc_bpm} bpm`;
+            document.getElementById('pan-soglia-passo').textContent = formattedPace;
+            document.getElementById('pan-soglia-w').textContent = `${s.potenza_w} W`;
+            document.getElementById('pan-soglia-wkg').textContent = `${Number(s.potenza_w_kg).toFixed(2)} W/kg`;
+            document.getElementById('pan-soglia-date').textContent = `Agg. ${s.data_rilevamento || '2026-11-18'}`;
+
+            const calcWkg = (Number(s.potenza_w) / db.atleta.peso_kg).toFixed(2);
+            document.getElementById('soglia-wkg-calc').textContent = `Su ${db.atleta.peso_kg} kg: ${calcWkg} W/kg`;
+
+            const histBox = document.getElementById('threshold-history-box');
+            const histList = document.getElementById('threshold-history-list');
+            if (s.storico && s.storico.length > 0) {
+                histBox.classList.remove('hidden');
+                histList.innerHTML = s.storico.map((item, idx) => `
+                    <span class="inline-flex items-center gap-2 text-xs bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg font-mono text-slate-700">
+                        <span><strong>${item.data}</strong>: ${item.fc_bpm} bpm · ${item.passo}/km · ${item.potenza_w}W (${item.potenza_w_kg} W/kg)</span>
+                        <button onclick="deleteThresholdHistory(${idx})" class="text-slate-400 hover:text-rose-600" title="Rimuovi"><i class="fa-solid fa-xmark"></i></button>
+                    </span>
+                `).join('');
+            } else {
+                histBox.classList.add('hidden');
+            }
+        }
+
+        function saveThresholdInline() {
+            db.soglia.fc_bpm = parseInt(document.getElementById('soglia-fc').value) || 187;
+            db.soglia.passo = document.getElementById('soglia-passo').value.trim() || "4:23";
+            db.soglia.potenza_w = parseInt(document.getElementById('soglia-w').value) || 360;
+            db.soglia.potenza_w_kg = parseFloat(document.getElementById('soglia-wkg').value) || 5.26;
+            db.soglia.data_rilevamento = document.getElementById('soglia-data').value || "2026-11-18";
+            saveLocal();
+            renderThresholdDisplays();
+            recalcZones();
+        }
+
+        function archiveThresholdSnapshot() {
+            db.soglia.storico = db.soglia.storico || [];
+            db.soglia.storico.unshift({
+                data: db.soglia.data_rilevamento || new Date().toISOString().slice(0, 10),
+                fc_bpm: db.soglia.fc_bpm,
+                passo: db.soglia.passo,
+                potenza_w: db.soglia.potenza_w,
+                potenza_w_kg: db.soglia.potenza_w_kg
+            });
+            saveLocal();
+            renderThresholdDisplays();
+        }
+
+        function deleteThresholdHistory(idx) {
+            if (db.soglia.storico) {
+                db.soglia.storico.splice(idx, 1);
+                saveLocal();
+                renderThresholdDisplays();
+            }
+        }
+
+        function openThresholdModal() {
+            const s = db.soglia || DEFAULT_DB.soglia;
+            document.getElementById('m-soglia-fc').value = s.fc_bpm;
+            document.getElementById('m-soglia-passo').value = s.passo;
+            document.getElementById('m-soglia-w').value = s.potenza_w;
+            document.getElementById('m-soglia-wkg').value = s.potenza_w_kg;
+            document.getElementById('m-soglia-data').value = s.data_rilevamento || "2026-11-18";
+            const m = document.getElementById('modal-threshold');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+
+        function saveThresholdModal() {
+            db.soglia.fc_bpm = parseInt(document.getElementById('m-soglia-fc').value) || 187;
+            db.soglia.passo = document.getElementById('m-soglia-passo').value.trim() || "4:23";
+            db.soglia.potenza_w = parseInt(document.getElementById('m-soglia-w').value) || 360;
+            db.soglia.potenza_w_kg = parseFloat(document.getElementById('m-soglia-wkg').value) || 5.26;
+            db.soglia.data_rilevamento = document.getElementById('m-soglia-data').value || "2026-11-18";
+            restoreSavedInputs();
+            saveLocal();
+            closeModals();
+            renderAll();
         }
 
         function updateReadiness(shouldSave = true) {
@@ -1191,12 +1421,12 @@
             const parts = str.trim().split(':').map(Number);
             if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
             if (parts.length === 2) return parts[0]*60 + parts[1];
-            return 2700;
+            return 263;
         }
 
         function secToPace(secPerKm) {
-            const m = Math.floor(secPerKm / 60);
-            const s = Math.round(secPerKm % 60).toString().padStart(2, '0');
+            const m = Math.floor(Math.round(secPerKm) / 60);
+            const s = (Math.round(secPerKm) % 60).toString().padStart(2, '0');
             return `${m}'${s}"/km`;
         }
 
@@ -1219,27 +1449,58 @@
 
             const ratio = (pace21 / pace10).toFixed(2);
             let profileMsg = ratio > 1.07
-                ? "Profilo più veloce che resistente: nel blocco dopo il 21/11 daremo priorità all'allungamento graduale del lungo domenicale."
+                ? "Profilo veloce con ottimo motore anaerobico (soglia " + db.soglia.passo + "/km): dopo il 21/11 lavoreremo sull'estensione graduale dei lunghi."
                 : "Ottimo indice di resistenza aerobica: reggi molto bene il passaggio dai 10 km alla mezza maratona.";
 
             document.getElementById('endurance-index-box').innerHTML = `
                 <strong>Indice di Resistenza (Passo 21k / Passo 10k): ${ratio}</strong> (Passo 10k: ${secToPace(pace10)} vs Passo 21k: ${secToPace(pace21)}).<br>${profileMsg}
             `;
 
+            // Calcolo Zone su Soglia Corrente Garmin (LTHR 187 bpm, Passo 4'23"/km, Potenza 360 W)
+            const s = db.soglia || DEFAULT_DB.soglia;
+            const lthr = Number(s.fc_bpm) || 187;
+            const ltSec = timeToSec(s.passo || "4:23");
+            const ltW = Number(s.potenza_w) || 360;
+
             const zones = [
-                { z: "Z1 — Recupero Attivo", uso: "Rientro / Rigenerante", passo: `${secToPace(pace10 + 65)} – ${secToPace(pace10 + 85)}`, fc: "105–124 bpm" },
-                { z: "Z2 — Fondo Lento (Base)", uso: "80% del volume settimanale", passo: `${secToPace(pace10 + 45)} – ${secToPace(pace10 + 65)}`, fc: "125–145 bpm" },
-                { z: "Z3 — Medio / Ritmo Mezza", uso: "Lavori specifici da Gennaio", passo: `${secToPace(pace21 - 3)} – ${secToPace(pace21 + 5)}`, fc: "152–164 bpm" },
-                { z: "Z4 — Soglia Anaerobica", uso: "Ripetute lunghe (1000–2000m)", passo: `${secToPace(pace10 - 5)} – ${secToPace(pace10 + 3)}`, fc: "165–174 bpm" },
-                { z: "Z5 — VO2max", uso: "Ripetute brevi (400–600m)", passo: `${secToPace(pace10 - 18)} – ${secToPace(pace10 - 10)}`, fc: "> 175 bpm" }
+                {
+                    z: "Z1 — Recupero Attivo",
+                    passo: `> ${secToPace(ltSec * 1.25)}`,
+                    fc: `< ${Math.round(lthr * 0.80)} bpm`,
+                    watt: `< ${Math.round(ltW * 0.75)} W`
+                },
+                {
+                    z: "Z2 — Fondo Lento (Base)",
+                    passo: `${secToPace(ltSec * 1.15)} – ${secToPace(ltSec * 1.25)}`,
+                    fc: `${Math.round(lthr * 0.80)}–${Math.round(lthr * 0.88)} bpm (rientro 125–145)`,
+                    watt: `${Math.round(ltW * 0.75)}–${Math.round(ltW * 0.86)} W`
+                },
+                {
+                    z: "Z3 — Medio / Ritmo Mezza",
+                    passo: `${secToPace(ltSec * 1.06)} – ${secToPace(ltSec * 1.14)}`,
+                    fc: `${Math.round(lthr * 0.89)}–${Math.round(lthr * 0.94)} bpm`,
+                    watt: `${Math.round(ltW * 0.87)}–${Math.round(ltW * 0.95)} W`
+                },
+                {
+                    z: "Z4 — Soglia Anaerobica",
+                    passo: `${secToPace(ltSec * 0.99)} – ${secToPace(ltSec * 1.05)}`,
+                    fc: `${Math.round(lthr * 0.95)}–${lthr} bpm`,
+                    watt: `${Math.round(ltW * 0.96)}–${Math.round(ltW * 1.02)} W`
+                },
+                {
+                    z: "Z5 — VO2max / Ripetute Brevi",
+                    passo: `< ${secToPace(ltSec * 0.98)}`,
+                    fc: `> ${lthr} bpm`,
+                    watt: `> ${Math.round(ltW * 1.02)} W`
+                }
             ];
 
             document.getElementById('pace-zones-tbody').innerHTML = zones.map(z => `
                 <tr>
                     <td class="p-2.5 font-bold text-slate-800">${z.z}</td>
-                    <td class="p-2.5 text-slate-500 text-xs">${z.uso}</td>
                     <td class="p-2.5 font-mono font-bold text-blue-600">${z.passo}</td>
-                    <td class="p-2.5 font-mono text-xs">${z.fc}</td>
+                    <td class="p-2.5 font-mono text-xs text-rose-600 font-semibold">${z.fc}</td>
+                    <td class="p-2.5 font-mono text-xs text-amber-700 font-semibold">${z.watt}</td>
                 </tr>
             `).join('');
 
@@ -1379,7 +1640,6 @@
             `).join('');
         }
 
-        // MODALE SCARPE (MODIFICA E AGGIUNGI)
         function openEditShoeModal(idx) {
             const s = db.scarpe[idx];
             document.getElementById('modal-shoe-title').textContent = "Modifica Scarpa & Chilometraggio";
@@ -1461,9 +1721,8 @@
             }
         }
 
-        // MODALI ALTRI
         function closeModals() {
-            ['modal-complete', 'modal-skip', 'modal-profile', 'modal-add-workout', 'modal-add-race', 'modal-exercise', 'modal-shoe'].forEach(id => {
+            ['modal-complete', 'modal-skip', 'modal-profile', 'modal-add-workout', 'modal-add-race', 'modal-exercise', 'modal-shoe', 'modal-threshold'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
                 document.getElementById(id).classList.remove('flex');
             });
