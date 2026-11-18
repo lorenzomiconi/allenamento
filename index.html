@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RunCoach Pro — Area Riservata</title>
-    <!-- Tailwind CSS & FontAwesome 6.4.0 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase JS SDK v10.14.1 (Auth & Cloud Firestore) -->
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -17,17 +15,11 @@
         .tab-active { background-color: #2563eb; color: white; }
         .tab-inactive { color: #94a3b8; }
         .tab-inactive:hover { background-color: #1e293b; color: white; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 
-    <!-- ==================== NOTIFICA TOAST (SOSTITUISCE ALERT) ==================== -->
-    <div id="toast-box" class="fixed bottom-5 right-5 z-50 hidden max-w-sm rounded-xl px-4 py-3 text-xs font-semibold shadow-xl border transition-all"></div>
-
-    <!-- ==================== SCHERMATA DI LOGIN ==================== -->
+    <!-- SCHERMATA DI LOGIN -->
     <div id="auth-screen" class="min-h-screen bg-slate-900 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
             <div class="flex items-center gap-3 mb-6">
@@ -39,7 +31,6 @@
                     <p class="text-xs text-slate-500">Accesso Riservato & Cloud Privato</p>
                 </div>
             </div>
-
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
@@ -54,16 +45,14 @@
                     <i class="fa-solid fa-lock-open mr-1.5"></i> Accedi alla Dashboard
                 </button>
             </form>
-
             <p class="text-[11px] text-slate-400 text-center mt-6">
-                <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Nessun dato personale è salvato su GitHub: tutti i parametri sono protetti nel tuo database privato.
+                <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Dati protetti nel tuo database cloud privato.
             </p>
         </div>
     </div>
 
-    <!-- ==================== DASHBOARD RISERVATA ==================== -->
+    <!-- DASHBOARD RISERVATA -->
     <div id="app-shell" class="hidden flex-col md:flex-row min-h-screen">
-
         <!-- SIDEBAR -->
         <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col justify-between shrink-0">
             <div>
@@ -77,7 +66,6 @@
                     </div>
                 </div>
 
-                <!-- Profilo rapido nella sidebar -->
                 <div class="px-6 py-4 bg-slate-800/60 border-b border-slate-800 text-xs">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-slate-400">Atleta</span>
@@ -85,9 +73,9 @@
                     </div>
                     <div class="font-semibold text-sm text-white" id="side-atleta">-- kg · -- cm</div>
                     <div class="text-slate-400 mt-0.5">BMI: <span id="side-bmi" class="text-emerald-400 font-semibold">--</span> · FC Riposo: <span id="side-fc" class="text-slate-200">-- bpm</span></div>
+                    <div class="text-slate-400 mt-1 flex items-center gap-1.5">VO2 Max Garmin: <span id="side-vo2" class="text-purple-400 font-bold font-mono">54</span> <span id="side-vo2-lvl" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-semibold">Superiore</span></div>
                 </div>
 
-                <!-- Navigazione Tab -->
                 <nav class="p-4 space-y-1.5" id="nav-menu">
                     <button onclick="switchTab('panoramica')" id="btn-panoramica" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-active">
                         <i class="fa-solid fa-gauge-high w-5"></i> Panoramica & Readiness
@@ -107,7 +95,6 @@
                 </nav>
             </div>
 
-            <!-- Azioni Backup & Logout -->
             <div class="p-4 border-t border-slate-800 space-y-2">
                 <label class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition cursor-pointer shadow">
                     <i class="fa-solid fa-upload"></i> Importa Backup (.json)
@@ -126,7 +113,6 @@
         <main class="flex-1 p-4 md:p-8 overflow-y-auto">
             <div class="max-w-6xl mx-auto">
 
-                <!-- Banner Errore Cloud -->
                 <div id="cloud-error-banner" class="hidden mb-4 p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-start justify-between gap-3">
                     <div>
                         <strong class="block text-sm mb-0.5"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Errore di sincronizzazione Firebase Cloud</strong>
@@ -154,9 +140,8 @@
                     </div>
                 </div>
 
-                <!-- ==================== TAB 1: PANORAMICA ==================== -->
+                <!-- TAB 1: PANORAMICA -->
                 <div id="tab-panoramica" class="space-y-6">
-                    <!-- 5 KPI CARDS -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                             <div class="flex justify-between items-start">
@@ -166,7 +151,7 @@
                                 </div>
                                 <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-route"></i></span>
                             </div>
-                            <p class="text-[11px] text-slate-500 mt-2" id="kpi-km-sett-sub">Settimana in corso</p>
+                            <p class="text-[11px] text-slate-500 mt-2">Settimana attiva</p>
                         </div>
 
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-cyan-300 transition" onclick="switchTab('diario')">
@@ -214,7 +199,7 @@
                         </div>
                     </div>
 
-                    <!-- FASCIA SOGLIA ANAEROBICA GARMIN -->
+                    <!-- FASCIA SOGLIA GARMIN + VO2 MAX -->
                     <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-5 rounded-xl shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <div class="flex items-center gap-3.5">
                             <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl shrink-0">
@@ -229,7 +214,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
                             <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
                                 <div class="text-[10px] uppercase text-slate-400">FC Soglia</div>
                                 <div class="font-mono font-bold text-base text-rose-400" id="pan-soglia-fc">-- bpm</div>
@@ -246,21 +231,27 @@
                                 <div class="text-[10px] uppercase text-slate-400">Rapporto W/kg</div>
                                 <div class="font-mono font-bold text-base text-emerald-400" id="pan-soglia-wkg">-- W/kg</div>
                             </div>
+                            <div class="bg-slate-800/90 border border-purple-500/40 px-3.5 py-2 rounded-lg">
+                                <div class="text-[10px] uppercase text-purple-300">VO2 Max</div>
+                                <div class="font-mono font-bold text-base text-purple-400"><span id="pan-vo2-val">54</span> <span class="text-[11px] font-sans font-semibold text-purple-300" id="pan-vo2-lvl">Superiore</span></div>
+                            </div>
                         </div>
 
                         <button onclick="openThresholdModal()" class="shrink-0 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition shadow">
-                            <i class="fa-solid fa-pen mr-1"></i> Aggiorna Soglia
+                            <i class="fa-solid fa-pen mr-1"></i> Aggiorna
                         </button>
                     </div>
 
-                    <!-- SEMAFORO READINESS & PROSSIME SEDUTE -->
+                    <!-- READINESS + PROSSIME SEDUTE -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <div class="flex items-center justify-between mb-4">
                                 <h3 class="font-bold text-slate-900 flex items-center gap-2">
                                     <i class="fa-solid fa-heart-pulse text-rose-500"></i> Semaforo Readiness Mattutino (Garmin & Corpo)
                                 </h3>
-                                <span id="readiness-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">SEMAFORO VERDE — OK PER CORRERE</span>
+                                <span id="readiness-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                                    SEMAFORO VERDE — OK PER CORRERE
+                                </span>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                                 <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
@@ -305,21 +296,19 @@
                         </div>
                     </div>
 
-                    <!-- RIEPILOGO SETTIMANALE DINAMICO (ORDINE CRONOLOGICO CRESCENTE) -->
+                    <!-- RIEPILOGO SETTIMANALE -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                            <div>
-                                <h3 class="font-bold text-slate-900">Riepilogo Chilometraggio Settimanale (Corsa & Rulli)</h3>
-                                <p class="text-xs text-slate-500">Ordinato cronologicamente dal 25 Ott al 17 Gen · Clicca su una settimana per aprirla nel Diario.</p>
-                            </div>
-                            <span class="text-xs font-semibold text-cyan-700 bg-cyan-50 border border-cyan-200 px-3 py-1 rounded-full self-start sm:self-auto" id="weekly-rulli-badge">Totale Rulli Accumulati: 0.0 km</span>
+                            <h3 class="font-bold text-slate-900">Riepilogo Chilometraggio Settimanale (Corsa & Rulli)</h3>
+                            <span class="text-xs font-semibold text-cyan-700 bg-cyan-50 border border-cyan-200 px-3 py-1 rounded-full" id="weekly-rulli-badge">
+                                Totale Rulli Accumulati: 0.0 km
+                            </span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
                                     <tr>
                                         <th class="p-3">Settimana</th>
-                                        <th class="p-3">Fase</th>
                                         <th class="p-3">Corsa Prev.</th>
                                         <th class="p-3">Corsa Fatta</th>
                                         <th class="p-3 text-cyan-700">Km Rulli</th>
@@ -333,59 +322,21 @@
                     </div>
                 </div>
 
-                <!-- ==================== TAB 2: DIARIO & COACH DINAMICO ==================== -->
+                <!-- TAB 2: DIARIO (MENU TENDINA CRONOLOGICO) -->
                 <div id="tab-diario" class="hidden space-y-6">
-                    <!-- PANNELLO FILTRI CRONOLOGICI E INTERVALLO PERSONALIZZATO -->
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
-                        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
-                            <!-- A) Selettore Settimane in Ordine Cronologico Crescente -->
-                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 flex-1">
-                                <label for="diario-week-select" class="text-xs font-bold uppercase tracking-wide text-slate-500 whitespace-nowrap">
-                                    <i class="fa-solid fa-calendar-week text-blue-600 mr-1"></i> Settimana:
-                                </label>
-                                <select id="diario-week-select" onchange="handleWeekSelectChange(this.value)" class="w-full sm:w-80 border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
-                                    <option value="all">Tutte le date (Piano Completo)</option>
-                                    <option value="current">Settimana Corrente (Oggi)</option>
-                                </select>
-                            </div>
-
-                            <!-- B) Intervallo Date Libero (Dal / Al) + Tasti Rapidi -->
-                            <div class="flex flex-wrap items-center gap-2">
-                                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
-                                    <label for="diario-date-from" class="text-[11px] font-bold text-slate-500">Dal</label>
-                                    <input type="date" id="diario-date-from" onchange="handleCustomDateChange()" class="bg-transparent text-xs font-mono font-semibold text-slate-800 focus:outline-none">
-                                </div>
-                                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
-                                    <label for="diario-date-to" class="text-[11px] font-bold text-slate-500">Al</label>
-                                    <input type="date" id="diario-date-to" onchange="handleCustomDateChange()" class="bg-transparent text-xs font-mono font-semibold text-slate-800 focus:outline-none">
-                                </div>
-                                <button type="button" onclick="selectOnlyTodayFilter()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition">
-                                    Solo Oggi
-                                </button>
-                                <button type="button" onclick="resetDiarioFilter()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
-                                    Tutte
-                                </button>
-                                <span id="diario-days-badge" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                    Tutto il piano
-                                </span>
-                            </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <label class="text-xs font-semibold text-slate-500 whitespace-nowrap"><i class="fa-solid fa-calendar-days mr-1"></i> Mostra:</label>
+                            <select id="diario-week-select" onchange="filterDiario(this.value)" class="w-full sm:w-auto border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                <!-- Le settimane verranno generate in automatico qui dal JavaScript -->
+                            </select>
                         </div>
-
-                        <!-- Riepilogo Chilometri Periodo Filtrato + Totali -->
-                        <div class="pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-                            <span class="text-xs text-slate-500" id="diario-filter-caption">Visualizzazione completa di tutte le sedute in calendario.</span>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200" id="diario-tot-corsa">
-                                    Corsa Periodo: 0.0 / 0.0 km (Tot: 0.0 km)
-                                </span>
-                                <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200" id="diario-tot-rulli">
-                                    <i class="fa-solid fa-bicycle mr-1"></i> Rulli Periodo: 0.0 km (Tot: 0.0 km)
-                                </span>
-                            </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200" id="diario-tot-corsa">Totale Corsa: 0.0 km</span>
+                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200" id="diario-tot-rulli"><i class="fa-solid fa-bicycle mr-1"></i> Totale Km Rulli: 0.0 km</span>
                         </div>
                     </div>
 
-                    <!-- TABELLA SEDUTE DIARIO -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
@@ -407,41 +358,59 @@
                     </div>
                 </div>
 
-                <!-- ==================== TAB 3: GARE, SOGLIA & ZONE ==================== -->
+                <!-- TAB 3: GARE E ZONE -->
                 <div id="tab-gare" class="hidden space-y-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
                             <div>
-                                <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-fire-flame-curved text-amber-500"></i> Soglia Corrente Garmin (Modificabile)</h3>
+                                <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-fire-flame-curved text-amber-500"></i> Soglia Corrente Garmin (Modificabile)
+                                </h3>
                                 <p class="text-xs text-slate-500">Aggiorna qui i parametri rilevati dal Garmin: ogni modifica si salva nel cloud e ricalcola le Zone.</p>
                             </div>
                             <button onclick="archiveThresholdSnapshot()" class="shrink-0 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold px-3 py-2 rounded-lg transition">
                                 <i class="fa-solid fa-clock-rotate-left mr-1"></i> Salva nello storico
                             </button>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                             <div class="bg-rose-50/60 border border-rose-200/80 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-rose-700 block mb-1">FC Soglia (bpm)</label>
-                                <input type="number" id="soglia-fc" value="187" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-rose-200 rounded-lg px-3 py-1.5">
+                                <input type="number" id="soglia-fc" value="180" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-rose-200 rounded-lg px-3 py-1.5">
                             </div>
                             <div class="bg-blue-50/60 border border-blue-200/80 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-blue-700 block mb-1">Passo Soglia (min:sec)</label>
-                                <input type="text" id="soglia-passo" value="4:23" oninput="saveThresholdInline()" placeholder="4:23" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-blue-200 rounded-lg px-3 py-1.5">
+                                <input type="text" id="soglia-passo" value="4:30" oninput="saveThresholdInline()" placeholder="4:23" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-blue-200 rounded-lg px-3 py-1.5">
                             </div>
                             <div class="bg-amber-50/60 border border-amber-200/80 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-amber-700 block mb-1">Potenza Soglia (W)</label>
-                                <input type="number" id="soglia-w" value="360" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-amber-200 rounded-lg px-3 py-1.5">
+                                <input type="number" id="soglia-w" value="350" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-amber-200 rounded-lg px-3 py-1.5">
                             </div>
                             <div class="bg-emerald-50/60 border border-emerald-200/80 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-emerald-700 block mb-1">Potenza Relativa (W/kg)</label>
-                                <input type="number" step="0.01" id="soglia-wkg" value="5.22" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-emerald-200 rounded-lg px-3 py-1.5">
+                                <input type="number" step="0.01" id="soglia-wkg" value="5.00" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-emerald-200 rounded-lg px-3 py-1.5">
                                 <span class="text-[11px] text-slate-500 mt-1 block" id="soglia-wkg-calc">--</span>
                             </div>
                             <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-slate-600 block mb-1">Data Rilevamento</label>
                                 <input type="date" id="soglia-data" value="2026-11-18" onchange="saveThresholdInline()" class="w-full font-mono font-semibold text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-2">
                             </div>
+                            <!-- VO2 MAX MODIFICABILE -->
+                            <div class="bg-purple-50/70 border border-purple-200 p-3.5 rounded-xl">
+                                <label class="text-[11px] font-bold uppercase text-purple-700 block mb-1">VO2 Max Garmin</label>
+                                <div class="flex gap-1.5">
+                                    <input type="number" step="1" min="20" max="95" id="vo2-val" value="54" oninput="saveVo2Inline()" class="w-16 font-mono font-extrabold text-xl text-slate-900 bg-white border border-purple-200 rounded-lg px-2 py-1.5">
+                                    <select id="vo2-lvl" onchange="saveVo2Inline()" class="flex-1 text-[11px] font-bold text-purple-800 bg-white border border-purple-200 rounded-lg px-1 py-1.5">
+                                        <option value="Superiore" selected>Superiore</option>
+                                        <option value="Eccellente">Eccellente</option>
+                                        <option value="Buono">Buono</option>
+                                        <option value="Discreto">Discreto</option>
+                                        <option value="Scarso">Scarso</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
+
                         <div id="threshold-history-box" class="mt-4 hidden">
                             <div class="text-xs font-bold text-slate-600 mb-2">Storico Soglie Rilevate:</div>
                             <div id="threshold-history-list" class="flex flex-wrap gap-2"></div>
@@ -471,12 +440,12 @@
                                 </div>
                                 <div class="grid grid-cols-3 gap-3 items-center">
                                     <span class="font-bold text-sm">10 km</span>
-                                    <input type="text" id="pb-10k" value="46:22" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                    <input type="text" id="pb-10k" value="45:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
                                     <input type="text" id="garmin-10k" value="44:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
                                 </div>
                                 <div class="grid grid-cols-3 gap-3 items-center">
                                     <span class="font-bold text-sm">21.1 km</span>
-                                    <input type="text" id="pb-21k" value="1:41:38" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                    <input type="text" id="pb-21k" value="1:42:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
                                     <input type="text" id="garmin-21k" value="1:39:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
                                 </div>
                             </div>
@@ -496,18 +465,19 @@
                                 </table>
                             </div>
                         </div>
+
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                            <h3 class="font-bold text-slate-900 mb-2"><i class="fa-solid fa-bottle-water text-blue-500 mr-1"></i> Strategia Lunghi (<span id="nutr-weight-lbl">69</span> kg)</h3>
+                            <h3 class="font-bold text-slate-900 mb-2"><i class="fa-solid fa-bottle-water text-blue-500 mr-1"></i> Strategia Lunghi (<span id="nutr-weight-lbl">70</span> kg)</h3>
                             <p class="text-xs text-slate-500 mb-4">Calcolata sul tuo peso attuale per uscite oltre i 75–90 minuti:</p>
                             <ul class="space-y-3 text-sm" id="nutrition-list"></ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- ==================== TAB 4: FORZA GAMBE & UPPER ==================== -->
+                <!-- TAB 4: FORZA -->
                 <div id="tab-forza" class="hidden space-y-6">
                     <div class="bg-amber-50 border border-amber-200 text-amber-900 p-4 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div><strong>Regole Forza:</strong> Sforzo facile/moderato con <strong>3 ripetizioni di riserva (RIR 3)</strong>. Clicca sull'illustrazione per ingrandirla, spunta gli esercizi e annota i chili.</div>
+                        <div><strong>Regole Forza:</strong> Sforzo facile/moderato con <strong>3 ripetizioni di riserva (RIR 3)</strong>. Clicca sull'illustrazione per ingrandirla, spunta gli esercizi svolti e annota i chili.</div>
                         <button onclick="resetStrengthChecks()" class="shrink-0 bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 font-semibold px-3 py-1.5 rounded-lg transition">
                             <i class="fa-solid fa-rotate-left mr-1"></i> Azzera spunte seduta
                         </button>
@@ -515,12 +485,12 @@
                     <div id="strength-cards-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
                 </div>
 
-                <!-- ==================== TAB 5: PARCO SCARPE & REGOLE ==================== -->
+                <!-- TAB 5: SCARPE -->
                 <div id="tab-scarpe" class="hidden space-y-6">
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
                         <div>
                             <h3 class="font-bold text-slate-900 text-sm">Gestione Libera Parco Scarpe</h3>
-                            <p class="text-xs text-slate-500">Modifica i km percorsi o il limite massimo: il Diario aggiorna i totali in automatico.</p>
+                            <p class="text-xs text-slate-500">Modifica direttamente i km percorsi o il limite massimo: ogni corsa registrata nel Diario aggiorna i totali in automatico.</p>
                         </div>
                         <button onclick="openAddShoeModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition">
                             <i class="fa-solid fa-plus mr-1"></i> Aggiungi Scarpa
@@ -537,8 +507,7 @@
         </main>
     </div>
 
-    <!-- ==================== MODALI ==================== -->
-    <!-- Modale Aggiorna Soglia -->
+    <!-- MODALI -->
     <div id="modal-threshold" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Aggiorna Soglia Corrente Garmin</h3>
@@ -546,13 +515,30 @@
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">FC Soglia (bpm)</label><input type="number" id="m-soglia-fc" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Passo Soglia (min:sec)</label><input type="text" id="m-soglia-passo" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Passo Soglia (min:sec)</label><input type="text" id="m-soglia-passo" placeholder="4:23" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">Potenza Soglia (W)</label><input type="number" id="m-soglia-w" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">Rapporto W/kg</label><input type="number" step="0.01" id="m-soglia-wkg" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
                 </div>
                 <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data Rilevamento</label><input type="date" id="m-soglia-data" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono"></div>
+                
+                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                    <div>
+                        <label class="block text-xs font-semibold text-purple-700 mb-1">VO2 Max Garmin</label>
+                        <input type="number" step="1" id="m-vo2-val" class="w-full border border-purple-200 rounded-lg px-3 py-2 font-mono font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-purple-700 mb-1">Fascia Garmin</label>
+                        <select id="m-vo2-lvl" class="w-full border border-purple-200 rounded-lg px-3 py-2 font-semibold text-sm">
+                            <option value="Superiore">Superiore</option>
+                            <option value="Eccellente">Eccellente</option>
+                            <option value="Buono">Buono</option>
+                            <option value="Discreto">Discreto</option>
+                            <option value="Scarso">Scarso</option>
+                        </select>
+                    </div>
+                </div>
             </div>
             <div class="flex justify-end gap-2 mt-6">
                 <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
@@ -561,28 +547,27 @@
         </div>
     </div>
 
-    <!-- Modale Dettaglio Esercizio Forza -->
     <div id="modal-exercise" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
             <div class="flex justify-between items-start mb-3">
-                <div><span class="text-xs font-bold uppercase tracking-wider text-blue-600" id="ex-modal-muscle">Muscoli</span><h3 class="text-xl font-bold text-slate-900" id="ex-modal-title">Esercizio</h3></div>
+                <div><span class="text-xs font-bold uppercase tracking-wider text-blue-600" id="ex-modal-muscle">Muscoli Target</span><h3 class="text-xl font-bold text-slate-900" id="ex-modal-title">Nome Esercizio</h3></div>
                 <button onclick="closeModals()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-center my-3" id="ex-modal-svg"></div>
             <div class="space-y-2 text-sm text-slate-700">
                 <div class="flex gap-4 text-xs font-mono bg-blue-50 text-blue-800 px-3 py-2 rounded-lg">
-                    <span><strong>Serie/Rip:</strong> <span id="ex-modal-serie">--</span></span><span><strong>Recupero:</strong> <span id="ex-modal-rec">--</span></span>
+                    <span><strong>Serie/Rip:</strong> <span id="ex-modal-serie">--</span></span>
+                    <span><strong>Recupero:</strong> <span id="ex-modal-rec">--</span></span>
                 </div>
                 <p class="text-xs leading-relaxed text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100" id="ex-modal-desc">--</p>
             </div>
             <div class="flex justify-between items-center mt-5 pt-3 border-t border-slate-100">
-                <a id="ex-modal-yt" href="#" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-rose-600 hover:underline flex items-center gap-1.5"><i class="fa-brands fa-youtube text-base"></i> Guarda su YouTube</a>
-                <button onclick="closeModals()" class="px-4 py-2 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800">Chiudi</button>
+                <a id="ex-modal-yt" href="#" target="_blank" class="text-xs font-semibold text-rose-600 hover:underline flex items-center gap-1.5"><i class="fa-brands fa-youtube text-base"></i> Guarda video</a>
+                <button onclick="closeModals()" class="px-4 py-2 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800">Chiudi Scheda</button>
             </div>
         </div>
     </div>
 
-    <!-- Modale Modifica/Aggiungi Scarpa -->
     <div id="modal-shoe" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1" id="modal-shoe-title">Modifica Scarpa</h3>
@@ -602,12 +587,14 @@
             </div>
             <div class="flex justify-between items-center mt-6">
                 <button type="button" id="btn-delete-shoe" onclick="deleteShoe()" class="text-xs text-rose-600 hover:underline hidden">Elimina scarpa</button>
-                <div class="flex gap-2 ml-auto"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="saveShoe()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Scarpa</button></div>
+                <div class="flex gap-2 ml-auto">
+                    <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
+                    <button onclick="saveShoe()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Scarpa</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modale Sync Seduta Completata -->
     <div id="modal-complete" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Registra Seduta Garmin</h3>
@@ -616,20 +603,22 @@
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Fatti</label><input type="number" step="0.01" id="modal-comp-km" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
-                    <div><label class="block text-xs font-semibold text-cyan-700 mb-1"><i class="fa-solid fa-bicycle mr-1"></i> Km Rulli Fatti</label><input type="number" step="0.1" id="modal-comp-rulli" class="w-full border border-cyan-300 bg-cyan-50/40 rounded-lg px-3 py-2 font-mono font-bold"></div>
+                    <div><label class="block text-xs font-semibold text-cyan-700 mb-1"><i class="fa-solid fa-bicycle mr-1"></i> Km Rulli Fatti</label><input type="number" step="0.1" id="modal-comp-rulli" placeholder="es. 24.5" class="w-full border border-cyan-300 bg-cyan-50/40 rounded-lg px-3 py-2 font-mono font-bold"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Passo Medio (Corsa)</label><input type="text" id="modal-comp-passo" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">FC Media (bpm)</label><input type="number" id="modal-comp-fc" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Passo Medio (Corsa)</label><input type="text" id="modal-comp-passo" placeholder="es. 5'35&quot;/km" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">FC Media (bpm)</label><input type="number" id="modal-comp-fc" placeholder="es. 138" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                 </div>
-                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Usate (solo corsa)</label><select id="modal-comp-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select></div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Usate (solo per corsa)</label><select id="modal-comp-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select></div>
                 <div><label class="block text-xs font-semibold text-slate-600 mb-1">Note & Sensazioni</label><input type="text" id="modal-comp-note" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
             </div>
-            <div class="flex justify-end gap-2 mt-6"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="saveCompletedWorkout()" class="px-4 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">Salva Seduta</button></div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
+                <button onclick="saveCompletedWorkout()" class="px-4 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">Salva Seduta</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modale Salta / Rimodula Seduta -->
     <div id="modal-skip" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Coach Dinamico — Rimodulazione</h3>
@@ -642,13 +631,17 @@
                     <option value="stanchezza">Stanchezza / FC alta / Sonno scarso</option>
                     <option value="schiena">Fastidio fisico / Affaticamento muscolare</option>
                 </select>
-                <div class="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg"><strong>Azione automatica:</strong> I km non corsi oggi verranno azzerati senza accumularli.</div>
+                <div class="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg">
+                    <strong>Azione automatica:</strong> I chilometri non corsi oggi verranno azzerati senza accumularli nei giorni successivi.
+                </div>
             </div>
-            <div class="flex justify-end gap-2 mt-6"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="confirmSkipWorkout()" class="px-4 py-2 text-sm font-semibold bg-amber-600 hover:bg-amber-700 text-white rounded-lg">Applica Rimodulazione</button></div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
+                <button onclick="confirmSkipWorkout()" class="px-4 py-2 text-sm font-semibold bg-amber-600 hover:bg-amber-700 text-white rounded-lg">Applica Rimodulazione</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modale Profilo Atleta -->
     <div id="modal-profile" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Profilo Atleta</h3>
@@ -657,35 +650,44 @@
                 <div><label class="block text-xs font-semibold text-slate-600 mb-1">Altezza (cm)</label><input type="number" id="prof-altezza" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                 <div><label class="block text-xs font-semibold text-slate-600 mb-1">FC a riposo baseline (bpm)</label><input type="number" id="prof-fc" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
             </div>
-            <div class="flex justify-end gap-2 mt-6"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="saveProfile()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Aggiorna</button></div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
+                <button onclick="saveProfile()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Aggiorna</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modale Nuova Seduta -->
     <div id="modal-add-workout" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Aggiungi Seduta al Diario</h3>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data</label><input type="date" id="new-w-data" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tipo Attività</label>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data</label><input type="date" id="new-w-data" value="2026-11-22" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Tipo Attività</label>
                         <select id="new-w-tipo" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                            <option value="Corsa facile">Corsa facile</option><option value="Lungo facile">Lungo facile</option><option value="Medio / Tempo Run">Medio / Tempo Run</option><option value="Ripetute">Ripetute</option><option value="Rulli">Rulli</option><option value="Forza">Forza</option><option value="Riposo">Riposo</option>
+                            <option value="Corsa facile">Corsa facile</option>
+                            <option value="Lungo facile">Lungo facile</option>
+                            <option value="Medio / Tempo Run">Medio / Tempo Run</option>
+                            <option value="Ripetute">Ripetute</option>
+                            <option value="Rulli">Rulli</option>
+                            <option value="Forza">Forza</option>
+                            <option value="Riposo">Riposo</option>
                         </select>
                     </div>
                 </div>
                 <div><label class="block text-xs font-semibold text-slate-600 mb-1">Dettaglio seduta</label><input type="text" id="new-w-dettaglio" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Previsti</label><input type="number" step="0.5" id="new-w-km" value="8" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Previsti</label><input type="number" step="0.5" id="new-w-km" value="10" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Previste</label><select id="new-w-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select></div>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 mt-6"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="saveNewWorkout()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Inserisci</button></div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
+                <button onclick="saveNewWorkout()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Inserisci</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modale Nuova Gara -->
     <div id="modal-add-race" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Aggiungi Gara o Test</h3>
@@ -693,20 +695,26 @@
                 <div><label class="block text-xs font-semibold text-slate-600 mb-1">Nome Gara</label><input type="text" id="new-r-nome" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data</label><input type="date" id="new-r-data" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Distanza</label>
-                        <select id="new-r-dist" class="w-full border border-slate-300 rounded-lg px-3 py-2"><option value="5 km">5 km</option><option value="10 km">10 km</option><option value="21.1 km">21.1 km</option><option value="42.2 km">42.2 km</option></select>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Distanza</label>
+                        <select id="new-r-dist" class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                            <option value="5 km">5 km</option><option value="10 km">10 km</option><option value="21.1 km">21.1 km</option><option value="42.2 km">42.2 km</option>
+                        </select>
                     </div>
                 </div>
-                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Ruolo</label><select id="new-r-tipo" class="w-full border border-slate-300 rounded-lg px-3 py-2"><option value="Gara Test">Gara Test</option><option value="Gara Principale">Gara Principale</option></select></div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Ruolo</label>
+                    <select id="new-r-tipo" class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                        <option value="Gara Test">Gara Test</option><option value="Gara Principale">Gara Principale</option>
+                    </select>
+                </div>
             </div>
-            <div class="flex justify-end gap-2 mt-6"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="saveNewRace()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Gara</button></div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
+                <button onclick="saveNewRace()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Gara</button>
+            </div>
         </div>
     </div>
 
-    <!-- ==================== SCRIPT PRINCIPALE ==================== -->
     <script>
-        // Configurazione Firebase
         const firebaseConfig = {
           apiKey: "AIzaSyCUd8OG-52jOr59yEZqJBgD-hYQs9IClqw",
           authDomain: "allenamento-run.firebaseapp.com",
@@ -726,24 +734,18 @@
         let cloudSaveTimer = null;
         let unsubscribeSnapshot = null;
 
-        // Template base neutro
         const NEUTRAL_TEMPLATE_DB = {
-            ui: {
-                activeTab: "panoramica",
-                diarioFilter: "all",
-                diarioDateFrom: "",
-                diarioDateTo: "",
-                readiness: { fc: 60, schiena: "ok", polpaccio: "ok" }
-            },
-            atleta: { peso_kg: 69.0, altezza_cm: 170, bmi: 23.88, fc_riposo: 60 },
-            soglia: { fc_bpm: 187, passo: "4:23", potenza_w: 360, potenza_w_kg: 5.22, data_rilevamento: "2026-11-18", storico: [] },
-            pb: { "5k": "22:00", "10k": "46:22", "21k": "1:41:38", garmin_5k: "21:30", garmin_10k: "44:30", garmin_21k: "1:39:00" },
+            ui: { activeTab: "panoramica", diarioFilter: "current", readiness: { fc: 60, schiena: "ok", polpaccio: "ok" } },
+            atleta: { peso_kg: 70.0, altezza_cm: 175, bmi: 22.86, fc_riposo: 60 },
+            soglia: { fc_bpm: 180, passo: "4:30", potenza_w: 350, potenza_w_kg: 5.00, data_rilevamento: "2026-11-18", storico: [] },
+            vo2max: { valore: 54, livello: "Superiore" },
+            pb: { "5k": "22:00", "10k": "45:00", "21k": "1:42:00", garmin_5k: "21:30", garmin_10k: "44:30", garmin_21k: "1:39:00" },
             scarpe: [
-                { id: "shoe-1", nome: "Mizuno Neo Zen", ruolo: "Corse facili e lunghi", km_percorsi: 134, vita_utile: 800, note: "Ottime per Z2 e Z1." },
-                { id: "shoe-2", nome: "Adidas Evo SL", ruolo: "Ritmo gara, ripetute", km_percorsi: 520, vita_utile: 650, note: "Usate a Ortona (PB 1:41:38)." }
+                { id: "shoe-1", nome: "Scarpa Lenti", ruolo: "Corse facili e recupero", km_percorsi: 0, vita_utile: 600, note: "Importa backup .json" },
+                { id: "shoe-2", nome: "Scarpa Qualità", ruolo: "Gare e lavori veloci", km_percorsi: 0, vita_utile: 650, note: "" }
             ],
             gare: [
-                { nome: "Test Intermedio 10k", data: "2027-02-14", distanza: "10 km", tipo: "Gara Test" },
+                { nome: "Test / Gara 10 km", data: "2027-02-14", distanza: "10 km", tipo: "Gara Test" },
                 { nome: "Mezza Maratona Obiettivo", data: "2027-04-18", distanza: "21.1 km", tipo: "Gara Principale" }
             ],
             allenamenti_settimana: [],
@@ -751,144 +753,49 @@
                 {
                     titolo: "Core Leggero (Mobilità & Schiena)", badge: "Giorni Rulli / Riposo",
                     esercizi: [
-                        { nome: "Gatto-cammello", imgKey: "cat_cow", muscoli: "Mobilità colonna & lombare", serie: "1x10 lente", rec: "30\"", note: "In quadrupedia, inarca e arrotonda la schiena piano, senza forzare.", carico: "Corpo libero", fatto: false },
-                        { nome: "Ponte glutei", imgKey: "glute_bridge", muscoli: "Grande gluteo & ischiocrurali", serie: "2x10", rec: "45\"", note: "Supino, ginocchia piegate, spingi sui talloni senza inarcare la schiena.", carico: "Corpo libero", fatto: false },
-                        { nome: "Bird-dog", imgKey: "bird_dog", muscoli: "Core profondo & stabilizzatori schiena", serie: "2x10/lato (pausa 3\")", rec: "45\"", note: "Estendi braccio e gamba opposti tenendo il bacino fermo.", carico: "Corpo libero", fatto: false },
-                        { nome: "Plank frontale", imgKey: "plank", muscoli: "Trasverso addominale & retto", serie: "2x20-30\"", rec: "45\"", note: "Corpo in linea dai talloni alle spalle, schiena neutra.", carico: "Corpo libero", fatto: false },
-                        { nome: "Dead bug", imgKey: "dead_bug", muscoli: "Core profondo & controllo pelvico", serie: "2x10/lato", rec: "45\"", note: "Schiena sempre aderente al pavimento.", carico: "Corpo libero", fatto: false }
+                        { nome: "Gatto-cammello", imgKey: "cat_cow", muscoli: "Mobilità colonna & lombare", serie: "1x10 lente", rec: "30"", note: "In quadrupedia, inarca e arrotonda la schiena piano.", carico: "Corpo libero", fatto: false },
+                        { nome: "Ponte glutei", imgKey: "glute_bridge", muscoli: "Grande gluteo & ischiocrurali", serie: "2x10", rec: "45"", note: "Supino, ginocchia piegate, spingi sui talloni.", carico: "Corpo libero", fatto: false },
+                        { nome: "Bird-dog", imgKey: "bird_dog", muscoli: "Core profondo & stabilizzatori schiena", serie: "2x10/lato (pausa 3")", rec: "45"", note: "Estendi braccio e gamba opposti tenendo il bacino fermo.", carico: "Corpo libero", fatto: false },
+                        { nome: "Plank frontale", imgKey: "plank", muscoli: "Trasverso addominale & retto", serie: "2x20-30"", rec: "45"", note: "Corpo in linea dai talloni alle spalle.", carico: "Corpo libero", fatto: false },
+                        { nome: "Dead bug", imgKey: "dead_bug", muscoli: "Core profondo & controllo pelvico", serie: "2x10/lato", rec: "45"", note: "Schiena sempre aderente al pavimento.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
                     titolo: "Forza A: Gambe & Core (Lunedì)", badge: "Sett. 1-4: 2 serie | Da Sett. 5: 3 serie",
                     esercizi: [
-                        { nome: "Squat o Goblet Squat leggero", imgKey: "squat", muscoli: "Quadricipiti, glutei, core", serie: "2-3 x 10", rec: "60-90\"", note: "Schiena neutra, ginocchia in linea con i piedi.", carico: "", fatto: false },
-                        { nome: "Affondi indietro", imgKey: "lunge", muscoli: "Glutei, quadricipiti, stabilità bacino", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Passo indietro controllato, busto dritto.", carico: "", fatto: false },
-                        { nome: "Ponte glutei su una gamba", imgKey: "single_bridge", muscoli: "Gluteo monolaterale & femorali", serie: "2-3 x 10/gamba", rec: "60\"", note: "Bacino alto e fermo, senza ruotare l'anca.", carico: "", fatto: false },
-                        { nome: "Alzate polpacci su una gamba", imgKey: "calf_raise", muscoli: "Gastrocnemio, soleo & tendine d'Achille", serie: "2-3 x 12/gamba", rec: "60\"", note: "Sul bordo di un gradino, discesa lenta in 3 secondi.", carico: "", fatto: false },
-                        { nome: "Plank frontale + Bird-dog", imgKey: "plank", muscoli: "Core & tenuta posturale", serie: "2-3 x 35\" / 8 lato", rec: "45\"", note: "Controllo posturale lento.", carico: "Corpo libero", fatto: false }
+                        { nome: "Squat o Goblet Squat leggero", imgKey: "squat", muscoli: "Quadricipiti, glutei, core", serie: "2-3 x 10", rec: "60-90"", note: "Schiena neutra, ginocchia in linea con i piedi.", carico: "", fatto: false },
+                        { nome: "Affondi indietro", imgKey: "lunge", muscoli: "Glutei, quadricipiti, stabilità bacino", serie: "2-3 x 8/gamba", rec: "60-90"", note: "Passo indietro controllato, busto dritto.", carico: "", fatto: false },
+                        { nome: "Ponte glutei su una gamba", imgKey: "single_bridge", muscoli: "Gluteo monolaterale & femorali", serie: "2-3 x 10/gamba", rec: "60"", note: "Bacino alto e fermo.", carico: "", fatto: false },
+                        { nome: "Alzate polpacci su una gamba", imgKey: "calf_raise", muscoli: "Gastrocnemio, soleo & tendine d'Achille", serie: "2-3 x 12/gamba", rec: "60"", note: "Sul bordo di un gradino, discesa lenta.", carico: "", fatto: false },
+                        { nome: "Plank frontale + Bird-dog", imgKey: "plank", muscoli: "Core & tenuta posturale", serie: "2-3 x 35" / 8 lato", rec: "45"", note: "Controllo posturale lento.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
                     titolo: "Forza B: Stabilità & Catena Posteriore (Venerdì)", badge: "Sett. 1-4: 2 serie | Da Sett. 5: 3 serie",
                     esercizi: [
-                        { nome: "Step-up su gradino (30-40 cm)", imgKey: "step_up", muscoli: "Glutei, quadricipiti, spinta di corsa", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Spingi con il tallone della gamba sul gradino.", carico: "", fatto: false },
-                        { nome: "Camminata laterale con elastico", imgKey: "band_walk", muscoli: "Medio gluteo (stabilità ginocchio/anca)", serie: "2 x 12 passi/lato", rec: "45\"", note: "Elastico sopra le ginocchia, ginocchia semiflesse.", carico: "Elastico", fatto: false },
-                        { nome: "Stacco rumeno con manubri leggeri", imgKey: "rdl", muscoli: "Ischiocrurali, glutei, erettori spinali", serie: "Solo da Sett. 3 (3x8)", rec: "60-90\"", note: "Solo dalla 3ª settimana se la schiena è senza fastidi.", carico: "", fatto: false },
-                        { nome: "Plank laterale + Dead bug", imgKey: "side_plank", muscoli: "Obliqui, quadrato dei lombi & core", serie: "2-3 x 30\" / 8 lato", rec: "45\"", note: "Corpo allineato, fianchi alti.", carico: "Corpo libero", fatto: false }
+                        { nome: "Step-up su gradino (30-40 cm)", imgKey: "step_up", muscoli: "Glutei, quadricipiti, spinta di corsa", serie: "2-3 x 8/gamba", rec: "60-90"", note: "Spingi con il tallone della gamba sul gradino.", carico: "", fatto: false },
+                        { nome: "Camminata laterale con elastico", imgKey: "band_walk", muscoli: "Medio gluteo", serie: "2 x 12 passi/lato", rec: "45"", note: "Elastico sopra le ginocchia, ginocchia semiflesse.", carico: "Elastico", fatto: false },
+                        { nome: "Stacco rumeno con manubri leggeri", imgKey: "rdl", muscoli: "Ischiocrurali, glutei, erettori spinali", serie: "Solo da Sett. 3 (3x8)", rec: "60-90"", note: "Solo se la schiena è senza fastidi.", carico: "", fatto: false },
+                        { nome: "Plank laterale + Dead bug", imgKey: "side_plank", muscoli: "Obliqui, quadrato dei lombi & core", serie: "2-3 x 30" / 8 lato", rec: "45"", note: "Corpo allineato, fianchi alti.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
                     titolo: "Forza C: Upper Body & Postura Runner", badge: "Giorni Facili / Rulli (2x/sett.)",
                     esercizi: [
-                        { nome: "Piegamenti (Push-up) o Panca Manubri", imgKey: "pushup", muscoli: "Pettorali, deltoidi anteriori, tricipiti", serie: "3 x 10-12", rec: "60\"", note: "Spinta controllata, RIR 3 (lascia 3 ripetizioni di margine).", carico: "", fatto: false },
-                        { nome: "Rematore con manubrio / elastico", imgKey: "row", muscoli: "Gran dorsale, romboidi, bicipiti", serie: "3 x 10/lato", rec: "60\"", note: "Rinforza il dorso per mantenere il busto aperto.", carico: "", fatto: false },
-                        { nome: "Military Press / Alzate manubri", imgKey: "overhead_press", muscoli: "Deltoidi & stabilizzatori scapola", serie: "3 x 10", rec: "60\"", note: "Addome attivo per non inarcare la zona lombare.", carico: "", fatto: false },
-                        { nome: "Face-pull con elastico / Tirate", imgKey: "face_pull", muscoli: "Deltoidi posteriori & cuffia rotatori", serie: "3 x 12-15", rec: "45\"", note: "Tira l'elastico verso il viso avvicinando le scapole.", carico: "Elastico", fatto: false }
+                        { nome: "Piegamenti (Push-up) o Panca Manubri", imgKey: "pushup", muscoli: "Pettorali, deltoidi anteriori", serie: "3 x 10-12", rec: "60"", note: "Spinta controllata, RIR 3.", carico: "", fatto: false },
+                        { nome: "Rematore con manubrio / elastico", imgKey: "row", muscoli: "Gran dorsale, romboidi", serie: "3 x 10/lato", rec: "60"", note: "Rinforza il dorso per mantenere il busto aperto.", carico: "", fatto: false },
+                        { nome: "Military Press / Alzate manubri", imgKey: "overhead_press", muscoli: "Deltoidi & stabilizzatori", serie: "3 x 10", rec: "60"", note: "Addome attivo.", carico: "", fatto: false },
+                        { nome: "Face-pull con elastico / Tirate", imgKey: "face_pull", muscoli: "Deltoidi posteriori & cuffia", serie: "3 x 12-15", rec: "45"", note: "Tira l'elastico verso il viso avvicinando le scapole.", carico: "Elastico", fatto: false }
                     ]
                 }
             ],
             regole: [
-                { tema: "Costruzione Aerobica (Z2)", desc: "L'80% dei chilometri deve essere corso lentamente sotto i 145 bpm per costruire la base aerobica." },
-                { tema: "Schiena", desc: "Se una seduta dà fastidio, passa ai rulli. Niente stacco rumeno nelle prime settimane." },
-                { tema: "Gestione Rulli", desc: "La domenica è dedicata ai Rulli in Z1 (60-70 rpm) per recuperare dal lungo senza impatti." },
-                { tema: "Polpaccio & tendini", desc: "Controlla i primi passi del mattino. Se fa male, niente corsa finché non passa." }
+                { tema: "Costruzione Aerobica (Z2)", desc: "L'80% del tuo volume da qui a fine anno deve essere fatto al passo lento. Controlla la frequenza per non uscire dalla Zona 2 (sotto i 145 bpm)." },
+                { tema: "Schiena & Core", desc: "Se una seduta dà fastidio, fermati o passa ai rulli. La Forza A (Lunedì) è fondamentale per rinforzare il core post-lungo." },
+                { tema: "Frequenza a riposo", desc: "Se per più giorni è 7-10 bpm sopra il valore normale, o dormi male, aggiungi un giorno di riposo." },
+                { tema: "Gestione Rulli", desc: "La domenica mattina è dedicata ai Rulli in Z1 (60-70 rpm): servono solo a far girare le gambe. Fai zero fatica." }
             ]
         };
-
-        // ==================== UTILITY DATE LOCALI (ZERO SPOSTAMENTI UTC) ====================
-        function parseLocalDate(isoStr) {
-            const [y, m, d] = isoStr.split('-').map(Number);
-            return new Date(y, m - 1, d);
-        }
-
-        function formatLocalISO(dt) {
-            return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-        }
-
-        function getLocalTodayISO() {
-            return formatLocalISO(new Date());
-        }
-
-        function addDaysISO(isoStr, days) {
-            const dt = parseLocalDate(isoStr);
-            dt.setDate(dt.getDate() + days);
-            return formatLocalISO(dt);
-        }
-
-        function diffDaysInclusive(fromIso, toIso) {
-            const d1 = parseLocalDate(fromIso);
-            const d2 = parseLocalDate(toIso);
-            return Math.round((d2.getTime() - d1.getTime()) / 86400000) + 1;
-        }
-
-        function capitalizeFirst(str) {
-            return str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
-        }
-
-        // Restituisce i confini Lunedì -> Domenica della settimana contenente dateStr
-        function getWeekBoundaries(dateStr) {
-            const d = parseLocalDate(dateStr);
-            const day = d.getDay() === 0 ? 7 : d.getDay(); // Lun=1 .. Dom=7
-            const start = new Date(d.getFullYear(), d.getMonth(), d.getDate() - day + 1);
-            const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
-            const startMonth = capitalizeFirst(start.toLocaleString('it-IT', { month: 'short' }).replace('.', ''));
-            const endMonth = capitalizeFirst(end.toLocaleString('it-IT', { month: 'short' }).replace('.', ''));
-            return {
-                startIso: formatLocalISO(start),
-                endIso: formatLocalISO(end),
-                shortLabel: `${start.getDate()} ${startMonth} – ${end.getDate()} ${endMonth}`,
-                fullLabel: `${start.getDate()} ${startMonth} – ${end.getDate()} ${endMonth} ${end.getFullYear()}`
-            };
-        }
-
-        // Genera l'elenco ordinato cronologicamente (crescente) di tutte le settimane dal 25 Ott 2026 al 17 Gen 2027 (e oltre se presenti)
-        function getAllChronologicalWeeks() {
-            const dates = db.allenamenti_settimana
-                .map(a => a.data)
-                .filter(d => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d))
-                .sort();
-
-            const minDate = dates.length && dates[0] < '2026-10-25' ? dates[0] : '2026-10-25';
-            const maxDate = dates.length && dates[dates.length - 1] > '2027-01-17' ? dates[dates.length - 1] : '2027-01-17';
-
-            const firstWeek = getWeekBoundaries(minDate);
-            const lastWeek = getWeekBoundaries(maxDate);
-
-            const weeks = [];
-            let cursorIso = firstWeek.startIso;
-            let idx = 1;
-            while (cursorIso <= lastWeek.startIso) {
-                const wb = getWeekBoundaries(cursorIso);
-                weeks.push({
-                    num: idx,
-                    key: `${wb.startIso}_${wb.endIso}`,
-                    startIso: wb.startIso,
-                    endIso: wb.endIso,
-                    shortLabel: wb.shortLabel,
-                    fullLabel: wb.fullLabel
-                });
-                cursorIso = addDaysISO(cursorIso, 7);
-                idx++;
-            }
-            return weeks;
-        }
-
-        // ==================== NOTIFICHE TOAST & ERRORI ====================
-        let toastTimer = null;
-        function showToast(msg, type = 'success') {
-            const box = document.getElementById('toast-box');
-            if (!box) return;
-            const styles = {
-                success: 'bg-emerald-900 text-white border-emerald-700',
-                error: 'bg-rose-900 text-white border-rose-700',
-                info: 'bg-slate-900 text-white border-slate-700'
-            };
-            box.className = `fixed bottom-5 right-5 z-50 max-w-sm rounded-xl px-4 py-3 text-xs font-semibold shadow-xl border ${styles[type] || styles.info}`;
-            box.textContent = msg;
-            box.classList.remove('hidden');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => box.classList.add('hidden'), 3500);
-        }
 
         function showCloudError(err) {
             const banner = document.getElementById('cloud-error-banner');
@@ -896,7 +803,9 @@
             const badge = document.getElementById('sync-badge');
             let msg = err && err.message ? err.message : "Impossibile raggiungere Firestore.";
             if (err && err.code === 'permission-denied') {
-                msg = "Permessi negati da Firestore: verifica le regole su Firebase Console > Firestore Database > Regole.";
+                msg = "Permessi negati da Firestore: controlla le Regole.";
+            } else if (err && (err.code === 'not-found' || msg.includes('database'))) {
+                msg = "Database Firestore non trovato.";
             }
             if (banner && text) { text.textContent = msg; banner.classList.remove('hidden'); }
             if (badge) {
@@ -910,7 +819,6 @@
             if (banner) banner.classList.add('hidden');
         }
 
-        // ==================== AUTENTICAZIONE & SINCRONIZZAZIONE CLOUD ====================
         async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
@@ -919,14 +827,14 @@
             const btn = document.getElementById('login-btn');
             errBox.classList.add('hidden');
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Accesso in corso...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Accesso...`;
             try {
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (err) {
                 errBox.textContent = "Credenziali non valide (" + err.code + ").";
                 errBox.classList.remove('hidden');
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-lock-open mr-1.5"></i> Accedi alla Dashboard`;
+                btn.innerHTML = `<i class="fa-solid fa-lock-open mr-1.5"></i> Accedi`;
             }
         }
 
@@ -958,8 +866,8 @@
                 const raw = localStorage.getItem(k);
                 if (raw) {
                     try {
-                        const p = normalizeDb(JSON.parse(raw));
-                        if (p.allenamenti_settimana && p.allenamenti_settimana.length > 0) return p;
+                        const parsed = normalizeDb(JSON.parse(raw));
+                        if (parsed.allenamenti_settimana && parsed.allenamenti_settimana.length > 0) return parsed;
                     } catch (e) {}
                 }
             }
@@ -993,8 +901,9 @@
                 }
 
                 clearCloudError();
+                const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                 badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
-                badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Sincronizzato · ` + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+                badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Sincronizzato · ${now}`;
 
                 if (unsubscribeSnapshot) unsubscribeSnapshot();
                 unsubscribeSnapshot = docRef.onSnapshot((snap) => {
@@ -1005,11 +914,13 @@
                         localStorage.setItem(localCacheKey, JSON.stringify(db));
                         restoreSavedInputs();
                         renderAll();
+                        const t = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                         badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
-                        badge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down mr-1"></i> Aggiornato Live · ` + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        badge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down mr-1"></i> Aggiornato Live · ${t}`;
                     }
                 }, (err) => showCloudError(err));
             } catch (err) {
+                console.error("Errore lettura Firestore:", err);
                 db = localPopulated || structuredClone(NEUTRAL_TEMPLATE_DB);
                 showCloudError(err);
             }
@@ -1029,10 +940,11 @@
                 localStorage.setItem('runcoach_cloud_' + currentUser.uid, JSON.stringify(db));
                 await firestore.collection('users').doc(currentUser.uid).set(db);
                 clearCloudError();
+                const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
-                badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ` + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                showToast("Dati sincronizzati sul Cloud.", "success");
+                badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ${now}`;
             } catch (err) {
+                console.error("Errore invio Firestore:", err);
                 showCloudError(err);
             }
         }
@@ -1052,17 +964,18 @@
                 try {
                     await firestore.collection('users').doc(currentUser.uid).set(db);
                     clearCloudError();
+                    const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     if (badge) {
                         badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
-                        badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ` + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ${now}`;
                     }
                 } catch (err) {
+                    console.error("Errore salvataggio Firestore:", err);
                     showCloudError(err);
                 }
             }, 400);
         }
 
-        // ==================== ILLUSTRAZIONI SVG ESERCIZI FORZA ====================
         function getExerciseSVG(key, large = false) {
             const cls = large ? "w-72 h-48" : "w-20 h-14 shrink-0";
             const base = `<svg viewBox="0 0 160 110" class="${cls} rounded-lg bg-white border border-slate-200" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="96" x2="150" y2="96" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>`;
@@ -1088,30 +1001,35 @@
             return base + (shapes[key] || shapes.squat) + `</svg>`;
         }
 
-        // ==================== NORMALIZZAZIONE E RIPRISTINO INPUT ====================
+        function getLocalTodayISO() {
+            const now = new Date();
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        }
+
+        function getWeekBoundaries(dateStr) {
+            const d = new Date(dateStr);
+            const day = d.getDay() === 0 ? 7 : d.getDay(); 
+            const start = new Date(d);
+            start.setDate(d.getDate() - day + 1); 
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6); 
+            return {
+                startIso: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`,
+                endIso: `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`,
+                label: `${start.getDate()} ${start.toLocaleString('it-IT', {month:'short'})} – ${end.getDate()} ${end.toLocaleString('it-IT', {month:'short'})}`
+            };
+        }
+
         function normalizeDb(raw) {
             const merged = structuredClone(NEUTRAL_TEMPLATE_DB);
             if (!raw || typeof raw !== 'object') return merged;
-            if (raw.ui) {
-                merged.ui = {
-                    ...merged.ui,
-                    ...raw.ui,
-                    readiness: { ...merged.ui.readiness, ...(raw.ui.readiness || {}) }
-                };
-            }
+            if (raw.ui) merged.ui = { ...merged.ui, ...raw.ui, readiness: { ...merged.ui.readiness, ...(raw.ui.readiness || {}) } };
             if (raw.atleta) merged.atleta = { ...merged.atleta, ...raw.atleta };
-            if (raw.soglia) {
-                merged.soglia = {
-                    ...merged.soglia,
-                    ...raw.soglia,
-                    storico: Array.isArray(raw.soglia.storico) ? raw.soglia.storico : []
-                };
-            }
+            if (raw.soglia) merged.soglia = { ...merged.soglia, ...raw.soglia, storico: Array.isArray(raw.soglia.storico) ? raw.soglia.storico : [] };
+            if (raw.vo2max) merged.vo2max = { ...merged.vo2max, ...raw.vo2max };
             if (raw.pb) merged.pb = { ...merged.pb, ...raw.pb };
             if (Array.isArray(raw.gare) && raw.gare.length) merged.gare = raw.gare;
-            if (Array.isArray(raw.allenamenti_settimana)) {
-                merged.allenamenti_settimana = raw.allenamenti_settimana.map(item => ({ km_rulli: null, ...item }));
-            }
+            if (Array.isArray(raw.allenamenti_settimana)) merged.allenamenti_settimana = raw.allenamenti_settimana.map(item => ({ km_rulli: null, ...item }));
             if (Array.isArray(raw.regole) && raw.regole.length) merged.regole = raw.regole;
             if (Array.isArray(raw.scarpe) && raw.scarpe.length) merged.scarpe = raw.scarpe;
             if (Array.isArray(raw.forza) && raw.forza.length) {
@@ -1132,8 +1050,8 @@
 
         function restoreSavedInputs() {
             document.getElementById('pb-5k').value = db.pb["5k"] || "22:00";
-            document.getElementById('pb-10k').value = db.pb["10k"] || "46:22";
-            document.getElementById('pb-21k').value = db.pb["21k"] || "1:41:38";
+            document.getElementById('pb-10k').value = db.pb["10k"] || "45:00";
+            document.getElementById('pb-21k').value = db.pb["21k"] || "1:42:00";
             document.getElementById('garmin-5k').value = db.pb.garmin_5k || "21:30";
             document.getElementById('garmin-10k').value = db.pb.garmin_10k || "44:30";
             document.getElementById('garmin-21k').value = db.pb.garmin_21k || "1:39:00";
@@ -1150,11 +1068,9 @@
             document.getElementById('soglia-wkg').value = s.potenza_w_kg;
             document.getElementById('soglia-data').value = s.data_rilevamento || "2026-11-18";
 
-            // Ripristino filtri Diario
-            const fromEl = document.getElementById('diario-date-from');
-            const toEl = document.getElementById('diario-date-to');
-            if (fromEl) fromEl.value = db.ui.diarioDateFrom || "";
-            if (toEl) toEl.value = db.ui.diarioDateTo || "";
+            const v = db.vo2max || { valore: 54, livello: "Superiore" };
+            document.getElementById('vo2-val').value = v.valore;
+            document.getElementById('vo2-lvl').value = v.livello;
         }
 
         function switchTab(tabId, persist = true) {
@@ -1171,7 +1087,7 @@
 
             const titles = {
                 panoramica: ["Panoramica & Readiness", "Monitoraggio condizione, soglia Garmin e prevenzione infortuni"],
-                diario: ["Diario & Coach Dinamico", "Filtro cronologico per settimane, intervalli personalizzati e Km Rulli"],
+                diario: ["Diario & Coach Dinamico", "Piano giornaliero, Km Rulli e rimodulazione automatica"],
                 gare: ["Gare, Soglia & Zone Ritmo", "Soglia Garmin (FC/Passo/Watt), obiettivi 10k e Mezza Maratona"],
                 forza: ["Forza Gambe & Upper Body", "Schede progressive con illustrazioni esercizi e tracciamento carichi"],
                 scarpe: ["Parco Scarpe & Regole", "Gestione libera km percorsi/rimanenti e protocollo sicurezza"]
@@ -1179,27 +1095,33 @@
             document.getElementById('page-title').textContent = titles[tabId][0];
             document.getElementById('page-subtitle').textContent = titles[tabId][1];
 
-            if (persist && db) { db.ui.activeTab = tabId; saveLocal(); }
+            if (persist && db) {
+                db.ui.activeTab = tabId;
+                saveLocal();
+            }
         }
 
-        // ==================== AGGIORNAMENTO KPI E RENDER GENERALE ====================
         function updateTotalsUI() {
-            const oggiIso = getLocalTodayISO();
-            const curWeek = getWeekBoundaries(oggiIso);
-
             const totRulli = db.allenamenti_settimana.reduce((sum, a) => sum + (Number(a.km_rulli) || 0), 0);
-            const settCurItems = db.allenamenti_settimana.filter(a => a.data >= curWeek.startIso && a.data <= curWeek.endIso);
-            const kmPrevCur = settCurItems.reduce((s, a) => s + (Number(a.km_previsti) || 0), 0);
-            const kmFattiCur = settCurItems.reduce((s, a) => s + (Number(a.km_fatti) || 0), 0);
-            const rulliSettCur = settCurItems.reduce((s, a) => s + (Number(a.km_rulli) || 0), 0);
+            const totCorsa = db.allenamenti_settimana.reduce((sum, a) => sum + (Number(a.km_fatti) || 0), 0);
 
-            document.getElementById('kpi-km-sett').textContent = `${kmFattiCur.toFixed(1).replace(/\.0$/, '')} / ${kmPrevCur.toFixed(1).replace(/\.0$/, '')} km`;
-            document.getElementById('kpi-km-sett-sub').textContent = `Sett. ${curWeek.shortLabel}`;
+            const thisW = getWeekBoundaries(getLocalTodayISO());
+            const settBase = db.allenamenti_settimana.filter(a => a.data >= thisW.startIso && a.data <= thisW.endIso);
+            const kmPrevBase = settBase.reduce((s, a) => s + (Number(a.km_previsti) || 0), 0);
+            const kmFattiBase = settBase.reduce((s, a) => s + (Number(a.km_fatti) || 0), 0);
+            const rulliSettBase = settBase.reduce((s, a) => s + (Number(a.km_rulli) || 0), 0);
+
+            document.getElementById('kpi-km-sett').textContent = `${kmFattiBase} / ${kmPrevBase} km`;
             document.getElementById('kpi-rulli-tot').textContent = `${totRulli.toFixed(1)} km`;
-            document.getElementById('kpi-rulli-sub').textContent = `Sett. corrente: ${rulliSettCur.toFixed(1)} km`;
+            document.getElementById('kpi-rulli-sub').textContent = `Sett. corrente: ${rulliSettBase.toFixed(1)} km`;
 
             const weeklyBadge = document.getElementById('weekly-rulli-badge');
             if (weeklyBadge) weeklyBadge.textContent = `Totale Rulli Accumulati: ${totRulli.toFixed(1)} km`;
+
+            const dCorsa = document.getElementById('diario-tot-corsa');
+            const dRulli = document.getElementById('diario-tot-rulli');
+            if (dCorsa) dCorsa.textContent = `Totale Corsa (vista attuale): ${totCorsa.toFixed(1)} km`;
+            if (dRulli) dRulli.innerHTML = `<i class="fa-solid fa-bicycle mr-1"></i> Totale Rulli (vista attuale): ${totRulli.toFixed(1)} km`;
         }
 
         function renderAll() {
@@ -1228,9 +1150,9 @@
                 document.getElementById('kpi-shoe2-sub').textContent = `${s2.km_percorsi} / ${s2.vita_utile} km · Rimanenti`;
             }
 
-            const todayDt = parseLocalDate(getLocalTodayISO());
-            const d10k = Math.max(0, Math.ceil((parseLocalDate("2027-02-14") - todayDt) / 86400000));
-            const d21k = Math.max(0, Math.ceil((parseLocalDate("2027-04-18") - todayDt) / 86400000));
+            const today = new Date();
+            const d10k = Math.max(0, Math.ceil((new Date("2027-02-14") - today) / (1000 * 60 * 60 * 24)));
+            const d21k = Math.max(0, Math.ceil((new Date("2027-04-18") - today) / (1000 * 60 * 60 * 24)));
             document.getElementById('kpi-cd-21k').textContent = `${d21k} gg`;
             document.getElementById('kpi-cd-sub').textContent = `Test 10k tra ${d10k} gg`;
 
@@ -1245,15 +1167,20 @@
             renderShoesAndRules();
         }
 
-        // ==================== SOGLIA ANAEROBICA GARMIN ====================
         function renderThresholdDisplays() {
             const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
+            const v = db.vo2max || { valore: 54, livello: "Superiore" };
             const formattedPace = s.passo.includes(':') ? s.passo.replace(':', "'") + '"/km' : s.passo;
             document.getElementById('pan-soglia-fc').textContent = `${s.fc_bpm} bpm`;
             document.getElementById('pan-soglia-passo').textContent = formattedPace;
             document.getElementById('pan-soglia-w').textContent = `${s.potenza_w} W`;
             document.getElementById('pan-soglia-wkg').textContent = `${Number(s.potenza_w_kg).toFixed(2)} W/kg`;
             document.getElementById('pan-soglia-date').textContent = `Agg. ${s.data_rilevamento || ''}`;
+
+            document.getElementById('pan-vo2-val').textContent = v.valore;
+            document.getElementById('pan-vo2-lvl').textContent = v.livello;
+            document.getElementById('side-vo2').textContent = v.valore;
+            document.getElementById('side-vo2-lvl').textContent = v.livello;
 
             const calcWkg = (Number(s.potenza_w) / db.atleta.peso_kg).toFixed(2);
             document.getElementById('soglia-wkg-calc').textContent = `Su ${db.atleta.peso_kg} kg: ${calcWkg} W/kg`;
@@ -1262,17 +1189,30 @@
             const histList = document.getElementById('threshold-history-list');
             if (s.storico && s.storico.length > 0) {
                 histBox.classList.remove('hidden');
-                histList.innerHTML = s.storico.map((item, idx) => `<span class="inline-flex items-center gap-2 text-xs bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg font-mono text-slate-700"><span><strong>${item.data}</strong>: ${item.fc_bpm} bpm · ${item.passo}/km · ${item.potenza_w}W (${item.potenza_w_kg} W/kg)</span><button onclick="deleteThresholdHistory(${idx})" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-xmark"></i></button></span>`).join('');
+                histList.innerHTML = s.storico.map((item, idx) => `
+                    <span class="inline-flex items-center gap-2 text-xs bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg font-mono text-slate-700">
+                        <span><strong>${item.data}</strong>: ${item.fc_bpm} bpm · ${item.passo}/km · ${item.potenza_w}W${item.vo2 ? ` · VO2 ${item.vo2}` : ''}</span>
+                        <button onclick="deleteThresholdHistory(${idx})" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-xmark"></i></button>
+                    </span>
+                `).join('');
             } else {
                 histBox.classList.add('hidden');
             }
         }
 
+        function saveVo2Inline() {
+            db.vo2max = db.vo2max || { valore: 54, livello: "Superiore" };
+            db.vo2max.valore = parseInt(document.getElementById('vo2-val').value) || 54;
+            db.vo2max.livello = document.getElementById('vo2-lvl').value || "Superiore";
+            saveLocal();
+            renderThresholdDisplays();
+        }
+
         function saveThresholdInline() {
-            db.soglia.fc_bpm = parseInt(document.getElementById('soglia-fc').value) || 187;
-            db.soglia.passo = document.getElementById('soglia-passo').value.trim() || "4:23";
-            db.soglia.potenza_w = parseInt(document.getElementById('soglia-w').value) || 360;
-            db.soglia.potenza_w_kg = parseFloat(document.getElementById('soglia-wkg').value) || 5.22;
+            db.soglia.fc_bpm = parseInt(document.getElementById('soglia-fc').value) || 180;
+            db.soglia.passo = document.getElementById('soglia-passo').value.trim() || "4:30";
+            db.soglia.potenza_w = parseInt(document.getElementById('soglia-w').value) || 350;
+            db.soglia.potenza_w_kg = parseFloat(document.getElementById('soglia-wkg').value) || 5.00;
             db.soglia.data_rilevamento = document.getElementById('soglia-data').value || getLocalTodayISO();
             saveLocal();
             renderThresholdDisplays();
@@ -1281,16 +1221,17 @@
 
         function archiveThresholdSnapshot() {
             db.soglia.storico = db.soglia.storico || [];
+            const v = db.vo2max || { valore: 54, livello: "Superiore" };
             db.soglia.storico.unshift({
                 data: db.soglia.data_rilevamento || getLocalTodayISO(),
                 fc_bpm: db.soglia.fc_bpm,
                 passo: db.soglia.passo,
                 potenza_w: db.soglia.potenza_w,
-                potenza_w_kg: db.soglia.potenza_w_kg
+                potenza_w_kg: db.soglia.potenza_w_kg,
+                vo2: `${v.valore} (${v.livello})`
             });
             saveLocal();
             renderThresholdDisplays();
-            showToast("Soglia salvata nello storico.", "success");
         }
 
         function deleteThresholdHistory(idx) {
@@ -1303,29 +1244,34 @@
 
         function openThresholdModal() {
             const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
+            const v = db.vo2max || { valore: 54, livello: "Superiore" };
             document.getElementById('m-soglia-fc').value = s.fc_bpm;
             document.getElementById('m-soglia-passo').value = s.passo;
             document.getElementById('m-soglia-w').value = s.potenza_w;
             document.getElementById('m-soglia-wkg').value = s.potenza_w_kg;
             document.getElementById('m-soglia-data').value = s.data_rilevamento || getLocalTodayISO();
+            document.getElementById('m-vo2-val').value = v.valore;
+            document.getElementById('m-vo2-lvl').value = v.livello;
             const m = document.getElementById('modal-threshold');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function saveThresholdModal() {
-            db.soglia.fc_bpm = parseInt(document.getElementById('m-soglia-fc').value) || 187;
-            db.soglia.passo = document.getElementById('m-soglia-passo').value.trim() || "4:23";
-            db.soglia.potenza_w = parseInt(document.getElementById('m-soglia-w').value) || 360;
-            db.soglia.potenza_w_kg = parseFloat(document.getElementById('m-soglia-wkg').value) || 5.22;
+            db.soglia.fc_bpm = parseInt(document.getElementById('m-soglia-fc').value) || 180;
+            db.soglia.passo = document.getElementById('m-soglia-passo').value.trim() || "4:30";
+            db.soglia.potenza_w = parseInt(document.getElementById('m-soglia-w').value) || 350;
+            db.soglia.potenza_w_kg = parseFloat(document.getElementById('m-soglia-wkg').value) || 5.00;
             db.soglia.data_rilevamento = document.getElementById('m-soglia-data').value || getLocalTodayISO();
+            db.vo2max = {
+                valore: parseInt(document.getElementById('m-vo2-val').value) || 54,
+                livello: document.getElementById('m-vo2-lvl').value || "Superiore"
+            };
             restoreSavedInputs();
             saveLocal();
             closeModals();
             renderAll();
         }
 
-        // ==================== READINESS & PROSSIME SEDUTE ====================
         function updateReadiness(shouldSave = true) {
             const fc = parseInt(document.getElementById('input-fc-riposo').value) || 60;
             const schiena = document.getElementById('input-schiena').value;
@@ -1344,17 +1290,17 @@
                 badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800";
                 badge.textContent = "SEMAFORO ROSSO — RIPOSO / RULLI";
                 advice.className = "text-sm bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-lg";
-                advice.innerHTML = `<strong>Stop precauzionale attivo:</strong> Dolore rilevato o FC riposo elevata. Niente corsa oggi.`;
+                advice.innerHTML = `<strong>Stop precauzionale:</strong> Hai segnalato dolore o un aumento della FC a riposo di +${fc - baseFc} bpm. Niente corsa.`;
             } else if (schiena === 'lieve' || polpaccio === 'affaticato' || fc >= baseFc + 5) {
                 badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800";
                 badge.textContent = "SEMAFORO GIALLO — CAUTELA";
                 advice.className = "text-sm bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-lg";
-                advice.innerHTML = `<strong>Attenzione al carico:</strong> Mantieni i battiti sotto i <strong>135 bpm</strong> ed evita gli allunghi.`;
+                advice.innerHTML = `<strong>Attenzione al carico:</strong> Leggero affaticamento. Mantieni i battiti sotto i <strong>135 bpm</strong> ed evita gli allunghi.`;
             } else {
                 badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800";
                 badge.textContent = "SEMAFORO VERDE — OK PER CORRERE";
                 advice.className = "text-sm bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-lg";
-                advice.innerHTML = `Parametri nella norma (${fc} bpm). Puoi correre tra <strong>125 e 145 bpm</strong> nelle corse facili.`;
+                advice.innerHTML = `Parametri nella norma (${fc} bpm). Puoi correre la seduta prevista mantenendo i battiti in Z2.`;
             }
         }
 
@@ -1383,166 +1329,73 @@
                 } else if (a.data === domaniIso) {
                     dayTag = `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-100 text-indigo-700">DOMANI</span>`;
                 }
-
-                const statusIcon = a.stato === 'completato'
-                    ? `<i class="fa-solid fa-circle-check text-emerald-600 ml-1"></i>`
-                    : (a.stato === 'saltato' ? `<i class="fa-solid fa-circle-xmark text-rose-500 ml-1"></i>` : '');
-                const targetBadge = a.km_previsti > 0
-                    ? `${a.km_previsti} km`
-                    : (Number(a.km_rulli) > 0 ? `${a.km_rulli} km rulli` : 'Cross/Forza');
-
-                return `<div onclick="openCompleteModal(${a.idx})" class="p-3 rounded-lg border ${cardStyle} flex justify-between items-center cursor-pointer hover:shadow-xs transition"><div class="min-w-0 pr-2"><div class="flex items-center gap-1.5 mb-0.5">${dayTag}<span class="text-[11px] font-mono text-slate-500">${a.data} (${a.giorno || ''})</span>${statusIcon}</div><div class="font-bold text-sm text-slate-900 truncate">${a.tipo}</div><div class="text-[11px] text-slate-500 truncate">${a.dettaglio || ''}</div></div><span class="shrink-0 text-xs font-bold px-2.5 py-1 rounded bg-white border border-slate-200 text-blue-700">${targetBadge}</span></div>`;
+                const statusIcon = a.stato === 'completato' ? `<i class="fa-solid fa-circle-check text-emerald-600 ml-1"></i>` : (a.stato === 'saltato' ? `<i class="fa-solid fa-circle-xmark text-rose-500 ml-1"></i>` : '');
+                const targetBadge = a.km_previsti > 0 ? `${a.km_previsti} km` : (Number(a.km_rulli) > 0 ? `${a.km_rulli} km rulli` : 'Cross/Forza');
+                return `
+                    <div onclick="openCompleteModal(${a.idx})" class="p-3 rounded-lg border ${cardStyle} flex justify-between items-center cursor-pointer hover:shadow-xs transition">
+                        <div class="min-w-0 pr-2">
+                            <div class="flex items-center gap-1.5 mb-0.5">${dayTag}<span class="text-[11px] font-mono text-slate-500">${a.data} (${a.giorno || ''})</span>${statusIcon}</div>
+                            <div class="font-bold text-sm text-slate-900 truncate">${a.tipo}</div>
+                            <div class="text-[11px] text-slate-500 truncate">${a.dettaglio || ''}</div>
+                        </div>
+                        <span class="shrink-0 text-xs font-bold px-2.5 py-1 rounded bg-white border border-slate-200 text-blue-700">${targetBadge}</span>
+                    </div>
+                `;
             }).join('');
         }
 
-        // ==================== RIEPILOGO SETTIMANALE DINAMICO (TAB 1) ====================
-        function inferWeekPhase(startIso) {
-            if (startIso <= "2026-10-26") return "Recupero post-gara";
-            if (startIso <= "2026-11-02") return "Fermo / Stop";
-            if (startIso <= "2026-11-09") return "Settimana Rientro";
-            if (startIso <= "2026-11-16") return "Inizio Base";
-            if (startIso <= "2026-12-07") return "Base Aerobica";
-            if (startIso <= "2026-12-14") return "Scarico";
-            if (startIso <= "2027-01-04") return "Qualità & Ritmo";
-            return "Test 10k";
-        }
-
-        function jumpToWeekInDiario(weekKey) {
-            const [startIso, endIso] = weekKey.split('_');
-            db.ui.diarioFilter = weekKey;
-            db.ui.diarioDateFrom = startIso;
-            db.ui.diarioDateTo = endIso;
-            const fromEl = document.getElementById('diario-date-from');
-            const toEl = document.getElementById('diario-date-to');
-            if (fromEl) fromEl.value = startIso;
-            if (toEl) toEl.value = endIso;
-            switchTab('diario', true);
-            renderDiario();
-        }
-
         function renderWeeklySummary() {
-            const oggiIso = getLocalTodayISO();
-            const curWeek = getWeekBoundaries(oggiIso);
-            const allWeeks = getAllChronologicalWeeks();
+            if (!db.allenamenti_settimana.length) return;
+            const weekMap = new Map();
+            db.allenamenti_settimana.forEach(a => {
+                const w = getWeekBoundaries(a.data);
+                const key = `${w.startIso}_${w.endIso}`;
+                if(!weekMap.has(key)) weekMap.set(key, { label: w.label, start: w.startIso, end: w.endIso, items: [] });
+                weekMap.get(key).items.push(a);
+            });
+            const sortedWeeks = Array.from(weekMap.values()).sort((a,b) => a.start.localeCompare(b.start));
 
-            document.getElementById('weekly-summary-body').innerHTML = allWeeks.map(w => {
-                const items = db.allenamenti_settimana.filter(x => x.data >= w.startIso && x.data <= w.endIso);
-                const prev = items.reduce((s, x) => s + (Number(x.km_previsti) || 0), 0);
-                const fatti = items.reduce((s, x) => s + (Number(x.km_fatti) || 0), 0);
-                const rulli = items.reduce((s, x) => s + (Number(x.km_rulli) || 0), 0);
-                const pct = prev > 0 ? Math.min(100, Math.round((fatti / prev) * 100)) : (fatti > 0 ? 100 : 0);
-                const isCurrent = w.startIso === curWeek.startIso;
-
-                return `<tr onclick="jumpToWeekInDiario('${w.key}')" class="${isCurrent ? 'bg-blue-50/70' : 'hover:bg-slate-50'} cursor-pointer transition" title="Clicca per aprire questa settimana nel Diario">
-                    <td class="p-3 font-semibold text-slate-800 whitespace-nowrap">
-                        <span class="text-xs font-mono text-slate-400 mr-1.5">S${w.num}</span>${w.shortLabel}
-                        ${isCurrent ? '<span class="ml-1.5 px-1.5 py-0.5 text-[9px] font-bold bg-blue-600 text-white rounded">CORRENTE</span>' : ''}
-                    </td>
-                    <td class="p-3 text-slate-500 text-xs">${inferWeekPhase(w.startIso)}</td>
-                    <td class="p-3 font-mono">${prev.toFixed(1)} km</td>
-                    <td class="p-3 font-mono font-bold text-blue-600">${fatti.toFixed(1)} km</td>
-                    <td class="p-3 font-mono font-bold text-cyan-700">${rulli.toFixed(1)} km</td>
-                    <td class="p-3 w-40">
-                        <div class="w-full bg-slate-200 rounded-full h-2">
-                            <div class="bg-blue-600 h-2 rounded-full transition-all" style="width:${pct}%"></div>
-                        </div>
-                    </td>
-                </tr>`;
+            document.getElementById('weekly-summary-body').innerHTML = sortedWeeks.map((w, idx) => {
+                const prev = w.items.reduce((s, x) => s + (Number(x.km_previsti) || 0), 0);
+                const fatti = w.items.reduce((s, x) => s + (Number(x.km_fatti) || 0), 0);
+                const rulli = w.items.reduce((s, x) => s + (Number(x.km_rulli) || 0), 0);
+                const pct = prev > 0 ? Math.min(100, Math.round((fatti / prev) * 100)) : 100;
+                return `
+                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="switchTab('diario'); document.getElementById('diario-week-select').value='${w.start}_${w.end}'; filterDiario('${w.start}_${w.end}');">
+                        <td class="p-3">
+                            <div class="font-semibold text-slate-800">Sett. ${idx+1}</div>
+                            <div class="text-[10px] text-slate-500">${w.label}</div>
+                        </td>
+                        <td class="p-3 font-mono">${prev.toFixed(1)} km</td>
+                        <td class="p-3 font-mono font-bold text-blue-600">${fatti.toFixed(1)} km</td>
+                        <td class="p-3 font-mono font-bold text-cyan-700">${rulli.toFixed(1)} km</td>
+                        <td class="p-3 w-40">
+                            <div class="w-full bg-slate-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width:${pct}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
             }).join('');
 
             const allPrev = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_previsti) || 0), 0);
             const allFatti = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_fatti) || 0), 0);
             const allRulli = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_rulli) || 0), 0);
-
-            document.getElementById('weekly-summary-foot').innerHTML = `<tr><td class="p-3 rounded-bl-lg" colspan="2">TOTALE GENERALE DIARIO</td><td class="p-3 font-mono">${allPrev.toFixed(1)} km</td><td class="p-3 font-mono text-blue-300">${allFatti.toFixed(1)} km</td><td class="p-3 font-mono text-cyan-300">${allRulli.toFixed(1)} km</td><td class="p-3 rounded-br-lg text-slate-300">Corsa + Rulli: ${(allFatti + allRulli).toFixed(1)} km</td></tr>`;
+            document.getElementById('weekly-summary-foot').innerHTML = `
+                <tr>
+                    <td class="p-3 rounded-bl-lg">TOTALE GENERALE</td>
+                    <td class="p-3 font-mono">${allPrev.toFixed(1)} km</td>
+                    <td class="p-3 font-mono text-blue-300">${allFatti.toFixed(1)} km</td>
+                    <td class="p-3 font-mono text-cyan-300">${allRulli.toFixed(1)} km</td>
+                    <td class="p-3 rounded-br-lg text-slate-300">Corsa + Rulli: ${(allFatti + allRulli).toFixed(1)} km</td>
+                </tr>
+            `;
         }
 
-        // ==================== DIARIO & FILTRI CRONOLOGICI / INTERVALLO LIBERO ====================
-        function handleWeekSelectChange(val) {
-            const oggiIso = getLocalTodayISO();
-            const fromEl = document.getElementById('diario-date-from');
-            const toEl = document.getElementById('diario-date-to');
-
-            if (val === 'all') {
-                db.ui.diarioFilter = 'all';
-                db.ui.diarioDateFrom = '';
-                db.ui.diarioDateTo = '';
-                if (fromEl) fromEl.value = '';
-                if (toEl) toEl.value = '';
-            } else if (val === 'current') {
-                const cur = getWeekBoundaries(oggiIso);
-                db.ui.diarioFilter = 'current';
-                db.ui.diarioDateFrom = cur.startIso;
-                db.ui.diarioDateTo = cur.endIso;
-                if (fromEl) fromEl.value = cur.startIso;
-                if (toEl) toEl.value = cur.endIso;
-            } else if (val.includes('_')) {
-                const [startIso, endIso] = val.split('_');
-                db.ui.diarioFilter = val;
-                db.ui.diarioDateFrom = startIso;
-                db.ui.diarioDateTo = endIso;
-                if (fromEl) fromEl.value = startIso;
-                if (toEl) toEl.value = endIso;
-            }
-
+        function filterDiario(f) {
+            db.ui.diarioFilter = f;
             saveLocal();
             renderDiario();
-        }
-
-        function handleCustomDateChange() {
-            const fromEl = document.getElementById('diario-date-from');
-            const toEl = document.getElementById('diario-date-to');
-            let fromVal = fromEl ? fromEl.value : '';
-            let toVal = toEl ? toEl.value : '';
-
-            // Se l'utente imposta solo Dal o mette Al precedente a Dal, allinea Al = Dal (vista 1 giorno)
-            if (fromVal && (!toVal || toVal < fromVal)) {
-                toVal = fromVal;
-                if (toEl) toEl.value = toVal;
-            } else if (toVal && !fromVal) {
-                fromVal = toVal;
-                if (fromEl) fromEl.value = fromVal;
-            }
-
-            db.ui.diarioDateFrom = fromVal;
-            db.ui.diarioDateTo = toVal;
-
-            if (!fromVal && !toVal) {
-                db.ui.diarioFilter = 'all';
-            } else {
-                const oggiIso = getLocalTodayISO();
-                const cur = getWeekBoundaries(oggiIso);
-                const allWeeks = getAllChronologicalWeeks();
-                const matchedWeek = allWeeks.find(w => w.startIso === fromVal && w.endIso === toVal);
-
-                if (fromVal === cur.startIso && toVal === cur.endIso) {
-                    db.ui.diarioFilter = 'current';
-                } else if (matchedWeek) {
-                    db.ui.diarioFilter = matchedWeek.key;
-                } else {
-                    db.ui.diarioFilter = 'custom';
-                }
-            }
-
-            saveLocal();
-            renderDiario();
-        }
-
-        function selectOnlyTodayFilter() {
-            const oggiIso = getLocalTodayISO();
-            const fromEl = document.getElementById('diario-date-from');
-            const toEl = document.getElementById('diario-date-to');
-            if (fromEl) fromEl.value = oggiIso;
-            if (toEl) toEl.value = oggiIso;
-            db.ui.diarioDateFrom = oggiIso;
-            db.ui.diarioDateTo = oggiIso;
-            db.ui.diarioFilter = 'custom';
-            saveLocal();
-            renderDiario();
-        }
-
-        function resetDiarioFilter() {
-            handleWeekSelectChange('all');
         }
 
         function updateRulliKm(idx, rawVal) {
@@ -1555,112 +1408,60 @@
             updateTotalsUI();
             renderWeeklySummary();
             renderUpcoming();
-            renderDiarioSummaryOnly();
-        }
-
-        function getFilteredDiarioRows() {
-            const filterMode = db.ui.diarioFilter || 'all';
-            const fromVal = db.ui.diarioDateFrom || '';
-            const toVal = db.ui.diarioDateTo || '';
-            const oggiIso = getLocalTodayISO();
-
-            return db.allenamenti_settimana
-                .map((a, idx) => ({ ...a, idx }))
-                .filter(a => {
-                    if (filterMode === 'all' && !fromVal && !toVal) return true;
-                    if (filterMode === 'current' && !fromVal && !toVal) {
-                        const cur = getWeekBoundaries(oggiIso);
-                        return a.data >= cur.startIso && a.data <= cur.endIso;
-                    }
-                    if (fromVal && toVal) return a.data >= fromVal && a.data <= toVal;
-                    if (fromVal) return a.data >= fromVal;
-                    if (toVal) return a.data <= toVal;
-                    return true;
-                });
-        }
-
-        function renderDiarioSummaryOnly() {
-            const rows = getFilteredDiarioRows();
-            const fCorsaFatti = rows.reduce((s, a) => s + (Number(a.km_fatti) || 0), 0);
-            const fCorsaPrev = rows.reduce((s, a) => s + (Number(a.km_previsti) || 0), 0);
-            const fRulli = rows.reduce((s, a) => s + (Number(a.km_rulli) || 0), 0);
-
-            const totCorsa = db.allenamenti_settimana.reduce((s, a) => s + (Number(a.km_fatti) || 0), 0);
-            const totRulli = db.allenamenti_settimana.reduce((s, a) => s + (Number(a.km_rulli) || 0), 0);
-
-            const dCorsa = document.getElementById('diario-tot-corsa');
-            const dRulli = document.getElementById('diario-tot-rulli');
-            if (dCorsa) {
-                dCorsa.textContent = `Corsa Periodo: ${fCorsaFatti.toFixed(1)} / ${fCorsaPrev.toFixed(1)} km (Tot: ${totCorsa.toFixed(1)} km)`;
-            }
-            if (dRulli) {
-                dRulli.innerHTML = `<i class="fa-solid fa-bicycle mr-1"></i> Rulli Periodo: ${fRulli.toFixed(1)} km (Tot: ${totRulli.toFixed(1)} km)`;
-            }
         }
 
         function renderDiario() {
+            const currentFilter = db.ui.diarioFilter || 'current';
             const oggiIso = getLocalTodayISO();
-            const curWeek = getWeekBoundaries(oggiIso);
-            const allWeeks = getAllChronologicalWeeks();
-
-            // 1. Popola il dropdown in ordine cronologico crescente (Sett. 1 -> Sett. 13)
+            const thisWeek = getWeekBoundaries(oggiIso);
+            
             const selectEl = document.getElementById('diario-week-select');
-            if (selectEl) {
-                let optsHTML = `<option value="all">Tutte le date (Piano Completo)</option>`;
-                optsHTML += `<option value="current">Settimana Corrente (${curWeek.shortLabel})</option>`;
-                allWeeks.forEach(w => {
-                    const isCurrent = w.startIso === curWeek.startIso;
-                    const todayTag = isCurrent ? ' • OGGI' : '';
-                    optsHTML += `<option value="${w.key}">Sett. ${w.num}: ${w.fullLabel}${todayTag}</option>`;
+            if (selectEl && db.allenamenti_settimana.length > 0) {
+                const weekMap = new Map();
+                db.allenamenti_settimana.forEach(a => {
+                    if(!a.data) return;
+                    const w = getWeekBoundaries(a.data);
+                    const key = `${w.startIso}_${w.endIso}`;
+                    if(!weekMap.has(key)) weekMap.set(key, w);
                 });
-                optsHTML += `<option value="custom" hidden>Periodo Personalizzato</option>`;
-
-                if (selectEl.innerHTML !== optsHTML) {
-                    selectEl.innerHTML = optsHTML;
-                }
-
-                const activeMode = db.ui.diarioFilter || 'all';
-                if ([...selectEl.options].some(o => o.value === activeMode)) {
-                    selectEl.value = activeMode;
-                } else {
-                    selectEl.value = 'custom';
-                }
+                
+                const sortedWeeks = Array.from(weekMap.values()).sort((a,b) => b.startIso.localeCompare(a.startIso));
+                let optsHTML = `<option value="all">Tutte le date (Piano Completo)</option><option value="current">Settimana Corrente (Oggi)</option>`;
+                sortedWeeks.forEach((w, i) => {
+                    const isFuture = w.startIso > oggiIso;
+                    const tag = isFuture ? ' (Futura)' : '';
+                    // Numero settimana al contrario rispetto al sort
+                    const weekNum = sortedWeeks.length - i; 
+                    optsHTML += `<option value="${w.startIso}_${w.endIso}">Sett. ${weekNum}: ${w.label}${tag}</option>`;
+                });
+                
+                if (selectEl.innerHTML !== optsHTML) selectEl.innerHTML = optsHTML;
+                
+                if (currentFilter === 'current') selectEl.value = 'current';
+                else if ([...selectEl.options].some(o => o.value === currentFilter)) selectEl.value = currentFilter;
+                else selectEl.value = 'all';
             }
 
-            // 2. Aggiorna input Dal/Al e badge numero giorni selezionati
-            const fromVal = db.ui.diarioDateFrom || '';
-            const toVal = db.ui.diarioDateTo || '';
-            const fromEl = document.getElementById('diario-date-from');
-            const toEl = document.getElementById('diario-date-to');
-            if (fromEl && fromEl.value !== fromVal) fromEl.value = fromVal;
-            if (toEl && toEl.value !== toVal) toEl.value = toVal;
-
-            const daysBadge = document.getElementById('diario-days-badge');
-            const captionEl = document.getElementById('diario-filter-caption');
-            if (fromVal && toVal) {
-                const numDays = Math.max(1, diffDaysInclusive(fromVal, toVal));
-                if (daysBadge) daysBadge.textContent = numDays === 1 ? '1 giorno' : `${numDays} giorni`;
-                if (captionEl) {
-                    captionEl.textContent = numDays === 1
-                        ? `Filtro attivo sul singolo giorno: ${fromVal}`
-                        : `Filtro attivo dal ${fromVal} al ${toVal} (${numDays} giorni)`;
-                }
-            } else {
-                if (daysBadge) daysBadge.textContent = 'Tutto il piano';
-                if (captionEl) captionEl.textContent = 'Visualizzazione completa di tutte le sedute in calendario.';
-            }
-
-            // 3. Aggiorna i badge chilometrici del periodo filtrato + totale
-            renderDiarioSummaryOnly();
-
-            // 4. Renderizza le righe filtrate
             const tbody = document.getElementById('diario-tbody');
-            const rows = getFilteredDiarioRows();
+            
+            const rows = db.allenamenti_settimana.map((a, idx) => ({ ...a, idx })).filter(a => {
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'current') return a.data >= thisWeek.startIso && a.data <= thisWeek.endIso;
+                const [start, end] = currentFilter.split('_');
+                return a.data >= start && a.data <= end;
+            });
 
             if (!rows.length) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-sm text-slate-400">Nessuna seduta trovata nell'intervallo selezionato.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-sm text-slate-400">Nessuna seduta in questo periodo.</td></tr>`;
+                document.getElementById('diario-tot-corsa').textContent = `Totale Corsa: 0.0 km`;
+                document.getElementById('diario-tot-rulli').innerHTML = `<i class="fa-solid fa-bicycle mr-1"></i> Totale Rulli: 0.0 km`;
                 return;
             }
+
+            const totC = rows.reduce((s, a) => s + (Number(a.km_fatti) || 0), 0);
+            const totR = rows.reduce((s, a) => s + (Number(a.km_rulli) || 0), 0);
+            document.getElementById('diario-tot-corsa').textContent = `Corsa Vista Attuale: ${totC.toFixed(1)} km`;
+            document.getElementById('diario-tot-rulli').innerHTML = `<i class="fa-solid fa-bicycle mr-1"></i> Rulli Vista Attuale: ${totR.toFixed(1)} km`;
 
             tbody.innerHTML = rows.map(a => {
                 let badge = `<span class="px-2 py-1 rounded text-xs font-semibold bg-amber-100 text-amber-800">DA FARE</span>`;
@@ -1671,27 +1472,69 @@
                 const rulliVal = (a.km_rulli !== null && a.km_rulli !== undefined && a.km_rulli !== 0) ? a.km_rulli : '';
                 const isRulliRow = a.tipo.toLowerCase().includes('rulli');
 
-                return `<tr class="${isToday ? 'bg-blue-50/60' : 'hover:bg-slate-50'} transition"><td class="p-3.5 font-mono text-xs whitespace-nowrap"><div class="font-bold text-slate-800 flex items-center gap-1.5">${a.data} ${isToday ? '<span class="px-1.5 py-0.5 text-[9px] bg-blue-600 text-white rounded font-sans">OGGI</span>' : ''}</div><div class="text-slate-400">${a.giorno || ''}</div></td><td class="p-3.5"><div class="font-bold text-slate-900">${a.tipo}</div><div class="text-xs text-slate-500">${a.dettaglio || ''}</div>${a.note ? `<div class="text-xs text-blue-600 mt-0.5"><i class="fa-solid fa-note-sticky mr-1"></i>${a.note}</div>` : ''}</td><td class="p-3.5 font-mono font-semibold">${a.km_previsti > 0 ? a.km_previsti + ' km' : '-'}</td><td class="p-3.5 font-mono text-xs">${a.km_fatti !== null && a.km_fatti !== undefined && a.km_fatti > 0 ? `<strong>${a.km_fatti} km</strong>` : '<span class="text-slate-400">--</span>'} ${a.passo && a.passo !== '-' ? `<div class="text-slate-500">${a.passo}</div>` : ''}</td><td class="p-3.5 whitespace-nowrap"><div class="flex items-center gap-1"><input type="number" step="0.1" value="${rulliVal}" oninput="updateRulliKm(${a.idx}, this.value)" placeholder="${isRulliRow ? 'km' : '-'}" class="w-16 text-xs font-mono font-bold text-right border ${isRulliRow ? 'border-cyan-300 bg-cyan-50/50 text-cyan-900' : 'border-slate-200 bg-white text-slate-700'} rounded px-2 py-1"><span class="text-[11px] text-slate-400">km</span></div></td><td class="p-3.5 text-xs font-medium">${a.scarpa || '-'}</td><td class="p-3.5">${badge}</td><td class="p-3.5 text-right whitespace-nowrap space-x-1"><button onclick="openCompleteModal(${a.idx})" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded text-xs font-semibold transition"><i class="fa-solid fa-check"></i> Sync</button><button onclick="openSkipModal(${a.idx})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-xs font-semibold transition"><i class="fa-solid fa-xmark"></i> Salta</button></td></tr>`;
+                return `
+                    <tr class="${isToday ? 'bg-blue-50/60' : 'hover:bg-slate-50'} transition">
+                        <td class="p-3.5 font-mono text-xs whitespace-nowrap">
+                            <div class="font-bold text-slate-800 flex items-center gap-1.5">
+                                ${a.data}
+                                ${isToday ? '<span class="px-1.5 py-0.5 text-[9px] bg-blue-600 text-white rounded font-sans">OGGI</span>' : ''}
+                            </div>
+                            <div class="text-slate-400">${a.giorno || ''}</div>
+                        </td>
+                        <td class="p-3.5">
+                            <div class="font-bold text-slate-900">${a.tipo}</div>
+                            <div class="text-xs text-slate-500">${a.dettaglio || ''}</div>
+                            ${a.note ? `<div class="text-xs text-blue-600 mt-0.5"><i class="fa-solid fa-note-sticky mr-1"></i>${a.note}</div>` : ''}
+                        </td>
+                        <td class="p-3.5 font-mono font-semibold">${a.km_previsti > 0 ? a.km_previsti + ' km' : '-'}</td>
+                        <td class="p-3.5 font-mono text-xs">
+                            ${a.km_fatti !== null && a.km_fatti !== undefined && a.km_fatti > 0 ? `<strong>${a.km_fatti} km</strong>` : '<span class="text-slate-400">--</span>'}
+                            ${a.passo && a.passo !== '-' ? `<div class="text-slate-500">${a.passo}</div>` : ''}
+                        </td>
+                        <td class="p-3.5 whitespace-nowrap">
+                            <div class="flex items-center gap-1">
+                                <input type="number" step="0.1" value="${rulliVal}" oninput="updateRulliKm(${a.idx}, this.value)" placeholder="${isRulliRow ? 'km' : '-'}" class="w-16 text-xs font-mono font-bold text-right border ${isRulliRow ? 'border-cyan-300 bg-cyan-50/50 text-cyan-900' : 'border-slate-200 bg-white text-slate-700'} rounded px-2 py-1">
+                                <span class="text-[11px] text-slate-400">km</span>
+                            </div>
+                        </td>
+                        <td class="p-3.5 text-xs font-medium">${a.scarpa || '-'}</td>
+                        <td class="p-3.5">${badge}</td>
+                        <td class="p-3.5 text-right whitespace-nowrap space-x-1">
+                            <button onclick="openCompleteModal(${a.idx})" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded text-xs font-semibold transition"><i class="fa-solid fa-check"></i> Sync</button>
+                            <button onclick="openSkipModal(${a.idx})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-xs font-semibold transition"><i class="fa-solid fa-xmark"></i> Salta</button>
+                        </td>
+                    </tr>
+                `;
             }).join('');
         }
 
-        // ==================== TAB 3: GARE, PB & ZONE ====================
         function renderRaces() {
             document.getElementById('races-list').innerHTML = db.gare.map(g => {
                 const isMain = g.tipo.includes('Principale');
-                const color = isMain ? 'border-indigo-500 bg-indigo-50/40' : (g.tipo.includes('Test') ? 'border-amber-500 bg-amber-50/40' : 'border-slate-300 bg-slate-50');
-                return `<div class="p-4 rounded-xl border-l-4 ${color} flex justify-between items-center"><div><span class="text-xs font-bold uppercase tracking-wider text-slate-500">${g.tipo} · ${g.distanza}</span><h4 class="font-bold text-slate-900">${g.nome}</h4></div><div class="text-right font-mono font-bold text-sm text-slate-700">${g.data}</div></div>`;
+                const isTest = g.tipo.includes('Test');
+                const color = isMain ? 'border-indigo-500 bg-indigo-50/40' : (isTest ? 'border-amber-500 bg-amber-50/40' : 'border-slate-300 bg-slate-50');
+                return `
+                    <div class="p-4 rounded-xl border-l-4 ${color} flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">${g.tipo} · ${g.distanza}</span>
+                            <h4 class="font-bold text-slate-900">${g.nome}</h4>
+                        </div>
+                        <div class="text-right font-mono font-bold text-sm text-slate-700">${g.data}</div>
+                    </div>
+                `;
             }).join('');
         }
 
         function timeToSec(str) {
-            const p = str.trim().split(':').map(Number);
-            return p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : (p.length === 2 ? p[0] * 60 + p[1] : 270);
+            const parts = str.trim().split(':').map(Number);
+            if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
+            if (parts.length === 2) return parts[0]*60 + parts[1];
+            return 270;
         }
 
-        function secToPace(sec) {
-            const m = Math.floor(Math.round(sec) / 60);
-            const s = (Math.round(sec) % 60).toString().padStart(2, '0');
+        function secToPace(secPerKm) {
+            const m = Math.floor(Math.round(secPerKm) / 60);
+            const s = (Math.round(secPerKm) % 60).toString().padStart(2, '0');
             return `${m}'${s}"/km`;
         }
 
@@ -1707,42 +1550,78 @@
         }
 
         function recalcZones() {
-            const ratio = (timeToSec(document.getElementById('pb-21k').value) / 21.0975) / (timeToSec(document.getElementById('pb-10k').value) / 10);
-            document.getElementById('endurance-index-box').innerHTML = `<strong>Indice di Resistenza: ${ratio.toFixed(2)}</strong><br>${ratio > 1.07 ? "Profilo veloce: lavoreremo sull'estensione aerobica dei lunghi." : "Ottima resistenza aerobica sul passaggio 10k -> 21k."}`;
+            const t10 = timeToSec(document.getElementById('pb-10k').value);
+            const t21 = timeToSec(document.getElementById('pb-21k').value);
+            const pace10 = t10 / 10;
+            const pace21 = t21 / 21.0975;
+            const ratio = (pace21 / pace10).toFixed(2);
+            let profileMsg = ratio > 1.07 ? "Profilo veloce con ottimo motore anaerobico." : "Ottimo indice di resistenza aerobica.";
+            document.getElementById('endurance-index-box').innerHTML = `<strong>Indice di Resistenza (Passo 21k / Passo 10k): ${ratio}</strong> (Passo 10k: ${secToPace(pace10)} vs Passo 21k: ${secToPace(pace21)}).<br>${profileMsg}`;
 
             const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
-            const lthr = Number(s.fc_bpm) || 187;
-            const ltSec = timeToSec(s.passo || "4:23");
-            const ltW = Number(s.potenza_w) || 360;
+            const lthr = Number(s.fc_bpm) || 180;
+            const ltSec = timeToSec(s.passo || "4:30");
+            const ltW = Number(s.potenza_w) || 350;
+
             const titleEl = document.getElementById('zones-table-title');
-            if (titleEl) titleEl.textContent = `Zone Dinamiche (Soglia ${lthr} bpm · ${s.passo}/km · ${ltW} W)`;
+            if (titleEl) titleEl.textContent = `Zone Dinamiche (Calibrate su Soglia ${lthr} bpm · ${s.passo}/km · ${ltW} W)`;
 
             const zones = [
                 { z: "Z1 — Recupero Attivo", passo: `> ${secToPace(ltSec * 1.25)}`, fc: `< ${Math.round(lthr * 0.80)} bpm`, watt: `< ${Math.round(ltW * 0.75)} W` },
                 { z: "Z2 — Fondo Lento (Base)", passo: `${secToPace(ltSec * 1.15)} – ${secToPace(ltSec * 1.25)}`, fc: `${Math.round(lthr * 0.80)}–${Math.round(lthr * 0.88)} bpm`, watt: `${Math.round(ltW * 0.75)}–${Math.round(ltW * 0.86)} W` },
                 { z: "Z3 — Medio / Ritmo Mezza", passo: `${secToPace(ltSec * 1.06)} – ${secToPace(ltSec * 1.14)}`, fc: `${Math.round(lthr * 0.89)}–${Math.round(lthr * 0.94)} bpm`, watt: `${Math.round(ltW * 0.87)}–${Math.round(ltW * 0.95)} W` },
                 { z: "Z4 — Soglia Anaerobica", passo: `${secToPace(ltSec * 0.99)} – ${secToPace(ltSec * 1.05)}`, fc: `${Math.round(lthr * 0.95)}–${lthr} bpm`, watt: `${Math.round(ltW * 0.96)}–${Math.round(ltW * 1.02)} W` },
-                { z: "Z5 — VO2max", passo: `< ${secToPace(ltSec * 0.98)}`, fc: `> ${lthr} bpm`, watt: `> ${Math.round(ltW * 1.02)} W` }
+                { z: "Z5 — VO2max / Ripetute", passo: `< ${secToPace(ltSec * 0.98)}`, fc: `> ${lthr} bpm`, watt: `> ${Math.round(ltW * 1.02)} W` }
             ];
 
-            document.getElementById('pace-zones-tbody').innerHTML = zones.map(z => `<tr><td class="p-2.5 font-bold text-slate-800">${z.z}</td><td class="p-2.5 font-mono font-bold text-blue-600">${z.passo}</td><td class="p-2.5 font-mono text-xs text-rose-600 font-semibold">${z.fc}</td><td class="p-2.5 font-mono text-xs text-amber-700 font-semibold">${z.watt}</td></tr>`).join('');
+            document.getElementById('pace-zones-tbody').innerHTML = zones.map(z => `
+                <tr><td class="p-2.5 font-bold text-slate-800">${z.z}</td><td class="p-2.5 font-mono font-bold text-blue-600">${z.passo}</td><td class="p-2.5 font-mono text-xs text-rose-600 font-semibold">${z.fc}</td><td class="p-2.5 font-mono text-xs text-amber-700 font-semibold">${z.watt}</td></tr>
+            `).join('');
 
             const w = db.atleta.peso_kg;
-            document.getElementById('nutrition-list').innerHTML = `<li class="p-3 rounded-lg bg-slate-50 border border-slate-200"><div class="text-xs text-slate-500">Carboidrati target (> 90 min)</div><div class="font-bold text-slate-900">~${Math.round(w * 0.7)} g / ora</div></li><li class="p-3 rounded-lg bg-slate-50 border border-slate-200"><div class="text-xs text-slate-500">Idratazione stimata</div><div class="font-bold text-slate-900">~${Math.round(w * 7.5)} ml / ora + elettroliti</div></li><li class="p-3 rounded-lg bg-slate-50 border border-slate-200"><div class="text-xs text-slate-500">Recupero post-lungo (entro 45')</div><div class="font-bold text-slate-900">${Math.round(w * 1.0)}g carbo + ${Math.round(w * 0.3)}g proteine</div></li>`;
+            document.getElementById('nutrition-list').innerHTML = `
+                <li class="p-3 rounded-lg bg-slate-50 border border-slate-200"><div class="text-xs text-slate-500">Carboidrati target (> 90 min)</div><div class="font-bold text-slate-900">~${Math.round(w * 0.7)} g / ora (2 gel ogni 40-45')</div></li>
+                <li class="p-3 rounded-lg bg-slate-50 border border-slate-200"><div class="text-xs text-slate-500">Idratazione stimata</div><div class="font-bold text-slate-900">~${Math.round(w * 7.5)} ml / ora + elettroliti</div></li>
+                <li class="p-3 rounded-lg bg-slate-50 border border-slate-200"><div class="text-xs text-slate-500">Recupero post-lungo</div><div class="font-bold text-slate-900">${Math.round(w * 1.0)}g carbo + ${Math.round(w * 0.3)}g proteine</div></li>
+            `;
         }
 
-        // ==================== TAB 4: FORZA ====================
         function renderStrength() {
-            document.getElementById('strength-cards-container').innerHTML = db.forza.map((scheda, sIdx) => `<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200"><div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100"><h4 class="font-bold text-slate-900">${scheda.titolo}</h4><span class="text-xs px-2.5 py-1 rounded bg-blue-50 text-blue-700 font-semibold">${scheda.badge}</span></div><div class="space-y-3">${scheda.esercizi.map((ex, eIdx) => `<div class="p-3 rounded-xl ${ex.fatto ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 border-slate-200/80'} border flex items-center justify-between gap-3 hover:border-blue-300 transition"><div class="flex items-center gap-3 min-w-0"><input type="checkbox" ${ex.fatto ? 'checked' : ''} onchange="toggleExerciseDone(${sIdx}, ${eIdx}, this.checked)" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"><button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="group relative shrink-0 focus:outline-none">${getExerciseSVG(ex.imgKey || 'squat', false)}<span class="absolute bottom-0.5 right-0.5 bg-slate-900/75 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-magnifying-glass-plus"></i></span></button><div class="min-w-0"><button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="font-bold text-sm ${ex.fatto ? 'line-through text-slate-400' : 'text-slate-900 hover:text-blue-600'} text-left block truncate">${ex.nome}</button><div class="text-xs font-mono text-blue-600">${ex.serie} · rec ${ex.rec}</div><div class="text-xs text-slate-500 line-clamp-2 mt-0.5">${ex.note}</div></div></div><input type="text" value="${ex.carico || ''}" oninput="updateLoad(${sIdx}, ${eIdx}, this.value)" placeholder="kg/note" class="w-24 shrink-0 text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-right font-mono"></div>`).join('')}</div></div>`).join('');
+            document.getElementById('strength-cards-container').innerHTML = db.forza.map((scheda, sIdx) => `
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
+                        <h4 class="font-bold text-slate-900">${scheda.titolo}</h4><span class="text-xs px-2.5 py-1 rounded bg-blue-50 text-blue-700 font-semibold">${scheda.badge}</span>
+                    </div>
+                    <div class="space-y-3">
+                        ${scheda.esercizi.map((ex, eIdx) => `
+                            <div class="p-3 rounded-xl ${ex.fatto ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 border-slate-200/80'} border flex items-center justify-between gap-3 hover:border-blue-300 transition">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <input type="checkbox" ${ex.fatto ? 'checked' : ''} onchange="toggleExerciseDone(${sIdx}, ${eIdx}, this.checked)" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0">
+                                    <button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="group relative shrink-0 focus:outline-none">
+                                        ${getExerciseSVG(ex.imgKey || 'squat', false)}
+                                        <span class="absolute bottom-0.5 right-0.5 bg-slate-900/75 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+                                    </button>
+                                    <div class="min-w-0">
+                                        <button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="font-bold text-sm ${ex.fatto ? 'line-through text-slate-400' : 'text-slate-900 hover:text-blue-600'} text-left block truncate">${ex.nome}</button>
+                                        <div class="text-xs font-mono text-blue-600">${ex.serie} · rec ${ex.rec}</div>
+                                        <div class="text-xs text-slate-500 line-clamp-2 mt-0.5">${ex.note}</div>
+                                    </div>
+                                </div>
+                                <input type="text" value="${ex.carico || ''}" oninput="updateLoad(${sIdx}, ${eIdx}, this.value)" placeholder="kg / note" class="w-24 shrink-0 text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-right font-mono">
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
         }
 
         function toggleExerciseDone(sIdx, eIdx, checked) { db.forza[sIdx].esercizi[eIdx].fatto = checked; saveLocal(); renderStrength(); }
-        function resetStrengthChecks() { db.forza.forEach(s => s.esercizi.forEach(ex => ex.fatto = false)); saveLocal(); renderStrength(); showToast("Spunte forza azzerate.", "info"); }
+        function resetStrengthChecks() { db.forza.forEach(s => s.esercizi.forEach(ex => ex.fatto = false)); saveLocal(); renderStrength(); }
         function updateLoad(sIdx, eIdx, val) { db.forza[sIdx].esercizi[eIdx].carico = val; saveLocal(); }
 
         function openExerciseModal(sIdx, eIdx) {
             const ex = db.forza[sIdx].esercizi[eIdx];
-            document.getElementById('ex-modal-muscle').textContent = ex.muscoli || "Forza Runner";
+            document.getElementById('ex-modal-muscle').textContent = ex.muscoli || "Forza & Stabilità Runner";
             document.getElementById('ex-modal-title').textContent = ex.nome;
             document.getElementById('ex-modal-svg').innerHTML = getExerciseSVG(ex.imgKey || 'squat', true);
             document.getElementById('ex-modal-serie').textContent = ex.serie;
@@ -1750,11 +1629,9 @@
             document.getElementById('ex-modal-desc').textContent = ex.note;
             document.getElementById('ex-modal-yt').href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(ex.nome + " esecuzione corretta");
             const m = document.getElementById('modal-exercise');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
-        // ==================== TAB 5: SCARPE & REGOLE ====================
         function renderShoesAndRules() {
             document.getElementById('shoes-container').innerHTML = db.scarpe.map((s, idx) => {
                 const percorsi = Number(s.km_percorsi) || 0;
@@ -1763,10 +1640,31 @@
                 const pctUsura = Math.min(100, Math.max(0, Math.round((percorsi / max) * 100)));
                 const barColor = rimanenti <= 80 ? 'bg-rose-500' : (rimanenti <= 160 ? 'bg-amber-500' : 'bg-emerald-500');
                 const badgeColor = rimanenti <= 80 ? 'bg-rose-100 text-rose-800' : (rimanenti <= 160 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800');
-                return `<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between"><div><div class="flex justify-between items-start gap-2 mb-3"><div><span class="text-xs font-bold uppercase text-blue-600">${s.ruolo}</span><h3 class="text-xl font-bold text-slate-900 mt-0.5">${s.nome}</h3></div><button onclick="openEditShoeModal(${idx})" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold transition"><i class="fa-solid fa-pen mr-1"></i> Modifica Km</button></div><div class="flex flex-wrap items-baseline justify-between gap-2 my-3"><div class="text-2xl font-extrabold text-slate-900 font-mono">${percorsi} <span class="text-sm font-normal text-slate-400">su ${max} km</span></div><span class="px-3 py-1 rounded-full text-xs font-bold ${badgeColor}">Rimanenti: ${rimanenti} km</span></div><div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden"><div class="${barColor} h-3 rounded-full transition-all duration-300" style="width:${pctUsura}%"></div></div><div class="flex justify-between text-[11px] text-slate-400 mt-1 font-mono"><span>Usura: ${pctUsura}%</span><span>Disponibile: ${100 - pctUsura}%</span></div></div><p class="text-xs text-slate-500 mt-4 pt-3 border-t border-slate-100">${s.note || ''}</p></div>`;
+
+                return `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start gap-2 mb-3">
+                                <div><span class="text-xs font-bold uppercase text-blue-600">${s.ruolo}</span><h3 class="text-xl font-bold text-slate-900 mt-0.5">${s.nome}</h3></div>
+                                <button onclick="openEditShoeModal(${idx})" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold transition"><i class="fa-solid fa-pen mr-1"></i> Modifica Km</button>
+                            </div>
+                            <div class="flex flex-wrap items-baseline justify-between gap-2 my-3">
+                                <div class="text-2xl font-extrabold text-slate-900 font-mono">${percorsi} <span class="text-sm font-normal text-slate-400">su ${max} km</span></div>
+                                <span class="px-3 py-1 rounded-full text-xs font-bold ${badgeColor}">Rimanenti: ${rimanenti} km</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                                <div class="${barColor} h-3 rounded-full transition-all duration-300" style="width:${pctUsura}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-slate-400 mt-1 font-mono"><span>Usura: ${pctUsura}%</span><span>Disponibile: ${100 - pctUsura}%</span></div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-4 pt-3 border-t border-slate-100">${s.note || ''}</p>
+                    </div>
+                `;
             }).join('');
 
-            document.getElementById('rules-container').innerHTML = db.regole.map(r => `<div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="font-bold text-sm text-slate-900 mb-1"><i class="fa-solid fa-shield-halved text-blue-600 mr-1.5"></i>${r.tema}</div><p class="text-xs text-slate-600 leading-relaxed">${r.desc}</p></div>`).join('');
+            document.getElementById('rules-container').innerHTML = db.regole.map(r => `
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="font-bold text-sm text-slate-900 mb-1"><i class="fa-solid fa-shield-halved text-blue-600 mr-1.5"></i>${r.tema}</div><p class="text-xs text-slate-600 leading-relaxed">${r.desc}</p></div>
+            `).join('');
         }
 
         function openEditShoeModal(idx) {
@@ -1781,8 +1679,7 @@
             document.getElementById('btn-delete-shoe').classList.toggle('hidden', db.scarpe.length <= 1);
             previewShoeCalc();
             const m = document.getElementById('modal-shoe');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function openAddShoeModal() {
@@ -1796,14 +1693,14 @@
             document.getElementById('btn-delete-shoe').classList.add('hidden');
             previewShoeCalc();
             const m = document.getElementById('modal-shoe');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function previewShoeCalc() {
             const p = parseFloat(document.getElementById('shoe-input-percorsi').value) || 0;
             const max = parseFloat(document.getElementById('shoe-input-max').value) || 0;
-            document.getElementById('shoe-preview-rem').textContent = `${Math.max(0, +(max - p).toFixed(1))} km (${p} su ${max} km)`;
+            const rem = Math.max(0, +(max - p).toFixed(1));
+            document.getElementById('shoe-preview-rem').textContent = `${rem} km (${p} su ${max} km)`;
         }
 
         function saveShoe() {
@@ -1817,12 +1714,8 @@
             if (idx >= 0 && db.scarpe[idx]) {
                 const oldName = db.scarpe[idx].nome;
                 db.scarpe[idx] = { ...db.scarpe[idx], nome, ruolo, km_percorsi, vita_utile, note };
-                if (oldName !== nome) {
-                    db.allenamenti_settimana.forEach(a => { if (a.scarpa === oldName) a.scarpa = nome; });
-                }
-            } else {
-                db.scarpe.push({ id: 'shoe-' + Date.now(), nome, ruolo, km_percorsi, vita_utile, note });
-            }
+                if (oldName !== nome) { db.allenamenti_settimana.forEach(a => { if (a.scarpa === oldName) a.scarpa = nome; }); }
+            } else { db.scarpe.push({ id: 'shoe-' + Date.now(), nome, ruolo, km_percorsi, vita_utile, note }); }
             saveLocal();
             closeModals();
             renderAll();
@@ -1830,28 +1723,19 @@
 
         function deleteShoe() {
             const idx = parseInt(document.getElementById('modal-shoe-idx').value);
-            if (idx >= 0 && db.scarpe.length > 1) {
-                db.scarpe.splice(idx, 1);
-                saveLocal();
-                closeModals();
-                renderAll();
-            }
+            if (idx >= 0 && db.scarpe.length > 1) { db.scarpe.splice(idx, 1); saveLocal(); closeModals(); renderAll(); }
         }
 
         function populateShoeSelect(selectId, selectedVal) {
             const sel = document.getElementById(selectId);
-            sel.innerHTML = db.scarpe.map(s => `<option value="${s.nome}">${s.nome}</option>`).join('') + `<option value="-">Nessuna (Rulli / Forza)</option>`;
+            sel.innerHTML = db.scarpe.map(s => `<option value="${s.nome}">${s.nome}</option>`).join('') + `<option value="-">Nessuna</option>`;
             if (selectedVal && [...sel.options].some(o => o.value === selectedVal)) sel.value = selectedVal;
         }
 
-        // ==================== GESTIONE MODALI SEDUTE / GARE / PROFILO ====================
         function closeModals() {
             ['modal-complete', 'modal-skip', 'modal-profile', 'modal-add-workout', 'modal-add-race', 'modal-exercise', 'modal-shoe', 'modal-threshold'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.classList.add('hidden');
-                    el.classList.remove('flex');
-                }
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(id).classList.remove('flex');
             });
         }
 
@@ -1866,8 +1750,7 @@
             populateShoeSelect('modal-comp-scarpa', a.scarpa);
             document.getElementById('modal-comp-note').value = a.note || "";
             const m = document.getElementById('modal-complete');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function saveCompletedWorkout() {
@@ -1879,7 +1762,6 @@
             const fc = document.getElementById('modal-comp-fc').value;
             const scarpa = document.getElementById('modal-comp-scarpa').value;
             const note = document.getElementById('modal-comp-note').value;
-
             const oldItem = db.allenamenti_settimana[idx];
             const prevKm = (oldItem.stato === 'completato' && oldItem.km_fatti) ? oldItem.km_fatti : 0;
             const prevShoeName = oldItem.scarpa;
@@ -1892,18 +1774,15 @@
                 const newShoeObj = db.scarpe.find(s => s.nome === scarpa);
                 if (newShoeObj) newShoeObj.km_percorsi = +(newShoeObj.km_percorsi + km).toFixed(1);
             }
-
             oldItem.km_fatti = km;
             oldItem.km_rulli = kmRulli;
             oldItem.passo = passo || "-";
             oldItem.scarpa = scarpa;
             oldItem.stato = 'completato';
             oldItem.note = fc ? `FC media: ${fc} bpm. ${note}` : note;
-
             saveLocal();
             closeModals();
             renderAll();
-            showToast("Seduta registrata.", "success");
         }
 
         function openSkipModal(idx) {
@@ -1911,8 +1790,7 @@
             document.getElementById('modal-skip-idx').value = idx;
             document.getElementById('modal-skip-subtitle').textContent = `${a.data} — ${a.tipo}`;
             const m = document.getElementById('modal-skip');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function confirmSkipWorkout() {
@@ -1922,14 +1800,12 @@
             item.stato = 'saltato';
             item.km_fatti = 0;
             item.km_rulli = 0;
-
             const labels = {
                 imprevisto: "Saltato per imprevisto. Km non recuperati.",
                 stanchezza: "Saltato per stanchezza/FC alta. Prossima uscita alleggerita.",
                 schiena: "Saltato per fastidio fisico. Priorità recupero."
             };
             item.note = labels[reason];
-
             if (reason === 'stanchezza' || reason === 'schiena') {
                 for (let i = idx + 1; i < db.allenamenti_settimana.length; i++) {
                     if (db.allenamenti_settimana[i].km_previsti > 0 && db.allenamenti_settimana[i].stato === 'da_fare') {
@@ -1940,11 +1816,9 @@
                     }
                 }
             }
-
             saveLocal();
             closeModals();
             renderAll();
-            showToast("Seduta rimodulata.", "info");
         }
 
         function openProfileModal() {
@@ -1952,13 +1826,12 @@
             document.getElementById('prof-altezza').value = db.atleta.altezza_cm;
             document.getElementById('prof-fc').value = db.atleta.fc_riposo || 60;
             const m = document.getElementById('modal-profile');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function saveProfile() {
-            db.atleta.peso_kg = parseFloat(document.getElementById('prof-peso').value) || 69.0;
-            db.atleta.altezza_cm = parseInt(document.getElementById('prof-altezza').value) || 170;
+            db.atleta.peso_kg = parseFloat(document.getElementById('prof-peso').value) || 70.0;
+            db.atleta.altezza_cm = parseInt(document.getElementById('prof-altezza').value) || 175;
             db.atleta.fc_riposo = parseInt(document.getElementById('prof-fc').value) || 60;
             saveLocal();
             closeModals();
@@ -1966,50 +1839,29 @@
         }
 
         function openAddWorkoutModal() {
-            document.getElementById('new-w-data').value = getLocalTodayISO();
             populateShoeSelect('new-w-scarpa', db.scarpe[0] ? db.scarpe[0].nome : '-');
             const m = document.getElementById('modal-add-workout');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function saveNewWorkout() {
             const data = document.getElementById('new-w-data').value;
-            if (!data) {
-                showToast("Seleziona una data valida.", "error");
-                return;
-            }
             const tipo = document.getElementById('new-w-tipo').value;
             const dettaglio = document.getElementById('new-w-dettaglio').value;
             const km = parseFloat(document.getElementById('new-w-km').value) || 0;
             const scarpa = document.getElementById('new-w-scarpa').value;
-            const giorni = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
-            const gName = giorni[parseLocalDate(data).getDay()];
-
-            db.allenamenti_settimana.push({
-                data,
-                giorno: gName,
-                tipo,
-                dettaglio,
-                km_previsti: km,
-                km_fatti: null,
-                km_rulli: null,
-                passo: "",
-                scarpa,
-                stato: "da_fare",
-                note: ""
-            });
+            const giorni = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
+            const gName = data ? giorni[new Date(data).getDay()] : "";
+            db.allenamenti_settimana.push({ data, giorno: gName, tipo, dettaglio, km_previsti: km, km_fatti: null, km_rulli: null, passo: "", scarpa, stato: "da_fare", note: "" });
             db.allenamenti_settimana.sort((a, b) => a.data.localeCompare(b.data));
             saveLocal();
             closeModals();
             renderAll();
-            showToast("Seduta aggiunta al diario.", "success");
         }
 
         function openAddRaceModal() {
             const m = document.getElementById('modal-add-race');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function saveNewRace() {
@@ -2025,7 +1877,6 @@
             renderAll();
         }
 
-        // ==================== ESPORTA / IMPORTA BACKUP JSON ====================
         function exportJson() {
             saveLocal();
             const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
@@ -2035,7 +1886,6 @@
             a.download = "dati.json";
             a.click();
             URL.revokeObjectURL(url);
-            showToast("Backup dati.json scaricato.", "success");
         }
 
         function importJson(event) {
@@ -2050,14 +1900,11 @@
                     restoreSavedInputs();
                     renderAll();
                     switchTab(db.ui.activeTab || 'panoramica', false);
-                    showToast("Backup importato e sincronizzato sul Cloud.", "success");
-                } catch (err) {
-                    showToast("Errore: il file JSON selezionato non è valido.", "error");
-                }
+                } catch (err) { alert("File JSON non valido."); }
             };
             reader.readAsText(file);
-            event.target.value = "";
         }
     </script>
 </body>
 </html>
+Analisi in corso…
