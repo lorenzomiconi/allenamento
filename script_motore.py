@@ -41,13 +41,11 @@ def main():
     with open('dati.json', 'r', encoding='utf-8') as f:
         db = json.load(f)
 
-    if km_corsi_oggi > 0:
-        db['scarpe']['mizuno_neo_zen']['km_residui'] = max(
-            0, round(db['scarpe']['mizuno_neo_zen']['km_residui'] - km_corsi_oggi, 1)
-        )
-
+    scarpa_usata = "Mizuno Neo Zen"
     for seduta in db['allenamenti_settimana']:
         if seduta['data'] == oggi and km_corsi_oggi > 0:
+            if seduta.get('scarpa') and seduta['scarpa'] != '-':
+                scarpa_usata = seduta['scarpa']
             seduta['km_fatti'] = round(km_corsi_oggi, 2)
             seduta['passo'] = passo_medio_oggi
             if fc_media_oggi:
@@ -55,10 +53,18 @@ def main():
             if km_corsi_oggi >= (seduta['km_previsti'] * 0.8):
                 seduta['stato'] = 'completato'
 
+    if km_corsi_oggi > 0 and isinstance(db.get('scarpe'), list):
+        for s in db['scarpe']:
+            if s['nome'] == scarpa_usata:
+                s['km_percorsi'] = round(s['km_percorsi'] + km_corsi_oggi, 1)
+                break
+        else:
+            db['scarpe'][0]['km_percorsi'] = round(db['scarpe'][0]['km_percorsi'] + km_corsi_oggi, 1)
+
     with open('dati.json', 'w', encoding='utf-8') as f:
         json.dump(db, f, indent=2, ensure_ascii=False)
         
-    print(f"Aggiornamento concluso: {km_corsi_oggi:.2f} km sincronizzati.")
+    print(f"Aggiornamento concluso: {km_corsi_oggi:.2f} km sincronizzati su {scarpa_usata}.")
 
 if __name__ == "__main__":
     main()
