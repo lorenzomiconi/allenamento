@@ -5,6 +5,14 @@
     "bmi": 23.88,
     "fc_riposo": 60
   },
+  "soglia": {
+    "fc_bpm": 187,
+    "passo": "4:23",
+    "potenza_w": 360,
+    "potenza_w_kg": 5.26,
+    "data_rilevamento": "2026-11-18",
+    "storico": []
+  },
   "scarpe": [
     {
       "id": "neo-zen",
