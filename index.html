@@ -207,7 +207,7 @@
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <h3 class="font-bold text-base">Soglia Anaerobica Corrente (Garmin)</h3>
+                                    <h3 class="font-bold text-base">Soglia Anaerobica & VO2 Max (Garmin)</h3>
                                     <span class="text-[11px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-mono" id="pan-soglia-date">--</span>
                                 </div>
                                 <p class="text-xs text-slate-400">Valori utilizzati per calibrare passo, battiti e Watt delle tue zone.</p>
@@ -322,18 +322,38 @@
                     </div>
                 </div>
 
-                <!-- TAB 2: DIARIO (MENU TENDINA CRONOLOGICO) -->
+                <!-- TAB 2: DIARIO (SETTIMANE IN ORDINE CRONOLOGICO + INTERVALLO LIBERO GIORNI) -->
                 <div id="tab-diario" class="hidden space-y-6">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                        <div class="flex items-center gap-2 w-full sm:w-auto">
-                            <label class="text-xs font-semibold text-slate-500 whitespace-nowrap"><i class="fa-solid fa-calendar-days mr-1"></i> Mostra:</label>
-                            <select id="diario-week-select" onchange="filterDiario(this.value)" class="w-full sm:w-auto border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                                <!-- Le settimane verranno generate in automatico qui dal JavaScript -->
-                            </select>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <label class="text-xs font-semibold text-slate-500 whitespace-nowrap"><i class="fa-solid fa-calendar-week mr-1 text-blue-600"></i> Settimana:</label>
+                                <select id="diario-week-select" onchange="selectDiarioWeek(this.value)" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:border-blue-500">
+                                </select>
+                                <button onclick="filterDiarioToday()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition">
+                                    Solo Oggi
+                                </button>
+                                <button onclick="filterDiarioAll()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                                    Tutte le date
+                                </button>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200" id="diario-tot-corsa">Corsa: 0.0 km</span>
+                                <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200" id="diario-tot-rulli"><i class="fa-solid fa-bicycle mr-1"></i> Rulli: 0.0 km</span>
+                            </div>
                         </div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200" id="diario-tot-corsa">Totale Corsa: 0.0 km</span>
-                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200" id="diario-tot-rulli"><i class="fa-solid fa-bicycle mr-1"></i> Totale Km Rulli: 0.0 km</span>
+
+                        <!-- INTERVALLO PERSONALIZZATO (DAL - AL: ANCHE 1 SOLO GIORNO O 20 GIORNI) -->
+                        <div class="pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="font-semibold text-slate-500"><i class="fa-solid fa-sliders mr-1"></i> Periodo libero (1 giorno, 20 giorni, ecc.):</span>
+                                <label class="text-slate-500">Dal</label>
+                                <input type="date" id="diario-date-from" onchange="applyCustomDateRange()" class="border border-slate-300 rounded-lg px-2.5 py-1 font-mono text-xs bg-slate-50">
+                                <label class="text-slate-500">Al</label>
+                                <input type="date" id="diario-date-to" onchange="applyCustomDateRange()" class="border border-slate-300 rounded-lg px-2.5 py-1 font-mono text-xs bg-slate-50">
+                            </div>
+                            <span id="diario-range-info" class="text-slate-500 font-medium">--</span>
                         </div>
                     </div>
 
@@ -364,7 +384,7 @@
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
                             <div>
                                 <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                                    <i class="fa-solid fa-fire-flame-curved text-amber-500"></i> Soglia Corrente Garmin (Modificabile)
+                                    <i class="fa-solid fa-fire-flame-curved text-amber-500"></i> Soglia & VO2 Max Garmin (Modificabile)
                                 </h3>
                                 <p class="text-xs text-slate-500">Aggiorna qui i parametri rilevati dal Garmin: ogni modifica si salva nel cloud e ricalcola le Zone.</p>
                             </div>
@@ -395,7 +415,6 @@
                                 <label class="text-[11px] font-bold uppercase text-slate-600 block mb-1">Data Rilevamento</label>
                                 <input type="date" id="soglia-data" value="2026-11-18" onchange="saveThresholdInline()" class="w-full font-mono font-semibold text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-2">
                             </div>
-                            <!-- VO2 MAX MODIFICABILE -->
                             <div class="bg-purple-50/70 border border-purple-200 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-purple-700 block mb-1">VO2 Max Garmin</label>
                                 <div class="flex gap-1.5">
@@ -510,7 +529,7 @@
     <!-- MODALI -->
     <div id="modal-threshold" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <h3 class="text-lg font-bold text-slate-900 mb-1">Aggiorna Soglia Corrente Garmin</h3>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">Aggiorna Soglia & VO2 Max Garmin</h3>
             <p class="text-xs text-slate-500 mb-4">Modifica i valori rilevati dall'orologio.</p>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
@@ -522,7 +541,6 @@
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">Rapporto W/kg</label><input type="number" step="0.01" id="m-soglia-wkg" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
                 </div>
                 <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data Rilevamento</label><input type="date" id="m-soglia-data" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono"></div>
-                
                 <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
                     <div>
                         <label class="block text-xs font-semibold text-purple-700 mb-1">VO2 Max Garmin</label>
@@ -735,14 +753,14 @@
         let unsubscribeSnapshot = null;
 
         const NEUTRAL_TEMPLATE_DB = {
-            ui: { activeTab: "panoramica", diarioFilter: "current", readiness: { fc: 60, schiena: "ok", polpaccio: "ok" } },
-            atleta: { peso_kg: 70.0, altezza_cm: 175, bmi: 22.86, fc_riposo: 60 },
-            soglia: { fc_bpm: 180, passo: "4:30", potenza_w: 350, potenza_w_kg: 5.00, data_rilevamento: "2026-11-18", storico: [] },
+            ui: { activeTab: "panoramica", diarioFilter: "current", dateFrom: "", dateTo: "", readiness: { fc: 60, schiena: "ok", polpaccio: "ok" } },
+            atleta: { peso_kg: 69.0, altezza_cm: 170, bmi: 23.88, fc_riposo: 60 },
+            soglia: { fc_bpm: 187, passo: "4:23", potenza_w: 360, potenza_w_kg: 5.22, data_rilevamento: "2026-11-18", storico: [] },
             vo2max: { valore: 54, livello: "Superiore" },
-            pb: { "5k": "22:00", "10k": "45:00", "21k": "1:42:00", garmin_5k: "21:30", garmin_10k: "44:30", garmin_21k: "1:39:00" },
+            pb: { "5k": "22:00", "10k": "46:22", "21k": "1:41:38", garmin_5k: "21:30", garmin_10k: "44:30", garmin_21k: "1:39:00" },
             scarpe: [
-                { id: "shoe-1", nome: "Scarpa Lenti", ruolo: "Corse facili e recupero", km_percorsi: 0, vita_utile: 600, note: "Importa backup .json" },
-                { id: "shoe-2", nome: "Scarpa Qualità", ruolo: "Gare e lavori veloci", km_percorsi: 0, vita_utile: 650, note: "" }
+                { id: "shoe-1", nome: "Mizuno Neo Zen", ruolo: "Corse facili e recupero", km_percorsi: 134, vita_utile: 800, note: "Importa backup .json" },
+                { id: "shoe-2", nome: "Adidas Evo SL", ruolo: "Gare e lavori veloci", km_percorsi: 520, vita_utile: 650, note: "" }
             ],
             gare: [
                 { nome: "Test / Gara 10 km", data: "2027-02-14", distanza: "10 km", tipo: "Gara Test" },
@@ -753,39 +771,39 @@
                 {
                     titolo: "Core Leggero (Mobilità & Schiena)", badge: "Giorni Rulli / Riposo",
                     esercizi: [
-                        { nome: "Gatto-cammello", imgKey: "cat_cow", muscoli: "Mobilità colonna & lombare", serie: "1x10 lente", rec: "30"", note: "In quadrupedia, inarca e arrotonda la schiena piano.", carico: "Corpo libero", fatto: false },
-                        { nome: "Ponte glutei", imgKey: "glute_bridge", muscoli: "Grande gluteo & ischiocrurali", serie: "2x10", rec: "45"", note: "Supino, ginocchia piegate, spingi sui talloni.", carico: "Corpo libero", fatto: false },
-                        { nome: "Bird-dog", imgKey: "bird_dog", muscoli: "Core profondo & stabilizzatori schiena", serie: "2x10/lato (pausa 3")", rec: "45"", note: "Estendi braccio e gamba opposti tenendo il bacino fermo.", carico: "Corpo libero", fatto: false },
-                        { nome: "Plank frontale", imgKey: "plank", muscoli: "Trasverso addominale & retto", serie: "2x20-30"", rec: "45"", note: "Corpo in linea dai talloni alle spalle.", carico: "Corpo libero", fatto: false },
-                        { nome: "Dead bug", imgKey: "dead_bug", muscoli: "Core profondo & controllo pelvico", serie: "2x10/lato", rec: "45"", note: "Schiena sempre aderente al pavimento.", carico: "Corpo libero", fatto: false }
+                        { nome: "Gatto-cammello", imgKey: "cat_cow", muscoli: "Mobilità colonna & lombare", serie: "1x10 lente", rec: '30"', note: "In quadrupedia, inarca e arrotonda la schiena piano.", carico: "Corpo libero", fatto: false },
+                        { nome: "Ponte glutei", imgKey: "glute_bridge", muscoli: "Grande gluteo & ischiocrurali", serie: "2x10", rec: '45"', note: "Supino, ginocchia piegate, spingi sui talloni.", carico: "Corpo libero", fatto: false },
+                        { nome: "Bird-dog", imgKey: "bird_dog", muscoli: "Core profondo & stabilizzatori schiena", serie: '2x10/lato (pausa 3")', rec: '45"', note: "Estendi braccio e gamba opposti tenendo il bacino fermo.", carico: "Corpo libero", fatto: false },
+                        { nome: "Plank frontale", imgKey: "plank", muscoli: "Trasverso addominale & retto", serie: '2x20-30"', rec: '45"', note: "Corpo in linea dai talloni alle spalle.", carico: "Corpo libero", fatto: false },
+                        { nome: "Dead bug", imgKey: "dead_bug", muscoli: "Core profondo & controllo pelvico", serie: "2x10/lato", rec: '45"', note: "Schiena sempre aderente al pavimento.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
                     titolo: "Forza A: Gambe & Core (Lunedì)", badge: "Sett. 1-4: 2 serie | Da Sett. 5: 3 serie",
                     esercizi: [
-                        { nome: "Squat o Goblet Squat leggero", imgKey: "squat", muscoli: "Quadricipiti, glutei, core", serie: "2-3 x 10", rec: "60-90"", note: "Schiena neutra, ginocchia in linea con i piedi.", carico: "", fatto: false },
-                        { nome: "Affondi indietro", imgKey: "lunge", muscoli: "Glutei, quadricipiti, stabilità bacino", serie: "2-3 x 8/gamba", rec: "60-90"", note: "Passo indietro controllato, busto dritto.", carico: "", fatto: false },
-                        { nome: "Ponte glutei su una gamba", imgKey: "single_bridge", muscoli: "Gluteo monolaterale & femorali", serie: "2-3 x 10/gamba", rec: "60"", note: "Bacino alto e fermo.", carico: "", fatto: false },
-                        { nome: "Alzate polpacci su una gamba", imgKey: "calf_raise", muscoli: "Gastrocnemio, soleo & tendine d'Achille", serie: "2-3 x 12/gamba", rec: "60"", note: "Sul bordo di un gradino, discesa lenta.", carico: "", fatto: false },
-                        { nome: "Plank frontale + Bird-dog", imgKey: "plank", muscoli: "Core & tenuta posturale", serie: "2-3 x 35" / 8 lato", rec: "45"", note: "Controllo posturale lento.", carico: "Corpo libero", fatto: false }
+                        { nome: "Squat o Goblet Squat leggero", imgKey: "squat", muscoli: "Quadricipiti, glutei, core", serie: "2-3 x 10", rec: '60-90"', note: "Schiena neutra, ginocchia in linea con i piedi.", carico: "", fatto: false },
+                        { nome: "Affondi indietro", imgKey: "lunge", muscoli: "Glutei, quadricipiti, stabilità bacino", serie: "2-3 x 8/gamba", rec: '60-90"', note: "Passo indietro controllato, busto dritto.", carico: "", fatto: false },
+                        { nome: "Ponte glutei su una gamba", imgKey: "single_bridge", muscoli: "Gluteo monolaterale & femorali", serie: "2-3 x 10/gamba", rec: '60"', note: "Bacino alto e fermo.", carico: "", fatto: false },
+                        { nome: "Alzate polpacci su una gamba", imgKey: "calf_raise", muscoli: "Gastrocnemio, soleo & tendine d'Achille", serie: "2-3 x 12/gamba", rec: '60"', note: "Sul bordo di un gradino, discesa lenta.", carico: "", fatto: false },
+                        { nome: "Plank frontale + Bird-dog", imgKey: "plank", muscoli: "Core & tenuta posturale", serie: '2-3 x 35" / 8 lato', rec: '45"', note: "Controllo posturale lento.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
                     titolo: "Forza B: Stabilità & Catena Posteriore (Venerdì)", badge: "Sett. 1-4: 2 serie | Da Sett. 5: 3 serie",
                     esercizi: [
-                        { nome: "Step-up su gradino (30-40 cm)", imgKey: "step_up", muscoli: "Glutei, quadricipiti, spinta di corsa", serie: "2-3 x 8/gamba", rec: "60-90"", note: "Spingi con il tallone della gamba sul gradino.", carico: "", fatto: false },
-                        { nome: "Camminata laterale con elastico", imgKey: "band_walk", muscoli: "Medio gluteo", serie: "2 x 12 passi/lato", rec: "45"", note: "Elastico sopra le ginocchia, ginocchia semiflesse.", carico: "Elastico", fatto: false },
-                        { nome: "Stacco rumeno con manubri leggeri", imgKey: "rdl", muscoli: "Ischiocrurali, glutei, erettori spinali", serie: "Solo da Sett. 3 (3x8)", rec: "60-90"", note: "Solo se la schiena è senza fastidi.", carico: "", fatto: false },
-                        { nome: "Plank laterale + Dead bug", imgKey: "side_plank", muscoli: "Obliqui, quadrato dei lombi & core", serie: "2-3 x 30" / 8 lato", rec: "45"", note: "Corpo allineato, fianchi alti.", carico: "Corpo libero", fatto: false }
+                        { nome: "Step-up su gradino (30-40 cm)", imgKey: "step_up", muscoli: "Glutei, quadricipiti, spinta di corsa", serie: "2-3 x 8/gamba", rec: '60-90"', note: "Spingi con il tallone della gamba sul gradino.", carico: "", fatto: false },
+                        { nome: "Camminata laterale con elastico", imgKey: "band_walk", muscoli: "Medio gluteo", serie: "2 x 12 passi/lato", rec: '45"', note: "Elastico sopra le ginocchia, ginocchia semiflesse.", carico: "Elastico", fatto: false },
+                        { nome: "Stacco rumeno con manubri leggeri", imgKey: "rdl", muscoli: "Ischiocrurali, glutei, erettori spinali", serie: "Solo da Sett. 3 (3x8)", rec: '60-90"', note: "Solo se la schiena è senza fastidi.", carico: "", fatto: false },
+                        { nome: "Plank laterale + Dead bug", imgKey: "side_plank", muscoli: "Obliqui, quadrato dei lombi & core", serie: '2-3 x 30" / 8 lato', rec: '45"', note: "Corpo allineato, fianchi alti.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
                     titolo: "Forza C: Upper Body & Postura Runner", badge: "Giorni Facili / Rulli (2x/sett.)",
                     esercizi: [
-                        { nome: "Piegamenti (Push-up) o Panca Manubri", imgKey: "pushup", muscoli: "Pettorali, deltoidi anteriori", serie: "3 x 10-12", rec: "60"", note: "Spinta controllata, RIR 3.", carico: "", fatto: false },
-                        { nome: "Rematore con manubrio / elastico", imgKey: "row", muscoli: "Gran dorsale, romboidi", serie: "3 x 10/lato", rec: "60"", note: "Rinforza il dorso per mantenere il busto aperto.", carico: "", fatto: false },
-                        { nome: "Military Press / Alzate manubri", imgKey: "overhead_press", muscoli: "Deltoidi & stabilizzatori", serie: "3 x 10", rec: "60"", note: "Addome attivo.", carico: "", fatto: false },
-                        { nome: "Face-pull con elastico / Tirate", imgKey: "face_pull", muscoli: "Deltoidi posteriori & cuffia", serie: "3 x 12-15", rec: "45"", note: "Tira l'elastico verso il viso avvicinando le scapole.", carico: "Elastico", fatto: false }
+                        { nome: "Piegamenti (Push-up) o Panca Manubri", imgKey: "pushup", muscoli: "Pettorali, deltoidi anteriori", serie: "3 x 10-12", rec: '60"', note: "Spinta controllata, RIR 3.", carico: "", fatto: false },
+                        { nome: "Rematore con manubrio / elastico", imgKey: "row", muscoli: "Gran dorsale, romboidi", serie: "3 x 10/lato", rec: '60"', note: "Rinforza il dorso per mantenere il busto aperto.", carico: "", fatto: false },
+                        { nome: "Military Press / Alzate manubri", imgKey: "overhead_press", muscoli: "Deltoidi & stabilizzatori", serie: "3 x 10", rec: '60"', note: "Addome attivo.", carico: "", fatto: false },
+                        { nome: "Face-pull con elastico / Tirate", imgKey: "face_pull", muscoli: "Deltoidi posteriori & cuffia", serie: "3 x 12-15", rec: '45"', note: "Tira l'elastico verso il viso avvicinando le scapole.", carico: "Elastico", fatto: false }
                     ]
                 }
             ],
@@ -834,7 +852,7 @@
                 errBox.textContent = "Credenziali non valide (" + err.code + ").";
                 errBox.classList.remove('hidden');
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-lock-open mr-1.5"></i> Accedi`;
+                btn.innerHTML = `<i class="fa-solid fa-lock-open mr-1.5"></i> Accedi alla Dashboard`;
             }
         }
 
@@ -1006,18 +1024,22 @@
             return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         }
 
+        function addDaysISO(isoStr, days) {
+            const [y, m, d] = isoStr.split('-').map(Number);
+            const dt = new Date(y, m - 1, d + days);
+            return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+        }
+
         function getWeekBoundaries(dateStr) {
-            const d = new Date(dateStr);
-            const day = d.getDay() === 0 ? 7 : d.getDay(); 
-            const start = new Date(d);
-            start.setDate(d.getDate() - day + 1); 
-            const end = new Date(start);
-            end.setDate(start.getDate() + 6); 
-            return {
-                startIso: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`,
-                endIso: `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`,
-                label: `${start.getDate()} ${start.toLocaleString('it-IT', {month:'short'})} – ${end.getDate()} ${end.toLocaleString('it-IT', {month:'short'})}`
-            };
+            const [y, m, dNum] = dateStr.split('-').map(Number);
+            const d = new Date(y, m - 1, dNum);
+            const day = d.getDay() === 0 ? 7 : d.getDay();
+            const start = new Date(y, m - 1, dNum - day + 1);
+            const end = new Date(y, m - 1, dNum - day + 7);
+            const startIso = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`;
+            const endIso = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`;
+            const label = `${start.getDate()} ${start.toLocaleString('it-IT', {month:'short'})} – ${end.getDate()} ${end.toLocaleString('it-IT', {month:'short'})}`;
+            return { startIso, endIso, label };
         }
 
         function normalizeDb(raw) {
@@ -1050,8 +1072,8 @@
 
         function restoreSavedInputs() {
             document.getElementById('pb-5k').value = db.pb["5k"] || "22:00";
-            document.getElementById('pb-10k').value = db.pb["10k"] || "45:00";
-            document.getElementById('pb-21k').value = db.pb["21k"] || "1:42:00";
+            document.getElementById('pb-10k').value = db.pb["10k"] || "46:22";
+            document.getElementById('pb-21k').value = db.pb["21k"] || "1:41:38";
             document.getElementById('garmin-5k').value = db.pb.garmin_5k || "21:30";
             document.getElementById('garmin-10k').value = db.pb.garmin_10k || "44:30";
             document.getElementById('garmin-21k').value = db.pb.garmin_21k || "1:39:00";
@@ -1088,7 +1110,7 @@
             const titles = {
                 panoramica: ["Panoramica & Readiness", "Monitoraggio condizione, soglia Garmin e prevenzione infortuni"],
                 diario: ["Diario & Coach Dinamico", "Piano giornaliero, Km Rulli e rimodulazione automatica"],
-                gare: ["Gare, Soglia & Zone Ritmo", "Soglia Garmin (FC/Passo/Watt), obiettivi 10k e Mezza Maratona"],
+                gare: ["Gare, Soglia & Zone Ritmo", "Soglia Garmin (FC/Passo/Watt/VO2), obiettivi 10k e Mezza Maratona"],
                 forza: ["Forza Gambe & Upper Body", "Schede progressive con illustrazioni esercizi e tracciamento carichi"],
                 scarpe: ["Parco Scarpe & Regole", "Gestione libera km percorsi/rimanenti e protocollo sicurezza"]
             };
@@ -1103,8 +1125,6 @@
 
         function updateTotalsUI() {
             const totRulli = db.allenamenti_settimana.reduce((sum, a) => sum + (Number(a.km_rulli) || 0), 0);
-            const totCorsa = db.allenamenti_settimana.reduce((sum, a) => sum + (Number(a.km_fatti) || 0), 0);
-
             const thisW = getWeekBoundaries(getLocalTodayISO());
             const settBase = db.allenamenti_settimana.filter(a => a.data >= thisW.startIso && a.data <= thisW.endIso);
             const kmPrevBase = settBase.reduce((s, a) => s + (Number(a.km_previsti) || 0), 0);
@@ -1117,11 +1137,6 @@
 
             const weeklyBadge = document.getElementById('weekly-rulli-badge');
             if (weeklyBadge) weeklyBadge.textContent = `Totale Rulli Accumulati: ${totRulli.toFixed(1)} km`;
-
-            const dCorsa = document.getElementById('diario-tot-corsa');
-            const dRulli = document.getElementById('diario-tot-rulli');
-            if (dCorsa) dCorsa.textContent = `Totale Corsa (vista attuale): ${totCorsa.toFixed(1)} km`;
-            if (dRulli) dRulli.innerHTML = `<i class="fa-solid fa-bicycle mr-1"></i> Totale Rulli (vista attuale): ${totRulli.toFixed(1)} km`;
         }
 
         function renderAll() {
@@ -1348,12 +1363,13 @@
             if (!db.allenamenti_settimana.length) return;
             const weekMap = new Map();
             db.allenamenti_settimana.forEach(a => {
+                if (!a.data) return;
                 const w = getWeekBoundaries(a.data);
                 const key = `${w.startIso}_${w.endIso}`;
-                if(!weekMap.has(key)) weekMap.set(key, { label: w.label, start: w.startIso, end: w.endIso, items: [] });
+                if (!weekMap.has(key)) weekMap.set(key, { label: w.label, start: w.startIso, end: w.endIso, items: [] });
                 weekMap.get(key).items.push(a);
             });
-            const sortedWeeks = Array.from(weekMap.values()).sort((a,b) => a.start.localeCompare(b.start));
+            const sortedWeeks = Array.from(weekMap.values()).sort((a, b) => a.start.localeCompare(b.start));
 
             document.getElementById('weekly-summary-body').innerHTML = sortedWeeks.map((w, idx) => {
                 const prev = w.items.reduce((s, x) => s + (Number(x.km_previsti) || 0), 0);
@@ -1361,9 +1377,9 @@
                 const rulli = w.items.reduce((s, x) => s + (Number(x.km_rulli) || 0), 0);
                 const pct = prev > 0 ? Math.min(100, Math.round((fatti / prev) * 100)) : 100;
                 return `
-                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="switchTab('diario'); document.getElementById('diario-week-select').value='${w.start}_${w.end}'; filterDiario('${w.start}_${w.end}');">
+                    <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="jumpToWeek('${w.start}_${w.end}')">
                         <td class="p-3">
-                            <div class="font-semibold text-slate-800">Sett. ${idx+1}</div>
+                            <div class="font-semibold text-slate-800">Sett. ${idx + 1}</div>
                             <div class="text-[10px] text-slate-500">${w.label}</div>
                         </td>
                         <td class="p-3 font-mono">${prev.toFixed(1)} km</td>
@@ -1392,8 +1408,52 @@
             `;
         }
 
-        function filterDiario(f) {
-            db.ui.diarioFilter = f;
+        function jumpToWeek(weekKey) {
+            switchTab('diario', false);
+            selectDiarioWeek(weekKey);
+        }
+
+        function selectDiarioWeek(val) {
+            db.ui.diarioFilter = val;
+            if (val.includes('_')) {
+                const [s, e] = val.split('_');
+                db.ui.dateFrom = s;
+                db.ui.dateTo = e;
+            } else if (val === 'current') {
+                const w = getWeekBoundaries(getLocalTodayISO());
+                db.ui.dateFrom = w.startIso;
+                db.ui.dateTo = w.endIso;
+            } else {
+                db.ui.dateFrom = '';
+                db.ui.dateTo = '';
+            }
+            saveLocal();
+            renderDiario();
+        }
+
+        function filterDiarioToday() {
+            const oggi = getLocalTodayISO();
+            db.ui.diarioFilter = 'custom';
+            db.ui.dateFrom = oggi;
+            db.ui.dateTo = oggi;
+            saveLocal();
+            renderDiario();
+        }
+
+        function filterDiarioAll() {
+            db.ui.diarioFilter = 'all';
+            db.ui.dateFrom = '';
+            db.ui.dateTo = '';
+            saveLocal();
+            renderDiario();
+        }
+
+        function applyCustomDateRange() {
+            const fromVal = document.getElementById('diario-date-from').value;
+            const toVal = document.getElementById('diario-date-to').value;
+            db.ui.diarioFilter = 'custom';
+            db.ui.dateFrom = fromVal;
+            db.ui.dateTo = toVal;
             saveLocal();
             renderDiario();
         }
@@ -1414,54 +1474,78 @@
             const currentFilter = db.ui.diarioFilter || 'current';
             const oggiIso = getLocalTodayISO();
             const thisWeek = getWeekBoundaries(oggiIso);
-            
+
             const selectEl = document.getElementById('diario-week-select');
-            if (selectEl && db.allenamenti_settimana.length > 0) {
+            if (selectEl) {
                 const weekMap = new Map();
                 db.allenamenti_settimana.forEach(a => {
-                    if(!a.data) return;
+                    if (!a.data) return;
                     const w = getWeekBoundaries(a.data);
                     const key = `${w.startIso}_${w.endIso}`;
-                    if(!weekMap.has(key)) weekMap.set(key, w);
+                    if (!weekMap.has(key)) weekMap.set(key, w);
                 });
-                
-                const sortedWeeks = Array.from(weekMap.values()).sort((a,b) => b.startIso.localeCompare(a.startIso));
-                let optsHTML = `<option value="all">Tutte le date (Piano Completo)</option><option value="current">Settimana Corrente (Oggi)</option>`;
+
+                const sortedWeeks = Array.from(weekMap.values()).sort((a, b) => a.startIso.localeCompare(b.startIso));
+                let optsHTML = `<option value="current">Settimana Corrente (${thisWeek.label})</option>`;
                 sortedWeeks.forEach((w, i) => {
-                    const isFuture = w.startIso > oggiIso;
-                    const tag = isFuture ? ' (Futura)' : '';
-                    // Numero settimana al contrario rispetto al sort
-                    const weekNum = sortedWeeks.length - i; 
-                    optsHTML += `<option value="${w.startIso}_${w.endIso}">Sett. ${weekNum}: ${w.label}${tag}</option>`;
+                    const isCurr = w.startIso === thisWeek.startIso;
+                    const tag = isCurr ? ' ★' : '';
+                    optsHTML += `<option value="${w.startIso}_${w.endIso}">Sett. ${i + 1}: ${w.label}${tag}</option>`;
                 });
-                
-                if (selectEl.innerHTML !== optsHTML) selectEl.innerHTML = optsHTML;
-                
-                if (currentFilter === 'current') selectEl.value = 'current';
-                else if ([...selectEl.options].some(o => o.value === currentFilter)) selectEl.value = currentFilter;
-                else selectEl.value = 'all';
+                optsHTML += `<option value="all">Tutte le date (Piano Completo)</option>`;
+                if (currentFilter === 'custom') {
+                    optsHTML += `<option value="custom">Periodo personalizzato</option>`;
+                }
+
+                selectEl.innerHTML = optsHTML;
+                if ([...selectEl.options].some(o => o.value === currentFilter)) {
+                    selectEl.value = currentFilter;
+                } else {
+                    selectEl.value = 'all';
+                }
             }
 
+            let filterStart = db.ui.dateFrom || '';
+            let filterEnd = db.ui.dateTo || '';
+            if (currentFilter === 'current') {
+                filterStart = thisWeek.startIso;
+                filterEnd = thisWeek.endIso;
+            } else if (currentFilter.includes('_')) {
+                [filterStart, filterEnd] = currentFilter.split('_');
+            } else if (currentFilter === 'all') {
+                filterStart = '';
+                filterEnd = '';
+            }
+
+            const fromInp = document.getElementById('diario-date-from');
+            const toInp = document.getElementById('diario-date-to');
+            if (fromInp) fromInp.value = filterStart;
+            if (toInp) toInp.value = filterEnd;
+
             const tbody = document.getElementById('diario-tbody');
-            
             const rows = db.allenamenti_settimana.map((a, idx) => ({ ...a, idx })).filter(a => {
-                if (currentFilter === 'all') return true;
-                if (currentFilter === 'current') return a.data >= thisWeek.startIso && a.data <= thisWeek.endIso;
-                const [start, end] = currentFilter.split('_');
-                return a.data >= start && a.data <= end;
+                if (filterStart && a.data < filterStart) return false;
+                if (filterEnd && a.data > filterEnd) return false;
+                return true;
             });
 
-            if (!rows.length) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-sm text-slate-400">Nessuna seduta in questo periodo.</td></tr>`;
-                document.getElementById('diario-tot-corsa').textContent = `Totale Corsa: 0.0 km`;
-                document.getElementById('diario-tot-rulli').innerHTML = `<i class="fa-solid fa-bicycle mr-1"></i> Totale Rulli: 0.0 km`;
-                return;
+            const rangeInfo = document.getElementById('diario-range-info');
+            if (rangeInfo) {
+                rangeInfo.textContent = rows.length
+                    ? `${rows.length} ${rows.length === 1 ? 'giorno visualizzato' : 'giorni visualizzati'}`
+                    : '0 giorni nel periodo';
             }
 
             const totC = rows.reduce((s, a) => s + (Number(a.km_fatti) || 0), 0);
+            const totPrev = rows.reduce((s, a) => s + (Number(a.km_previsti) || 0), 0);
             const totR = rows.reduce((s, a) => s + (Number(a.km_rulli) || 0), 0);
-            document.getElementById('diario-tot-corsa').textContent = `Corsa Vista Attuale: ${totC.toFixed(1)} km`;
-            document.getElementById('diario-tot-rulli').innerHTML = `<i class="fa-solid fa-bicycle mr-1"></i> Rulli Vista Attuale: ${totR.toFixed(1)} km`;
+            document.getElementById('diario-tot-corsa').textContent = `Corsa: ${totC.toFixed(1)} / ${totPrev.toFixed(1)} km`;
+            document.getElementById('diario-tot-rulli').innerHTML = `<i class="fa-solid fa-bicycle mr-1"></i> Rulli: ${totR.toFixed(1)} km`;
+
+            if (!rows.length) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-sm text-slate-400">Nessuna seduta trovata in questo intervallo. Prova a selezionare un'altra settimana o clicca su <strong>Tutte le date</strong>.</td></tr>`;
+                return;
+            }
 
             tbody.innerHTML = rows.map(a => {
                 let badge = `<span class="px-2 py-1 rounded text-xs font-semibold bg-amber-100 text-amber-800">DA FARE</span>`;
@@ -1559,9 +1643,9 @@
             document.getElementById('endurance-index-box').innerHTML = `<strong>Indice di Resistenza (Passo 21k / Passo 10k): ${ratio}</strong> (Passo 10k: ${secToPace(pace10)} vs Passo 21k: ${secToPace(pace21)}).<br>${profileMsg}`;
 
             const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
-            const lthr = Number(s.fc_bpm) || 180;
-            const ltSec = timeToSec(s.passo || "4:30");
-            const ltW = Number(s.potenza_w) || 350;
+            const lthr = Number(s.fc_bpm) || 187;
+            const ltSec = timeToSec(s.passo || "4:23");
+            const ltW = Number(s.potenza_w) || 360;
 
             const titleEl = document.getElementById('zones-table-title');
             if (titleEl) titleEl.textContent = `Zone Dinamiche (Calibrate su Soglia ${lthr} bpm · ${s.passo}/km · ${ltW} W)`;
@@ -1830,8 +1914,8 @@
         }
 
         function saveProfile() {
-            db.atleta.peso_kg = parseFloat(document.getElementById('prof-peso').value) || 70.0;
-            db.atleta.altezza_cm = parseInt(document.getElementById('prof-altezza').value) || 175;
+            db.atleta.peso_kg = parseFloat(document.getElementById('prof-peso').value) || 69.0;
+            db.atleta.altezza_cm = parseInt(document.getElementById('prof-altezza').value) || 170;
             db.atleta.fc_riposo = parseInt(document.getElementById('prof-fc').value) || 60;
             saveLocal();
             closeModals();
@@ -1907,4 +1991,3 @@
     </script>
 </body>
 </html>
-Analisi in corso…
