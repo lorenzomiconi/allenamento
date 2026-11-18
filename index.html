@@ -65,8 +65,12 @@
             <button onclick="exportJson()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition shadow">
                 <i class="fa-solid fa-download"></i> Esporta dati.json (GitHub)
             </button>
-            <button onclick="resetToGitHub()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition">
-                <i class="fa-solid fa-rotate"></i> Ricarica da dati.json
+            <label class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition cursor-pointer">
+                <i class="fa-solid fa-upload"></i> Importa dati.json
+                <input type="file" accept=".json" onchange="importJson(event)" class="hidden">
+            </label>
+            <button onclick="resetToGitHub()" class="w-full bg-slate-800/60 hover:bg-rose-900/50 text-slate-400 hover:text-rose-200 text-[11px] py-1.5 px-3 rounded-lg flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-rotate"></i> Ripristina dati iniziali
             </button>
         </div>
     </aside>
@@ -82,8 +86,8 @@
                     <p class="text-sm text-slate-500" id="page-subtitle">Monitoraggio condizione, carico settimanale e prevenzione infortuni</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span id="sync-badge" class="text-xs px-3 py-1.5 rounded-full bg-blue-100 text-blue-700 font-medium">
-                        <i class="fa-solid fa-cloud-check mr-1"></i> Sincronizzato con dati.json
+                    <span id="sync-badge" class="text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold transition-all">
+                        <i class="fa-solid fa-check-circle mr-1"></i> Salvataggio automatico attivo
                     </span>
                     <button onclick="openAddWorkoutModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm transition">
                         <i class="fa-solid fa-plus mr-1"></i> Nuova Seduta
@@ -107,26 +111,26 @@
                         <p class="text-xs text-slate-500 mt-2">Settimana 16–22 Nov (Inizio Base)</p>
                     </div>
 
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-emerald-300 transition" onclick="switchTab('scarpe')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-xs font-semibold uppercase text-slate-400">Mizuno Neo Zen</p>
-                                <h3 class="text-2xl font-bold text-emerald-600 mt-1" id="kpi-neo-zen">142 km</h3>
+                                <p class="text-xs font-semibold uppercase text-slate-400" id="kpi-shoe1-name">Mizuno Neo Zen</p>
+                                <h3 class="text-2xl font-bold text-emerald-600 mt-1" id="kpi-shoe1-rem">142 km</h3>
                             </div>
                             <span class="p-2.5 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-shoe-prints"></i></span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-2">Km residui stimati (Corse facili)</p>
+                        <p class="text-xs text-slate-500 mt-2" id="kpi-shoe1-sub">458 / 600 km · Rimanenti</p>
                     </div>
 
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-blue-300 transition" onclick="switchTab('scarpe')">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-xs font-semibold uppercase text-slate-400">Test 10 km (Feb '27)</p>
-                                <h3 class="text-2xl font-bold text-amber-600 mt-1" id="kpi-cd-10k">-- gg</h3>
+                                <p class="text-xs font-semibold uppercase text-slate-400" id="kpi-shoe2-name">Adidas Evo SL</p>
+                                <h3 class="text-2xl font-bold text-blue-600 mt-1" id="kpi-shoe2-rem">520 km</h3>
                             </div>
-                            <span class="p-2.5 bg-amber-50 text-amber-600 rounded-lg"><i class="fa-solid fa-stopwatch"></i></span>
+                            <span class="p-2.5 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-bolt"></i></span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-2">14 Febbraio 2027 · Taratura ritmi</p>
+                        <p class="text-xs text-slate-500 mt-2" id="kpi-shoe2-sub">130 / 650 km · Rimanenti</p>
                     </div>
 
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
@@ -137,13 +141,12 @@
                             </div>
                             <span class="p-2.5 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-flag-checkered"></i></span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-2">18 Aprile 2027 · Gara Principale</p>
+                        <p class="text-xs text-slate-500 mt-2" id="kpi-cd-sub">Test 10k tra -- gg (14 Feb)</p>
                     </div>
                 </div>
 
                 <!-- SEMAFORO READINESS + PROSSIMA SEDUTA -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Semaforo Readiness Garmin -->
                     <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="font-bold text-slate-900 flex items-center gap-2">
@@ -155,12 +158,12 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                             <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-                                <label class="text-xs text-slate-500 block mb-1">FC a riposo oggi (baseline 60)</label>
-                                <input type="number" id="input-fc-riposo" value="60" onchange="updateReadiness()" class="w-full font-bold text-lg bg-white border border-slate-300 rounded px-2.5 py-1">
+                                <label class="text-xs text-slate-500 block mb-1">FC a riposo oggi (baseline <span id="lbl-base-fc">60</span>)</label>
+                                <input type="number" id="input-fc-riposo" value="60" oninput="updateReadiness(true)" class="w-full font-bold text-lg bg-white border border-slate-300 rounded px-2.5 py-1">
                             </div>
                             <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
                                 <label class="text-xs text-slate-500 block mb-1">Stato Schiena / Lombare</label>
-                                <select id="input-schiena" onchange="updateReadiness()" class="w-full font-semibold text-sm bg-white border border-slate-300 rounded px-2.5 py-2">
+                                <select id="input-schiena" onchange="updateReadiness(true)" class="w-full font-semibold text-sm bg-white border border-slate-300 rounded px-2.5 py-2">
                                     <option value="ok">Nessun fastidio (OK)</option>
                                     <option value="lieve">Leggera rigidità</option>
                                     <option value="dolore">Fastidio / Dolore</option>
@@ -168,7 +171,7 @@
                             </div>
                             <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
                                 <label class="text-xs text-slate-500 block mb-1">Polpaccio Sx & Tendine</label>
-                                <select id="input-polpaccio" onchange="updateReadiness()" class="w-full font-semibold text-sm bg-white border border-slate-300 rounded px-2.5 py-2">
+                                <select id="input-polpaccio" onchange="updateReadiness(true)" class="w-full font-semibold text-sm bg-white border border-slate-300 rounded px-2.5 py-2">
                                     <option value="ok">Primi passi OK</option>
                                     <option value="affaticato">Un po' carico</option>
                                     <option value="dolore">Dolore ai primi passi</option>
@@ -180,7 +183,6 @@
                         </div>
                     </div>
 
-                    <!-- Prossimi Allenamenti in arrivo -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2">
@@ -194,7 +196,7 @@
                     </div>
                 </div>
 
-                <!-- RIEPILOGO SETTIMANALE DAL FILE EXCEL -->
+                <!-- RIEPILOGO SETTIMANALE -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <h3 class="font-bold text-slate-900 mb-4">Riepilogo Chilometraggio Settimanale</h3>
                     <div class="overflow-x-auto">
@@ -218,12 +220,12 @@
             <div id="tab-diario" class="hidden space-y-6">
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
                     <div class="flex flex-wrap gap-2">
-                        <button onclick="filterDiario('all')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white">Tutte le date</button>
-                        <button onclick="filterDiario('nov_rientro')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">9–15 Nov (Rientro)</button>
-                        <button onclick="filterDiario('nov_base')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">16–21 Nov (Inizio Base)</button>
-                        <button onclick="filterDiario('storico')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">25 Ott – 8 Nov</button>
+                        <button onclick="filterDiario('all')" id="flt-all" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white">Tutte le date</button>
+                        <button onclick="filterDiario('nov_rientro')" id="flt-nov_rientro" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">9–15 Nov (Rientro)</button>
+                        <button onclick="filterDiario('nov_base')" id="flt-nov_base" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">16–21 Nov (Inizio Base)</button>
+                        <button onclick="filterDiario('storico')" id="flt-storico" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">25 Ott – 8 Nov</button>
                     </div>
-                    <p class="text-xs text-slate-500"><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Regola: i km saltati non si recuperano mai.</p>
+                    <p class="text-xs text-slate-500"><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Ogni seduta sincronizzata salva lo stato e aggiorna i km delle scarpe scelte.</p>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -249,7 +251,6 @@
             <!-- ==================== TAB 3: GARE, PB & ZONE RITMO ==================== -->
             <div id="tab-gare" class="hidden space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Calendario Gare -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-slate-900">Gare Obiettivo & Test</h3>
@@ -260,10 +261,9 @@
                         <div id="races-list" class="space-y-3"></div>
                     </div>
 
-                    <!-- PB & Previsioni Garmin -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="font-bold text-slate-900 mb-1">Personal Best (PB) & Previsioni Garmin</h3>
-                        <p class="text-xs text-slate-500 mb-4">Inserisci i tuoi tempi per calcolare le zone di ritmo e l'Indice di Resistenza.</p>
+                        <p class="text-xs text-slate-500 mb-4">Ogni modifica viene salvata automaticamente e ricalcola le zone di ritmo.</p>
                         <div class="grid grid-cols-3 gap-3 text-xs font-semibold text-slate-500 mb-2">
                             <div>Distanza</div>
                             <div>Tuo PB (mm:ss)</div>
@@ -272,25 +272,24 @@
                         <div class="space-y-3">
                             <div class="grid grid-cols-3 gap-3 items-center">
                                 <span class="font-bold text-sm">5 km</span>
-                                <input type="text" id="pb-5k" value="21:30" onchange="recalcZones()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                <input type="text" id="garmin-5k" value="21:10" onchange="recalcZones()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
+                                <input type="text" id="pb-5k" value="21:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                <input type="text" id="garmin-5k" value="21:10" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
                             </div>
                             <div class="grid grid-cols-3 gap-3 items-center">
                                 <span class="font-bold text-sm">10 km</span>
-                                <input type="text" id="pb-10k" value="44:45" onchange="recalcZones()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                <input type="text" id="garmin-10k" value="44:00" onchange="recalcZones()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
+                                <input type="text" id="pb-10k" value="44:45" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                <input type="text" id="garmin-10k" value="44:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
                             </div>
                             <div class="grid grid-cols-3 gap-3 items-center">
                                 <span class="font-bold text-sm">21.1 km (Ortona)</span>
-                                <input type="text" id="pb-21k" value="1:41:38" onchange="recalcZones()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                <input type="text" id="garmin-21k" value="1:38:30" onchange="recalcZones()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
+                                <input type="text" id="pb-21k" value="1:41:38" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                <input type="text" id="garmin-21k" value="1:38:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
                             </div>
                         </div>
                         <div id="endurance-index-box" class="mt-4 p-3.5 rounded-lg bg-indigo-50 border border-indigo-100 text-xs text-indigo-900"></div>
                     </div>
                 </div>
 
-                <!-- Zone di Ritmo + Nutrizione Lunghi -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="font-bold text-slate-900 mb-3">Zone di Ritmo Dinamiche (Passo / km)</h3>
@@ -310,7 +309,7 @@
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-slate-900 mb-2"><i class="fa-solid fa-bottle-water text-blue-500 mr-1"></i> Strategia Lunghi (69 kg)</h3>
+                        <h3 class="font-bold text-slate-900 mb-2"><i class="fa-solid fa-bottle-water text-blue-500 mr-1"></i> Strategia Lunghi (<span id="nutr-weight-lbl">69</span> kg)</h3>
                         <p class="text-xs text-slate-500 mb-4">Calcolata sul tuo peso attuale per uscite oltre i 75–90 minuti:</p>
                         <ul class="space-y-3 text-sm" id="nutrition-list"></ul>
                     </div>
@@ -319,11 +318,13 @@
 
             <!-- ==================== TAB 4: FORZA GAMBE & UPPER ==================== -->
             <div id="tab-forza" class="hidden space-y-6">
-                <div class="bg-amber-50 border border-amber-200 text-amber-900 p-4 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="bg-amber-50 border border-amber-200 text-amber-900 p-4 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                        <strong>Regole Forza:</strong> Sforzo facile/moderato con <strong>3 ripetizioni di riserva (RIR 3)</strong>. Mai prima di un lavoro chiave o del lungo. Settimana 1 = 16 Nov (2 serie) · Dalla Sett. 3 = 3 serie.
+                        <strong>Regole Forza:</strong> Sforzo facile/moderato con <strong>3 ripetizioni di riserva (RIR 3)</strong>. Clicca sull'illustrazione di qualsiasi esercizio per ingrandirla, spunta gli esercizi svolti e annota i chili.
                     </div>
-                    <span class="font-bold shrink-0">Annota i kg usati qui sotto</span>
+                    <button onclick="resetStrengthChecks()" class="shrink-0 bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 font-semibold px-3 py-1.5 rounded-lg transition">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> Azzera spunte seduta
+                    </button>
                 </div>
 
                 <div id="strength-cards-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
@@ -331,6 +332,16 @@
 
             <!-- ==================== TAB 5: PARCO SCARPE & REGOLE ==================== -->
             <div id="tab-scarpe" class="hidden space-y-6">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm">Gestione Libera Parco Scarpe</h3>
+                        <p class="text-xs text-slate-500">Modifica direttamente i km percorsi o il limite massimo di ogni scarpa: ogni corsa registrata nel Diario aggiorna i totali in automatico e salva tutto.</p>
+                    </div>
+                    <button onclick="openAddShoeModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition">
+                        <i class="fa-solid fa-plus mr-1"></i> Aggiungi Scarpa
+                    </button>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="shoes-container"></div>
 
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -341,6 +352,78 @@
 
         </div>
     </main>
+
+    <!-- MODALE SCHEDA VISIVA ESERCIZIO (INGRANDIMENTO ILLUSTRATIVO) -->
+    <div id="modal-exercise" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600" id="ex-modal-muscle">Muscoli Target</span>
+                    <h3 class="text-xl font-bold text-slate-900" id="ex-modal-title">Nome Esercizio</h3>
+                </div>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-center my-3" id="ex-modal-svg">
+            </div>
+            <div class="space-y-2 text-sm text-slate-700">
+                <div class="flex gap-4 text-xs font-mono bg-blue-50 text-blue-800 px-3 py-2 rounded-lg">
+                    <span><strong>Serie/Rip:</strong> <span id="ex-modal-serie">--</span></span>
+                    <span><strong>Recupero:</strong> <span id="ex-modal-rec">--</span></span>
+                </div>
+                <p class="text-xs leading-relaxed text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100" id="ex-modal-desc">--</p>
+            </div>
+            <div class="flex justify-between items-center mt-5 pt-3 border-t border-slate-100">
+                <a id="ex-modal-yt" href="#" target="_blank" class="text-xs font-semibold text-rose-600 hover:underline flex items-center gap-1.5">
+                    <i class="fa-brands fa-youtube text-base"></i> Guarda esecuzione video
+                </a>
+                <button onclick="closeModals()" class="px-4 py-2 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800">Chiudi Scheda</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE MODIFICA / AGGIUNGI SCARPA -->
+    <div id="modal-shoe" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-900 mb-1" id="modal-shoe-title">Modifica Scarpa</h3>
+            <p class="text-xs text-slate-500 mb-4">Imposta i km già percorsi e la vita utile massima (es. 130 su 650 km).</p>
+            <input type="hidden" id="modal-shoe-idx" value="-1">
+            <div class="space-y-3 text-sm">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Modello Scarpa</label>
+                    <input type="text" id="shoe-input-nome" placeholder="es. Adidas Evo SL" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-semibold">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Utilizzo / Ruolo</label>
+                    <input type="text" id="shoe-input-ruolo" placeholder="es. Gare e lavori di qualità" class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Km Percorsi Attuali</label>
+                        <input type="number" step="0.1" id="shoe-input-percorsi" oninput="previewShoeCalc()" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Vita Utile Max (km)</label>
+                        <input type="number" step="10" id="shoe-input-max" oninput="previewShoeCalc()" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
+                    </div>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-2 rounded-lg text-xs font-semibold flex justify-between" id="shoe-preview-box">
+                    <span>Rimanenti stimati:</span>
+                    <span id="shoe-preview-rem">520 km</span>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Note</label>
+                    <input type="text" id="shoe-input-note" placeholder="Note su ammortizzazione o rotazione..." class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                </div>
+            </div>
+            <div class="flex justify-between items-center mt-6">
+                <button type="button" id="btn-delete-shoe" onclick="deleteShoe()" class="text-xs text-rose-600 hover:underline hidden">Elimina scarpa</button>
+                <div class="flex gap-2 ml-auto">
+                    <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
+                    <button onclick="saveShoe()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Scarpa</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- MODALE REGISTRA / COMPLETA ALLENAMENTO -->
     <div id="modal-complete" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
@@ -367,9 +450,6 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Usate</label>
                         <select id="modal-comp-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                            <option value="Neo Zen">Mizuno Neo Zen</option>
-                            <option value="Evo SL">Adidas Evo SL</option>
-                            <option value="-">Nessuna (Rulli / Forza)</option>
                         </select>
                     </div>
                 </div>
@@ -380,7 +460,7 @@
             </div>
             <div class="flex justify-end gap-2 mt-6">
                 <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
-                <button onclick="saveCompletedWorkout()" class="px-4 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">Salva & Scala Scarpe</button>
+                <button onclick="saveCompletedWorkout()" class="px-4 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">Salva & Aggiorna Scarpe</button>
             </div>
         </div>
     </div>
@@ -469,9 +549,6 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Previste</label>
                         <select id="new-w-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                            <option value="Neo Zen">Mizuno Neo Zen</option>
-                            <option value="Evo SL">Adidas Evo SL</option>
-                            <option value="-">-</option>
                         </select>
                     </div>
                 </div>
@@ -523,8 +600,132 @@
     </div>
 
     <script>
-        // DATI COMPLETI PRECARICATI DAL TUO EXCEL (sincronizzabili con dati.json su GitHub)
+        const STORAGE_KEY = 'runcoach_db_v2';
+
+        // ILLUSTRAZIONI ANATOMICHE CHIARE PER OGNI ESERCIZIO (100% integrate, zero link esterni rotti)
+        function getExerciseSVG(key, large = false) {
+            const cls = large ? "w-72 h-48" : "w-20 h-14 shrink-0";
+            const base = `<svg viewBox="0 0 160 110" class="${cls} rounded-lg bg-white border border-slate-200 shadow-xs" fill="none" xmlns="http://www.w3.org/2000/svg">`;
+            const floor = `<line x1="10" y1="96" x2="150" y2="96" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>`;
+            const shapes = {
+                cat_cow: `${floor}
+                    <circle cx="122" cy="54" r="7" fill="#334155"/>
+                    <path d="M52 60 Q84 36 115 58" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+                    <path d="M52 60 Q84 74 115 58" stroke="#93c5fd" stroke-width="3" stroke-dasharray="3 3"/>
+                    <line x1="54" y1="60" x2="54" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="54" y1="95" x2="36" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="112" y1="59" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M84 30 L84 20 M80 24 L84 20 L88 24" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
+                glute_bridge: `${floor}
+                    <circle cx="30" cy="88" r="7" fill="#334155"/>
+                    <line x1="38" y1="90" x2="55" y2="90" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="55" y1="90" x2="92" y2="62" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="92" y1="62" x2="116" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M88 52 L88 40 M84 44 L88 40 L92 44" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
+                bird_dog: `${floor}
+                    <circle cx="114" cy="54" r="7" fill="#334155"/>
+                    <line x1="64" y1="60" x2="108" y2="60" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="106" y1="60" x2="144" y2="54" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="64" y1="60" x2="22" y2="54" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="64" y1="60" x2="64" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="104" y1="60" x2="104" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
+                plank: `${floor}
+                    <circle cx="128" cy="64" r="7" fill="#334155"/>
+                    <line x1="34" y1="84" x2="120" y2="68" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="116" y1="70" x2="116" y2="94" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="116" y1="94" x2="132" y2="94" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="34" y1="84" x2="28" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
+                dead_bug: `${floor}
+                    <circle cx="34" cy="88" r="7" fill="#334155"/>
+                    <line x1="42" y1="90" x2="96" y2="90" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="56" y1="88" x2="32" y2="66" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
+                    <line x1="56" y1="88" x2="60" y2="52" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+                    <polyline points="96,90 96,64 120,64" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+                    <line x1="96" y1="90" x2="134" y2="78" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>`,
+                squat: `${floor}
+                    <circle cx="88" cy="28" r="7" fill="#334155"/>
+                    <line x1="86" y1="36" x2="72" y2="64" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="84" y1="44" x2="106" y2="48" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/>
+                    <circle cx="109" cy="48" r="4" fill="#10b981"/>
+                    <polyline points="72,64 102,68 92,95" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+                lunge: `${floor}
+                    <circle cx="78" cy="24" r="7" fill="#334155"/>
+                    <line x1="78" y1="32" x2="78" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+                    <polyline points="78,62 110,62 110,95" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="78,62 52,82 40,95" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
+                single_bridge: `${floor}
+                    <circle cx="30" cy="88" r="7" fill="#334155"/>
+                    <line x1="38" y1="90" x2="55" y2="90" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="55" y1="90" x2="90" y2="62" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="90" y1="62" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="90" y1="62" x2="128" y2="34" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/>`,
+                calf_raise: `${floor}
+                    <rect x="64" y="84" width="32" height="12" rx="2" fill="#94a3b8"/>
+                    <circle cx="80" cy="18" r="7" fill="#334155"/>
+                    <line x1="80" y1="26" x2="80" y2="54" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="80" y1="54" x2="82" y2="82" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M98 76 L98 62 M94 66 L98 62 L102 66" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
+                step_up: `${floor}
+                    <rect x="92" y="72" width="44" height="24" rx="2" fill="#94a3b8"/>
+                    <circle cx="96" cy="18" r="7" fill="#334155"/>
+                    <line x1="96" y1="26" x2="94" y2="50" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+                    <polyline points="94,50 112,54 112,72" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="94" y1="50" x2="76" y2="95" stroke="#64748b" stroke-width="4.5" stroke-linecap="round"/>`,
+                band_walk: `${floor}
+                    <circle cx="80" cy="22" r="7" fill="#334155"/>
+                    <line x1="80" y1="30" x2="78" y2="56" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+                    <polyline points="78,56 64,74 60,95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <polyline points="78,56 98,74 104,95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="63" y1="73" x2="99" y2="73" stroke="#10b981" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M112 60 L126 60 M122 56 L126 60 L122 64" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>`,
+                rdl: `${floor}
+                    <circle cx="114" cy="46" r="7" fill="#334155"/>
+                    <line x1="66" y1="56" x2="106" y2="48" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="66" y1="56" x2="62" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="100" y1="50" x2="100" y2="76" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+                    <rect x="94" y="75" width="12" height="5" rx="1" fill="#10b981"/>`,
+                side_plank: `${floor}
+                    <circle cx="126" cy="54" r="7" fill="#334155"/>
+                    <line x1="34" y1="92" x2="118" y2="60" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="112" y1="64" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
+                pushup: `${floor}
+                    <circle cx="128" cy="58" r="7" fill="#334155"/>
+                    <line x1="32" y1="88" x2="120" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="114" y1="65" x2="114" y2="95" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M138 66 L138 80 M134 76 L138 80 L142 76" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
+                row: `${floor}
+                    <rect x="44" y="72" width="54" height="24" rx="3" fill="#e2e8f0" stroke="#94a3b8"/>
+                    <circle cx="114" cy="48" r="7" fill="#334155"/>
+                    <line x1="64" y1="58" x2="106" y2="50" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="64" y1="58" x2="54" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <polyline points="100,52 92,66 96,80" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
+                    <rect x="90" y="79" width="12" height="5" rx="1" fill="#10b981"/>`,
+                overhead_press: `${floor}
+                    <circle cx="80" cy="34" r="7" fill="#334155"/>
+                    <line x1="80" y1="42" x2="80" y2="68" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="76" y1="68" x2="72" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="84" y1="68" x2="88" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="74" y1="46" x2="66" y2="20" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
+                    <line x1="86" y1="46" x2="94" y2="20" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
+                    <rect x="61" y="16" width="10" height="4" fill="#10b981"/>
+                    <rect x="89" y="16" width="10" height="4" fill="#10b981"/>`,
+                face_pull: `${floor}
+                    <circle cx="88" cy="24" r="7" fill="#334155"/>
+                    <line x1="88" y1="32" x2="88" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="88" y1="62" x2="84" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="88" y1="62" x2="96" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="20" y1="32" x2="76" y2="30" stroke="#10b981" stroke-width="3" stroke-dasharray="3 2"/>
+                    <polyline points="88,38 74,30 82,24" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>`
+            };
+            return base + (shapes[key] || shapes.squat) + `</svg>`;
+        }
+
         const DEFAULT_DB = {
+            ui: {
+                activeTab: "panoramica",
+                diarioFilter: "all",
+                readiness: { fc: 60, schiena: "ok", polpaccio: "ok" }
+            },
             atleta: {
                 peso_kg: 69.0,
                 altezza_cm: 170,
@@ -535,88 +736,90 @@
                 "5k": "21:30", "10k": "44:45", "21k": "1:41:38",
                 garmin_5k: "21:10", garmin_10k: "44:00", garmin_21k: "1:38:30"
             },
-            scarpe: {
-                mizuno_neo_zen: {
+            scarpe: [
+                {
+                    id: "neo-zen",
                     nome: "Mizuno Neo Zen",
-                    km_residui: 142,
-                    km_iniziali_residui: 150,
                     ruolo: "Corse facili, lunghi lenti e recupero",
-                    note: "Riferimento al 29/10: 150 km residui (-8 km fatti il 3/11). Sostituire a fine vita."
+                    km_percorsi: 458,
+                    vita_utile: 600,
+                    note: "458 / 600 km percorsi → 142 km rimanenti (riferimento 150 km al 29/10 meno 8 km del 3/11)."
                 },
-                adidas_evo_sl: {
+                {
+                    id: "evo-sl",
                     nome: "Adidas Evo SL",
-                    km_totali_percorsi: 130,
-                    vita_utile_stimata: 600,
                     ruolo: "Gare e lavori di qualità",
-                    note: "Scarpa veloce: preservala per ripetute, medi e gare (10k Febbraio / Mezza Aprile)."
+                    km_percorsi: 130,
+                    vita_utile: 650,
+                    note: "130 / 650 km percorsi → 520 km rimanenti. Preservala per ripetute, medi e gare (10k Febbraio / Mezza Aprile)."
                 }
-            },
+            ],
             gare: [
                 { nome: "Mezza Maratona Ortona-Fossacesia", data: "2026-10-25", distanza: "21.1 km", tipo: "Storico (1h41'38\")" },
                 { nome: "Test / Gara 10 km", data: "2027-02-14", distanza: "10 km", tipo: "Gara Test" },
                 { nome: "Mezza Maratona Obiettivo", data: "2027-04-18", distanza: "21.1 km", tipo: "Gara Principale" }
             ],
             allenamenti_settimana: [
-                { data: "2026-10-25", giorno: "Dom", tipo: "GARA", dettaglio: "Mezza maratona Ortona-Fossacesia Marina, 1h41'38\"", km_previsti: 21.1, km_fatti: 21.21, passo: "4'48\"/km", scarpa: "Evo SL", stato: "completato", note: "Già fatto" },
-                { data: "2026-10-29", giorno: "Gio", tipo: "Corsa facile", dettaglio: "5 km facili (primo allenamento dopo la gara)", km_previsti: 5.0, km_fatti: 5.0, passo: "5'33\"/km", scarpa: "Neo Zen", stato: "completato", note: "Riferimento iniziale scarpe" },
+                { data: "2026-10-25", giorno: "Dom", tipo: "GARA", dettaglio: "Mezza maratona Ortona-Fossacesia Marina, 1h41'38\"", km_previsti: 21.1, km_fatti: 21.21, passo: "4'48\"/km", scarpa: "Adidas Evo SL", stato: "completato", note: "Già fatto" },
+                { data: "2026-10-29", giorno: "Gio", tipo: "Corsa facile", dettaglio: "5 km facili (primo allenamento dopo la gara)", km_previsti: 5.0, km_fatti: 5.0, passo: "5'33\"/km", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Riferimento iniziale scarpe" },
                 { data: "2026-11-02", giorno: "Lun", tipo: "Rulli", dettaglio: "30' Z1 (105-124 bpm)", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "completato", note: "Fatto: 30' rulli" },
-                { data: "2026-11-03", giorno: "Mar", tipo: "Corsa facile", dettaglio: "8 km facili", km_previsti: 8.0, km_fatti: 8.0, passo: "-", scarpa: "Neo Zen", stato: "completato", note: "Fatto" },
+                { data: "2026-11-03", giorno: "Mar", tipo: "Corsa facile", dettaglio: "8 km facili", km_previsti: 8.0, km_fatti: 8.0, passo: "-", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Fatto" },
                 { data: "2026-11-04", giorno: "Mer-Dom", tipo: "Stop / Recupero", dettaglio: "Fermo 4–8 Nov sostituito dal rientro del 9/11", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "saltato", note: "Non recuperare i km saltati" },
-                { data: "2026-11-09", giorno: "Lun", tipo: "Corsa facile", dettaglio: "Corsa facile 125-145 bpm + 800m camminata", km_previsti: 10.0, km_fatti: 10.0, passo: "5'42\"/km", scarpa: "Neo Zen", stato: "completato", note: "Ascesa 105m" },
+                { data: "2026-11-09", giorno: "Lun", tipo: "Corsa facile", dettaglio: "Corsa facile 125-145 bpm + 800m camminata", km_previsti: 10.0, km_fatti: 10.0, passo: "5'42\"/km", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Ascesa 105m" },
                 { data: "2026-11-10", giorno: "Mar", tipo: "Riposo", dettaglio: "Riposo totale", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "completato", note: "" },
                 { data: "2026-11-11", giorno: "Mer", tipo: "Rulli + Core leggero", dettaglio: "Rulli Z1-Z2 40' (105-145 bpm) + 10' core leggero", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-12", giorno: "Gio", tipo: "Corsa facile", dettaglio: "8 km facili a 125-145 bpm", km_previsti: 8.0, km_fatti: null, passo: "", scarpa: "Neo Zen", stato: "da_fare", note: "" },
+                { data: "2026-11-12", giorno: "Gio", tipo: "Corsa facile", dettaglio: "8 km facili a 125-145 bpm", km_previsti: 8.0, km_fatti: null, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
                 { data: "2026-11-13", giorno: "Ven", tipo: "Riposo + Core leggero", dettaglio: "20' core leggero e mobilità (solo se schiena OK)", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-14", giorno: "Sab", tipo: "Corsa facile", dettaglio: "10 km facili a 125-145 bpm, senza guardare il passo", km_previsti: 10.0, km_fatti: null, passo: "", scarpa: "Neo Zen", stato: "da_fare", note: "" },
+                { data: "2026-11-14", giorno: "Sab", tipo: "Corsa facile", dettaglio: "10 km facili a 125-145 bpm, senza guardare il passo", km_previsti: 10.0, km_fatti: null, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
                 { data: "2026-11-15", giorno: "Dom", tipo: "Rulli", dettaglio: "Z1-Z2 60' (fino a 90' se stai bene)", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
                 { data: "2026-11-16", giorno: "Lun", tipo: "Forza A + Rulli", dettaglio: "Forza A gambe e core (30-35', 2 serie) + Rulli Z1 20-30'", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "Settimana 1 Forza" },
-                { data: "2026-11-17", giorno: "Mar", tipo: "Corsa facile", dettaglio: "8 km facili a 125-145 bpm", km_previsti: 8.0, km_fatti: null, passo: "", scarpa: "Neo Zen", stato: "da_fare", note: "" },
+                { data: "2026-11-17", giorno: "Mar", tipo: "Corsa facile", dettaglio: "8 km facili a 125-145 bpm", km_previsti: 8.0, km_fatti: null, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
                 { data: "2026-11-18", giorno: "Mer", tipo: "Rulli", dettaglio: "Z2 40' (125-145 bpm), recupero attivo", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-19", giorno: "Gio", tipo: "Corsa facile + Allunghi", dettaglio: "9 km a 125-145 bpm + 4-5 allunghi da 80m negli ultimi 2 km", km_previsti: 9.0, km_fatti: null, passo: "", scarpa: "Neo Zen", stato: "da_fare", note: "" },
+                { data: "2026-11-19", giorno: "Gio", tipo: "Corsa facile + Allunghi", dettaglio: "9 km a 125-145 bpm + 4-5 allunghi da 80m negli ultimi 2 km", km_previsti: 9.0, km_fatti: null, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
                 { data: "2026-11-20", giorno: "Ven", tipo: "Forza B", dettaglio: "Forza B stabilità e core (30') — niente carichi pesanti", km_previsti: 0, km_fatti: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-21", giorno: "Sab", tipo: "Lungo facile", dettaglio: "12 km facili a 125-145 bpm, passo regolare (primo lungo base)", km_previsti: 12.0, km_fatti: null, passo: "", scarpa: "Neo Zen", stato: "da_fare", note: "" }
+                { data: "2026-11-21", giorno: "Sab", tipo: "Lungo facile", dettaglio: "12 km facili a 125-145 bpm, passo regolare (primo lungo base)", km_previsti: 12.0, km_fatti: null, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" }
             ],
             forza: [
                 {
                     titolo: "Core Leggero (Mobilità & Schiena)",
                     badge: "Giorni Rulli / Riposo",
                     esercizi: [
-                        { nome: "Gatto-cammello", serie: "1x10 lente", rec: "30\"", note: "In quadrupedia, sciogli la schiena senza forzare", carico: "Corpo libero" },
-                        { nome: "Ponte glutei", serie: "2x10", rec: "45\"", note: "Spingi sui talloni senza inarcare la lombare", carico: "Corpo libero" },
-                        { nome: "Bird-dog", serie: "2x10/lato (pausa 3\")", rec: "45\"", note: "Bacino fermo e allineato", carico: "Corpo libero" },
-                        { nome: "Plank frontale", serie: "2x20-30\"", rec: "45\"", note: "Addome contratto, schiena neutra", carico: "Corpo libero" },
-                        { nome: "Dead bug", serie: "2x10/lato", rec: "45\"", note: "Schiena sempre aderente al pavimento", carico: "Corpo libero" }
+                        { nome: "Gatto-cammello", imgKey: "cat_cow", muscoli: "Mobilità colonna & lombare", serie: "1x10 lente", rec: "30\"", note: "In quadrupedia, inarca e arrotonda la schiena piano, senza forzare. Serve a sciogliere la zona lombare.", carico: "Corpo libero", fatto: false },
+                        { nome: "Ponte glutei", imgKey: "glute_bridge", muscoli: "Grande gluteo & ischiocrurali", serie: "2x10", rec: "45\"", note: "Supino, ginocchia piegate, spingi sui talloni e solleva il bacino senza inarcare la schiena.", carico: "Corpo libero", fatto: false },
+                        { nome: "Bird-dog", imgKey: "bird_dog", muscoli: "Core profondo & stabilizzatori schiena", serie: "2x10/lato (pausa 3\")", rec: "45\"", note: "In quadrupedia, estendi braccio e gamba opposti tenendo il bacino fermo e allineato.", carico: "Corpo libero", fatto: false },
+                        { nome: "Plank frontale", imgKey: "plank", muscoli: "Trasverso addominale & retto", serie: "2x20-30\"", rec: "45\"", note: "Corpo in linea dai talloni alle spalle, addome contratto, schiena neutra.", carico: "Corpo libero", fatto: false },
+                        { nome: "Dead bug", imgKey: "dead_bug", muscoli: "Core profondo & controllo pelvico", serie: "2x10/lato", rec: "45\"", note: "Supino, schiena sempre aderente al pavimento, muovi braccio e gamba opposti lentamente.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
                     titolo: "Forza A: Gambe & Core (Lunedì)",
                     badge: "Sett. 1-2: 2 serie | Da Sett. 3: 3 serie",
                     esercizi: [
-                        { nome: "Squat o Goblet Squat leggero", serie: "2-3 x 10", rec: "60-90\"", note: "Schiena neutra, ginocchia in linea", carico: "" },
-                        { nome: "Affondi indietro", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Passo controllato, busto dritto", carico: "" },
-                        { nome: "Ponte glutei su una gamba", serie: "2-3 x 10/gamba", rec: "60\"", note: "Bacino alto e stabile", carico: "" },
-                        { nome: "Alzate polpacci su una gamba", serie: "2-3 x 12/gamba", rec: "60\"", note: "Discesa lenta 3\" su gradino (protezione tendine)", carico: "" },
-                        { nome: "Plank frontale + Bird-dog", serie: "2-3 x 35\" / 8 lato", rec: "45\"", note: "Controllo posturale", carico: "Corpo libero" }
+                        { nome: "Squat o Goblet Squat leggero", imgKey: "squat", muscoli: "Quadricipiti, glutei, core", serie: "2-3 x 10", rec: "60-90\"", note: "Schiena neutra, ginocchia in linea con i piedi. Il goblet si fa tenendo un manubrio o kettlebell al petto.", carico: "", fatto: false },
+                        { nome: "Affondi indietro", imgKey: "lunge", muscoli: "Glutei, quadricipiti, stabilità bacino", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Passo indietro controllato, busto dritto, ginocchio anteriore allineato alla caviglia.", carico: "", fatto: false },
+                        { nome: "Ponte glutei su una gamba", imgKey: "single_bridge", muscoli: "Gluteo monolaterale & femorali", serie: "2-3 x 10/gamba", rec: "60\"", note: "Bacino alto e fermo, senza ruotare l'anca né inarcare la schiena.", carico: "", fatto: false },
+                        { nome: "Alzate polpacci su una gamba", imgKey: "calf_raise", muscoli: "Gastrocnemio, soleo & tendine d'Achille", serie: "2-3 x 12/gamba", rec: "60\"", note: "Sul bordo di un gradino con una mano d'appoggio: sali esplosivo e scendi lento in 3 secondi. Protegge polpaccio e tendine.", carico: "", fatto: false },
+                        { nome: "Plank frontale + Bird-dog", imgKey: "plank", muscoli: "Core & tenuta posturale", serie: "2-3 x 35\" / 8 lato", rec: "45\"", note: "Controllo posturale lento, zero fretta.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
                     titolo: "Forza B: Stabilità & Catena Posteriore (Venerdì)",
                     badge: "Sett. 1-2: 2 serie | Da Sett. 3: 3 serie",
                     esercizi: [
-                        { nome: "Step-up su gradino (30-40 cm)", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Spingi con la gamba sul gradino", carico: "" },
-                        { nome: "Camminata laterale con elastico", serie: "2 x 12 passi/lato", rec: "45\"", note: "Elastico sopra le ginocchia", carico: "Elastico" },
-                        { nome: "Stacco rumeno con manubri leggeri", serie: "Solo da Sett. 3 (3x8)", rec: "60-90\"", note: "NON fare nelle sett. 1-2. Solo se schiena 100% OK", carico: "" },
-                        { nome: "Plank laterale + Dead bug", serie: "2-3 x 30\" / 8 lato", rec: "45\"", note: "Fianchi alti, schiena neutra", carico: "Corpo libero" }
+                        { nome: "Step-up su gradino (30-40 cm)", imgKey: "step_up", muscoli: "Glutei, quadricipiti, spinta di corsa", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Gradino di 30-40 cm: spingi con il tallone della gamba sul gradino, senza darti slancio con quella a terra.", carico: "", fatto: false },
+                        { nome: "Camminata laterale con elastico", imgKey: "band_walk", muscoli: "Medio gluteo (stabilità ginocchio/anca)", serie: "2 x 12 passi/lato", rec: "45\"", note: "Elastico sopra le ginocchia, ginocchia semiflesse, passi laterali controllati mantenendo tensione.", carico: "Elastico", fatto: false },
+                        { nome: "Stacco rumeno con manubri leggeri", imgKey: "rdl", muscoli: "Ischiocrurali, glutei, erettori spinali", serie: "Solo da Sett. 3 (3x8)", rec: "60-90\"", note: "NON fare nelle settimane 1-2. Introducilo dalla 3ª solo se la schiena è senza fastidi, con carico leggero.", carico: "", fatto: false },
+                        { nome: "Plank laterale + Dead bug", imgKey: "side_plank", muscoli: "Obliqui, quadrato dei lombi & core", serie: "2-3 x 30\" / 8 lato", rec: "45\"", note: "Corpo allineato, fianchi alti nel plank laterale e schiena piatta nel dead bug.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
                     titolo: "Forza C: Upper Body & Postura Runner",
                     badge: "Giorni Facili / Rulli (2x/sett.)",
                     esercizi: [
-                        { nome: "Piegamenti (Push-up) o Panca Manubri", serie: "3 x 10-12", rec: "60\"", note: "Spinta petto/spalle, RIR 3 (mai a cedimento)", carico: "" },
-                        { nome: "Rematore con manubrio / elastico", serie: "3 x 10/lato", rec: "60\"", note: "Rinforzo dorso per postura negli ultimi km", carico: "" },
-                        { nome: "Military Press / Alzate manubri", serie: "3 x 10", rec: "60\"", note: "Spalle stabili senza inarcare la schiena", carico: "" },
-                        { nome: "Face-pull con elastico / Tirate", serie: "3 x 12-15", rec: "45\"", note: "Apertura spalle e controllo scapole", carico: "Elastico" }
+                        { nome: "Piegamenti (Push-up) o Panca Manubri", imgKey: "pushup", muscoli: "Pettorali, deltoidi anteriori, tricipiti", serie: "3 x 10-12", rec: "60\"", note: "Spinta controllata, gomiti a 45° rispetto al busto, RIR 3 (lascia 3 ripetizioni di margine).", carico: "", fatto: false },
+                        { nome: "Rematore con manubrio / elastico", imgKey: "row", muscoli: "Gran dorsale, romboidi, bicipiti", serie: "3 x 10/lato", rec: "60\"", note: "Rinforza il dorso per mantenere il busto aperto e non chiuderti in avanti negli ultimi km di gara.", carico: "", fatto: false },
+                        { nome: "Military Press / Alzate manubri", imgKey: "overhead_press", muscoli: "Deltoidi & stabilizzatori scapola", serie: "3 x 10", rec: "60\"", note: "Spinta verso l'alto tenendo l'addome attivo per non inarcare la zona lombare.", carico: "", fatto: false },
+                        { nome: "Face-pull con elastico / Tirate", imgKey: "face_pull", muscoli: "Deltoidi posteriori & cuffia rotatori", serie: "3 x 12-15", rec: "45\"", note: "Tira l'elastico verso il viso aprendo i gomiti e avvicinando le scapole.", carico: "Elastico", fatto: false }
                     ]
                 }
             ],
@@ -626,48 +829,136 @@
                 { tema: "Ritmo corse facili", desc: "125-145 bpm, ritmo conversazionale (circa 5'30\"-6'00\"/km). Non guardare l'orologio." },
                 { tema: "Frequenza a riposo", desc: "Se per più giorni è 7-10 bpm sopra il valore normale (60 bpm), aggiungi un giorno di riposo." },
                 { tema: "Polpaccio sx & dita", desc: "Controlla il tendine ai primi passi del mattino. Se fa male, niente corsa finché non passa." },
-                { tema: "Rotazione scarpe", desc: "Neo Zen per i fondi lenti (142 km residui); Evo SL riservate esclusivamente a lavori veloci e gare." }
+                { tema: "Rotazione scarpe", desc: "Neo Zen per i fondi lenti (142 km rimanenti); Evo SL (130/650 km, 520 rimanenti) riservate a lavori veloci e gare." }
             ]
         };
 
-        let db = JSON.parse(localStorage.getItem('runcoach_db')) || structuredClone(DEFAULT_DB);
-        let currentFilter = 'all';
+        let db = null;
 
-        // All'avvio prova a leggere dati.json da GitHub se presente
-        async function initApp() {
-            try {
-                const res = await fetch('dati.json?t=' + Date.now());
-                if (res.ok) {
-                    const remoteData = await res.json();
-                    // Unisce eventuali aggiornamenti da GitHub Actions mantenendo la struttura completa
-                    if (remoteData.atleta) db.atleta = { ...db.atleta, ...remoteData.atleta };
-                    if (remoteData.scarpe && remoteData.scarpe.mizuno_neo_zen) {
-                        db.scarpe.mizuno_neo_zen.km_residui = remoteData.scarpe.mizuno_neo_zen.km_residui;
-                    }
-                    if (remoteData.scarpe && remoteData.scarpe.adidas_evo_sl) {
-                        db.scarpe.adidas_evo_sl.km_totali_percorsi = remoteData.scarpe.adidas_evo_sl.km_totali_percorsi;
-                    }
-                    if (remoteData.allenamenti_settimana && remoteData.allenamenti_settimana.length > 5) {
-                        db.allenamenti_settimana = remoteData.allenamenti_settimana;
-                    }
-                    saveLocal();
+        function normalizeDb(raw) {
+            const merged = structuredClone(DEFAULT_DB);
+            if (!raw || typeof raw !== 'object') return merged;
+
+            if (raw.ui) merged.ui = { ...merged.ui, ...raw.ui, readiness: { ...merged.ui.readiness, ...(raw.ui.readiness || {}) } };
+            if (raw.atleta) merged.atleta = { ...merged.atleta, ...raw.atleta };
+            if (raw.pb) merged.pb = { ...merged.pb, ...raw.pb };
+            if (Array.isArray(raw.gare) && raw.gare.length) merged.gare = raw.gare;
+            if (Array.isArray(raw.allenamenti_settimana) && raw.allenamenti_settimana.length) merged.allenamenti_settimana = raw.allenamenti_settimana;
+            if (Array.isArray(raw.regole) && raw.regole.length) merged.regole = raw.regole;
+
+            // Gestione compatibilità scarpe (sia array che vecchio oggetto)
+            if (Array.isArray(raw.scarpe) && raw.scarpe.length) {
+                merged.scarpe = raw.scarpe;
+            } else if (raw.scarpe && typeof raw.scarpe === 'object') {
+                if (raw.scarpe.mizuno_neo_zen && typeof raw.scarpe.mizuno_neo_zen.km_residui === 'number') {
+                    merged.scarpe[0].km_percorsi = Math.max(0, 600 - raw.scarpe.mizuno_neo_zen.km_residui);
                 }
-            } catch (e) {
-                console.log("Modalità locale attiva");
+                if (raw.scarpe.adidas_evo_sl && typeof raw.scarpe.adidas_evo_sl.km_totali_percorsi === 'number') {
+                    merged.scarpe[1].km_percorsi = raw.scarpe.adidas_evo_sl.km_totali_percorsi;
+                }
             }
-            renderAll();
+
+            // Preserva i carichi e le spunte degli esercizi salvati dall'utente mantenendo le illustrazioni
+            if (Array.isArray(raw.forza) && raw.forza.length) {
+                merged.forza.forEach((scheda, sIdx) => {
+                    if (raw.forza[sIdx] && Array.isArray(raw.forza[sIdx].esercizi)) {
+                        scheda.esercizi.forEach((ex, eIdx) => {
+                            const savedEx = raw.forza[sIdx].esercizi[eIdx];
+                            if (savedEx) {
+                                if (savedEx.carico !== undefined) ex.carico = savedEx.carico;
+                                if (savedEx.fatto !== undefined) ex.fatto = savedEx.fatto;
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Normalizza nomi scarpe nel diario
+            merged.allenamenti_settimana.forEach(a => {
+                if (a.scarpa === 'Neo Zen') a.scarpa = 'Mizuno Neo Zen';
+                if (a.scarpa === 'Evo SL') a.scarpa = 'Adidas Evo SL';
+            });
+
+            return merged;
         }
 
         function saveLocal() {
-            localStorage.setItem('runcoach_db', JSON.stringify(db));
+            if (!db) return;
+            try {
+                db.lastSaved = new Date().toISOString();
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+                const badge = document.getElementById('sync-badge');
+                if (badge) {
+                    const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    badge.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i> Salvato · ${now}`;
+                    badge.classList.add('ring-2', 'ring-emerald-400');
+                    setTimeout(() => badge.classList.remove('ring-2', 'ring-emerald-400'), 600);
+                }
+            } catch (e) {
+                console.error("Errore salvataggio localStorage:", e);
+            }
+        }
+
+        // Salvataggio garantito anche alla chiusura/cambio finestra
+        window.addEventListener('beforeunload', saveLocal);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') saveLocal();
+        });
+
+        async function initApp() {
+            const savedRaw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('runcoach_db');
+            if (savedRaw) {
+                // Priorità assoluta ai dati salvati dall'utente nel browser (non vengono mai sovrascritti alla riapertura)
+                try {
+                    db = normalizeDb(JSON.parse(savedRaw));
+                    saveLocal();
+                } catch (e) {
+                    db = structuredClone(DEFAULT_DB);
+                    saveLocal();
+                }
+            } else {
+                // Primo avvio assoluto: carica dati.json da GitHub se presente, altrimenti DEFAULT_DB
+                db = structuredClone(DEFAULT_DB);
+                try {
+                    const res = await fetch('dati.json?t=' + Date.now());
+                    if (res.ok) {
+                        const remoteData = await res.json();
+                        db = normalizeDb(remoteData);
+                    }
+                } catch (e) {
+                    console.log("Avvio con database predefinito.");
+                }
+                saveLocal();
+            }
+
+            // Ripristina i campi input salvati (PB, Garmin, Readiness) e la scheda attiva
+            restoreSavedInputs();
+            renderAll();
+            switchTab(db.ui.activeTab || 'panoramica', false);
+        }
+
+        function restoreSavedInputs() {
+            document.getElementById('pb-5k').value = db.pb["5k"] || "21:30";
+            document.getElementById('pb-10k').value = db.pb["10k"] || "44:45";
+            document.getElementById('pb-21k').value = db.pb["21k"] || "1:41:38";
+            document.getElementById('garmin-5k').value = db.pb.garmin_5k || "21:10";
+            document.getElementById('garmin-10k').value = db.pb.garmin_10k || "44:00";
+            document.getElementById('garmin-21k').value = db.pb.garmin_21k || "1:38:30";
+
+            const r = db.ui.readiness || { fc: db.atleta.fc_riposo || 60, schiena: "ok", polpaccio: "ok" };
+            document.getElementById('input-fc-riposo').value = r.fc;
+            document.getElementById('input-schiena').value = r.schiena;
+            document.getElementById('input-polpaccio').value = r.polpaccio;
         }
 
         function resetToGitHub() {
+            if (!confirm("Vuoi ripristinare i dati iniziali dal file dati.json? Le modifiche locali non esportate verranno sovrascritte.")) return;
+            localStorage.removeItem(STORAGE_KEY);
             localStorage.removeItem('runcoach_db');
             location.reload();
         }
 
-        function switchTab(tabId) {
+        function switchTab(tabId, persist = true) {
             ['panoramica', 'diario', 'gare', 'forza', 'scarpe'].forEach(t => {
                 document.getElementById('tab-' + t).classList.add('hidden');
                 const btn = document.getElementById('btn-' + t);
@@ -683,35 +974,55 @@
                 panoramica: ["Panoramica & Readiness", "Monitoraggio condizione, carico settimanale e prevenzione infortuni"],
                 diario: ["Diario & Coach Dinamico", "Piano giornaliero fino al 21 Novembre e rimodulazione automatica"],
                 gare: ["Gare, PB & Zone di Ritmo", "Obiettivi 10k Febbraio e Mezza Maratona Aprile, passi target e nutrizione"],
-                forza: ["Forza Gambe & Upper Body", "Schede progressive con tracciamento carichi e protezione schiena"],
-                scarpe: ["Parco Scarpe & Regole", "Usura Mizuno Neo Zen e Adidas Evo SL + protocollo di sicurezza"]
+                forza: ["Forza Gambe & Upper Body", "Schede progressive con illustrazioni esercizi e tracciamento carichi"],
+                scarpe: ["Parco Scarpe & Regole", "Gestione libera km percorsi/rimanenti e protocollo sicurezza"]
             };
             document.getElementById('page-title').textContent = titles[tabId][0];
             document.getElementById('page-subtitle').textContent = titles[tabId][1];
+
+            if (persist && db) {
+                db.ui.activeTab = tabId;
+                saveLocal();
+            }
         }
 
         function renderAll() {
-            // 1. Profilo
             const bmi = (db.atleta.peso_kg / Math.pow(db.atleta.altezza_cm / 100, 2)).toFixed(2);
             db.atleta.bmi = parseFloat(bmi);
             document.getElementById('side-atleta').textContent = `${db.atleta.peso_kg} kg · ${db.atleta.altezza_cm} cm`;
             document.getElementById('side-bmi').textContent = bmi;
             document.getElementById('side-fc').textContent = `${db.atleta.fc_riposo || 60} bpm`;
+            document.getElementById('lbl-base-fc').textContent = db.atleta.fc_riposo || 60;
+            document.getElementById('nutr-weight-lbl').textContent = db.atleta.peso_kg;
 
-            // 2. KPI & Countdown
-            document.getElementById('kpi-neo-zen').textContent = `${db.scarpe.mizuno_neo_zen.km_residui} km`;
+            // KPI Scarpe
+            if (db.scarpe[0]) {
+                const s1 = db.scarpe[0];
+                const rem1 = Math.max(0, +(s1.vita_utile - s1.km_percorsi).toFixed(1));
+                document.getElementById('kpi-shoe1-name').textContent = s1.nome;
+                document.getElementById('kpi-shoe1-rem').textContent = `${rem1} km`;
+                document.getElementById('kpi-shoe1-sub').textContent = `${s1.km_percorsi} / ${s1.vita_utile} km · Rimanenti`;
+            }
+            if (db.scarpe[1]) {
+                const s2 = db.scarpe[1];
+                const rem2 = Math.max(0, +(s2.vita_utile - s2.km_percorsi).toFixed(1));
+                document.getElementById('kpi-shoe2-name').textContent = s2.nome;
+                document.getElementById('kpi-shoe2-rem').textContent = `${rem2} km`;
+                document.getElementById('kpi-shoe2-sub').textContent = `${s2.km_percorsi} / ${s2.vita_utile} km · Rimanenti`;
+            }
+
             const today = new Date();
             const d10k = Math.max(0, Math.ceil((new Date("2027-02-14") - today) / (1000 * 60 * 60 * 24)));
             const d21k = Math.max(0, Math.ceil((new Date("2027-04-18") - today) / (1000 * 60 * 60 * 24)));
-            document.getElementById('kpi-cd-10k').textContent = `${d10k} gg`;
             document.getElementById('kpi-cd-21k').textContent = `${d21k} gg`;
+            document.getElementById('kpi-cd-sub').textContent = `Test 10k tra ${d10k} gg (14 Feb)`;
 
-            // Calcolo settimana 16-22 Nov
             const settBase = db.allenamenti_settimana.filter(a => a.data >= "2026-11-16" && a.data <= "2026-11-22");
             const kmPrevBase = settBase.reduce((s, a) => s + (a.km_previsti || 0), 0);
             const kmFattiBase = settBase.reduce((s, a) => s + (a.km_fatti || 0), 0);
             document.getElementById('kpi-km-sett').textContent = `${kmFattiBase} / ${kmPrevBase} km`;
 
+            updateReadiness(false);
             renderUpcoming();
             renderWeeklySummary();
             renderDiario();
@@ -721,11 +1032,16 @@
             renderShoesAndRules();
         }
 
-        function updateReadiness() {
+        function updateReadiness(shouldSave = true) {
             const fc = parseInt(document.getElementById('input-fc-riposo').value) || 60;
             const schiena = document.getElementById('input-schiena').value;
             const polpaccio = document.getElementById('input-polpaccio').value;
             const baseFc = db.atleta.fc_riposo || 60;
+
+            if (shouldSave) {
+                db.ui.readiness = { fc, schiena, polpaccio };
+                saveLocal();
+            }
 
             const badge = document.getElementById('readiness-badge');
             const advice = document.getElementById('readiness-advice');
@@ -795,11 +1111,21 @@
         }
 
         function filterDiario(f) {
-            currentFilter = f;
+            db.ui.diarioFilter = f;
+            saveLocal();
             renderDiario();
         }
 
         function renderDiario() {
+            const currentFilter = db.ui.diarioFilter || 'all';
+            ['all', 'nov_rientro', 'nov_base', 'storico'].forEach(key => {
+                const btn = document.getElementById('flt-' + key);
+                if (!btn) return;
+                btn.className = key === currentFilter
+                    ? "filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white"
+                    : "filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200";
+            });
+
             const tbody = document.getElementById('diario-tbody');
             const rows = db.allenamenti_settimana.map((a, idx) => ({ ...a, idx })).filter(a => {
                 if (currentFilter === 'nov_rientro') return a.data >= '2026-11-09' && a.data <= '2026-11-15';
@@ -874,6 +1200,17 @@
             return `${m}'${s}"/km`;
         }
 
+        function savePbAndRecalc() {
+            db.pb["5k"] = document.getElementById('pb-5k').value;
+            db.pb["10k"] = document.getElementById('pb-10k').value;
+            db.pb["21k"] = document.getElementById('pb-21k').value;
+            db.pb.garmin_5k = document.getElementById('garmin-5k').value;
+            db.pb.garmin_10k = document.getElementById('garmin-10k').value;
+            db.pb.garmin_21k = document.getElementById('garmin-21k').value;
+            saveLocal();
+            recalcZones();
+        }
+
         function recalcZones() {
             const t10 = timeToSec(document.getElementById('pb-10k').value);
             const t21 = timeToSec(document.getElementById('pb-21k').value);
@@ -906,10 +1243,9 @@
                 </tr>
             `).join('');
 
-            // Nutrizione calibrata su peso attuale
             const w = db.atleta.peso_kg;
-            const carbs = Math.round(w * 0.7); // ~48g/ora per 69 kg
-            const water = Math.round(w * 7.5); // ~520ml/ora
+            const carbs = Math.round(w * 0.7);
+            const water = Math.round(w * 7.5);
             document.getElementById('nutrition-list').innerHTML = `
                 <li class="p-3 rounded-lg bg-slate-50 border border-slate-200">
                     <div class="text-xs text-slate-500">Carboidrati target (> 90 min)</div>
@@ -933,19 +1269,56 @@
                         <h4 class="font-bold text-slate-900">${scheda.titolo}</h4>
                         <span class="text-xs px-2.5 py-1 rounded bg-blue-50 text-blue-700 font-semibold">${scheda.badge}</span>
                     </div>
-                    <div class="space-y-2.5">
+                    <div class="space-y-3">
                         ${scheda.esercizi.map((ex, eIdx) => `
-                            <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between gap-2">
-                                <div>
-                                    <div class="font-semibold text-sm text-slate-800">${ex.nome} <span class="text-xs font-mono text-blue-600">(${ex.serie} · rec ${ex.rec})</span></div>
-                                    <div class="text-xs text-slate-500">${ex.note}</div>
+                            <div class="p-3 rounded-xl ${ex.fatto ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 border-slate-200/80'} border flex items-center justify-between gap-3 hover:border-blue-300 transition">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <input type="checkbox" ${ex.fatto ? 'checked' : ''} onchange="toggleExerciseDone(${sIdx}, ${eIdx}, this.checked)" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0" title="Segna esercizio svolto">
+                                    <button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="group relative shrink-0 focus:outline-none" title="Clicca per ingrandire l'illustrazione">
+                                        ${getExerciseSVG(ex.imgKey || 'squat', false)}
+                                        <span class="absolute bottom-0.5 right-0.5 bg-slate-900/75 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 transition">
+                                            <i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        </span>
+                                    </button>
+                                    <div class="min-w-0">
+                                        <button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="font-bold text-sm ${ex.fatto ? 'line-through text-slate-400' : 'text-slate-900 hover:text-blue-600'} text-left block truncate">
+                                            ${ex.nome}
+                                        </button>
+                                        <div class="text-xs font-mono text-blue-600">${ex.serie} · rec ${ex.rec}</div>
+                                        <div class="text-xs text-slate-500 line-clamp-2 mt-0.5">${ex.note}</div>
+                                    </div>
                                 </div>
-                                <input type="text" value="${ex.carico || ''}" onchange="updateLoad(${sIdx}, ${eIdx}, this.value)" placeholder="kg / note" class="w-24 text-xs border border-slate-300 rounded px-2 py-1.5 bg-white text-right font-mono">
+                                <input type="text" value="${ex.carico || ''}" oninput="updateLoad(${sIdx}, ${eIdx}, this.value)" placeholder="kg / note" class="w-24 shrink-0 text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-right font-mono">
                             </div>
                         `).join('')}
                     </div>
                 </div>
             `).join('');
+        }
+
+        function toggleExerciseDone(sIdx, eIdx, checked) {
+            db.forza[sIdx].esercizi[eIdx].fatto = checked;
+            saveLocal();
+            renderStrength();
+        }
+
+        function resetStrengthChecks() {
+            db.forza.forEach(s => s.esercizi.forEach(ex => ex.fatto = false));
+            saveLocal();
+            renderStrength();
+        }
+
+        function openExerciseModal(sIdx, eIdx) {
+            const ex = db.forza[sIdx].esercizi[eIdx];
+            document.getElementById('ex-modal-muscle').textContent = ex.muscoli || "Forza & Stabilità Runner";
+            document.getElementById('ex-modal-title').textContent = ex.nome;
+            document.getElementById('ex-modal-svg').innerHTML = getExerciseSVG(ex.imgKey || 'squat', true);
+            document.getElementById('ex-modal-serie').textContent = ex.serie;
+            document.getElementById('ex-modal-rec').textContent = ex.rec;
+            document.getElementById('ex-modal-desc').textContent = ex.note;
+            document.getElementById('ex-modal-yt').href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(ex.nome + " esecuzione corretta");
+            const m = document.getElementById('modal-exercise');
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function updateLoad(sIdx, eIdx, val) {
@@ -954,40 +1327,49 @@
         }
 
         function renderShoesAndRules() {
-            const neo = db.scarpe.mizuno_neo_zen;
-            const evo = db.scarpe.adidas_evo_sl;
-            const neoPct = Math.max(0, Math.min(100, Math.round((neo.km_residui / (neo.km_iniziali_residui || 150)) * 100)));
-            const evoPct = Math.max(0, Math.min(100, Math.round(((evo.vita_utile_stimata - evo.km_totali_percorsi) / evo.vita_utile_stimata) * 100)));
+            document.getElementById('shoes-container').innerHTML = db.scarpe.map((s, idx) => {
+                const percorsi = Number(s.km_percorsi) || 0;
+                const max = Number(s.vita_utile) || 600;
+                const rimanenti = Math.max(0, +(max - percorsi).toFixed(1));
+                const pctUsura = Math.min(100, Math.max(0, Math.round((percorsi / max) * 100)));
+                const barColor = rimanenti <= 80 ? 'bg-rose-500' : (rimanenti <= 160 ? 'bg-amber-500' : 'bg-emerald-500');
+                const badgeColor = rimanenti <= 80 ? 'bg-rose-100 text-rose-800' : (rimanenti <= 160 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800');
 
-            document.getElementById('shoes-container').innerHTML = `
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex justify-between items-start mb-2">
+                return `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
                         <div>
-                            <span class="text-xs font-bold uppercase text-emerald-600">Fondi Lenti & Recupero</span>
-                            <h3 class="text-xl font-bold text-slate-900">${neo.nome}</h3>
-                        </div>
-                        <span class="text-2xl font-extrabold text-emerald-600">${neo.km_residui} km <span class="text-xs font-normal text-slate-400">residui</span></span>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-3 my-3">
-                        <div class="bg-emerald-500 h-3 rounded-full" style="width:${neoPct}%"></div>
-                    </div>
-                    <p class="text-xs text-slate-500">${neo.note}</p>
-                </div>
+                            <div class="flex justify-between items-start gap-2 mb-3">
+                                <div>
+                                    <span class="text-xs font-bold uppercase text-blue-600">${s.ruolo}</span>
+                                    <h3 class="text-xl font-bold text-slate-900 mt-0.5">${s.nome}</h3>
+                                </div>
+                                <button onclick="openEditShoeModal(${idx})" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold transition">
+                                    <i class="fa-solid fa-pen mr-1"></i> Modifica Km
+                                </button>
+                            </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span class="text-xs font-bold uppercase text-rose-600">Qualità & Gare (10k / Mezza)</span>
-                            <h3 class="text-xl font-bold text-slate-900">${evo.nome}</h3>
+                            <div class="flex flex-wrap items-baseline justify-between gap-2 my-3">
+                                <div class="text-2xl font-extrabold text-slate-900 font-mono">
+                                    ${percorsi} <span class="text-sm font-normal text-slate-400">su ${max} km</span>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs font-bold ${badgeColor}">
+                                    Rimanenti: ${rimanenti} km
+                                </span>
+                            </div>
+
+                            <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                                <div class="${barColor} h-3 rounded-full transition-all duration-300" style="width:${pctUsura}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-slate-400 mt-1 font-mono">
+                                <span>Usura: ${pctUsura}%</span>
+                                <span>Disponibile: ${100 - pctUsura}%</span>
+                            </div>
                         </div>
-                        <span class="text-2xl font-extrabold text-slate-800">${evo.km_totali_percorsi} km <span class="text-xs font-normal text-slate-400">percorsi</span></span>
+
+                        <p class="text-xs text-slate-500 mt-4 pt-3 border-t border-slate-100">${s.note || ''}</p>
                     </div>
-                    <div class="w-full bg-slate-200 rounded-full h-3 my-3">
-                        <div class="bg-blue-600 h-3 rounded-full" style="width:${evoPct}%"></div>
-                    </div>
-                    <p class="text-xs text-slate-500">${evo.note}</p>
-                </div>
-            `;
+                `;
+            }).join('');
 
             document.getElementById('rules-container').innerHTML = db.regole.map(r => `
                 <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
@@ -997,9 +1379,91 @@
             `).join('');
         }
 
-        // MODALI
+        // MODALE SCARPE (MODIFICA E AGGIUNGI)
+        function openEditShoeModal(idx) {
+            const s = db.scarpe[idx];
+            document.getElementById('modal-shoe-title').textContent = "Modifica Scarpa & Chilometraggio";
+            document.getElementById('modal-shoe-idx').value = idx;
+            document.getElementById('shoe-input-nome').value = s.nome;
+            document.getElementById('shoe-input-ruolo').value = s.ruolo;
+            document.getElementById('shoe-input-percorsi').value = s.km_percorsi;
+            document.getElementById('shoe-input-max').value = s.vita_utile;
+            document.getElementById('shoe-input-note').value = s.note || "";
+            document.getElementById('btn-delete-shoe').classList.toggle('hidden', db.scarpe.length <= 1);
+            previewShoeCalc();
+            const m = document.getElementById('modal-shoe');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+
+        function openAddShoeModal() {
+            document.getElementById('modal-shoe-title').textContent = "Aggiungi Nuova Scarpa";
+            document.getElementById('modal-shoe-idx').value = -1;
+            document.getElementById('shoe-input-nome').value = "";
+            document.getElementById('shoe-input-ruolo').value = "Corse facili / Lenti";
+            document.getElementById('shoe-input-percorsi').value = 0;
+            document.getElementById('shoe-input-max').value = 650;
+            document.getElementById('shoe-input-note').value = "";
+            document.getElementById('btn-delete-shoe').classList.add('hidden');
+            previewShoeCalc();
+            const m = document.getElementById('modal-shoe');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+
+        function previewShoeCalc() {
+            const p = parseFloat(document.getElementById('shoe-input-percorsi').value) || 0;
+            const max = parseFloat(document.getElementById('shoe-input-max').value) || 0;
+            const rem = Math.max(0, +(max - p).toFixed(1));
+            document.getElementById('shoe-preview-rem').textContent = `${rem} km (${p} su ${max} km)`;
+        }
+
+        function saveShoe() {
+            const idx = parseInt(document.getElementById('modal-shoe-idx').value);
+            const nome = document.getElementById('shoe-input-nome').value.trim() || "Nuova Scarpa";
+            const ruolo = document.getElementById('shoe-input-ruolo').value.trim() || "Corsa";
+            const km_percorsi = parseFloat(document.getElementById('shoe-input-percorsi').value) || 0;
+            const vita_utile = parseFloat(document.getElementById('shoe-input-max').value) || 600;
+            const note = document.getElementById('shoe-input-note').value.trim();
+
+            if (idx >= 0 && db.scarpe[idx]) {
+                const oldName = db.scarpe[idx].nome;
+                db.scarpe[idx] = { ...db.scarpe[idx], nome, ruolo, km_percorsi, vita_utile, note };
+                if (oldName !== nome) {
+                    db.allenamenti_settimana.forEach(a => { if (a.scarpa === oldName) a.scarpa = nome; });
+                }
+            } else {
+                db.scarpe.push({
+                    id: 'shoe-' + Date.now(),
+                    nome, ruolo, km_percorsi, vita_utile, note
+                });
+            }
+
+            saveLocal();
+            closeModals();
+            renderAll();
+        }
+
+        function deleteShoe() {
+            const idx = parseInt(document.getElementById('modal-shoe-idx').value);
+            if (idx >= 0 && db.scarpe.length > 1) {
+                db.scarpe.splice(idx, 1);
+                saveLocal();
+                closeModals();
+                renderAll();
+            }
+        }
+
+        function populateShoeSelect(selectId, selectedVal) {
+            const sel = document.getElementById(selectId);
+            const options = db.scarpe.map(s => `<option value="${s.nome}">${s.nome}</option>`).join('') + `<option value="-">Nessuna (Rulli / Forza)</option>`;
+            sel.innerHTML = options;
+            if (selectedVal && [...sel.options].some(o => o.value === selectedVal)) {
+                sel.value = selectedVal;
+            }
+        }
+
+        // MODALI ALTRI
         function closeModals() {
-            ['modal-complete', 'modal-skip', 'modal-profile', 'modal-add-workout', 'modal-add-race'].forEach(id => {
+            ['modal-complete', 'modal-skip', 'modal-profile', 'modal-add-workout', 'modal-add-race', 'modal-exercise', 'modal-shoe'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
                 document.getElementById(id).classList.remove('flex');
             });
@@ -1012,7 +1476,7 @@
             document.getElementById('modal-comp-km').value = a.km_fatti ?? a.km_previsti;
             document.getElementById('modal-comp-passo').value = a.passo || "";
             document.getElementById('modal-comp-fc').value = "";
-            document.getElementById('modal-comp-scarpa').value = a.scarpa || "Neo Zen";
+            populateShoeSelect('modal-comp-scarpa', a.scarpa);
             document.getElementById('modal-comp-note').value = a.note || "";
             const m = document.getElementById('modal-complete');
             m.classList.remove('hidden'); m.classList.add('flex');
@@ -1028,18 +1492,22 @@
 
             const oldItem = db.allenamenti_settimana[idx];
             const prevKm = (oldItem.stato === 'completato' && oldItem.km_fatti) ? oldItem.km_fatti : 0;
-            const diffKm = km - prevKm;
+            const prevShoeName = oldItem.scarpa;
+
+            if (prevKm > 0 && prevShoeName && prevShoeName !== '-') {
+                const oldShoeObj = db.scarpe.find(s => s.nome === prevShoeName);
+                if (oldShoeObj) oldShoeObj.km_percorsi = Math.max(0, +(oldShoeObj.km_percorsi - prevKm).toFixed(1));
+            }
+            if (km > 0 && scarpa && scarpa !== '-') {
+                const newShoeObj = db.scarpe.find(s => s.nome === scarpa);
+                if (newShoeObj) newShoeObj.km_percorsi = +(newShoeObj.km_percorsi + km).toFixed(1);
+            }
 
             oldItem.km_fatti = km;
             oldItem.passo = passo || "-";
             oldItem.scarpa = scarpa;
             oldItem.stato = 'completato';
             oldItem.note = fc ? `FC media: ${fc} bpm. ${note}` : note;
-
-            if (diffKm !== 0) {
-                if (scarpa === 'Neo Zen') db.scarpe.mizuno_neo_zen.km_residui = Math.max(0, +(db.scarpe.mizuno_neo_zen.km_residui - diffKm).toFixed(1));
-                if (scarpa === 'Evo SL') db.scarpe.adidas_evo_sl.km_totali_percorsi = +(db.scarpe.adidas_evo_sl.km_totali_percorsi + diffKm).toFixed(1);
-            }
 
             saveLocal();
             closeModals();
@@ -1068,7 +1536,6 @@
             };
             item.note = labels[reason];
 
-            // Rimodula la prossima seduta di corsa
             if (reason === 'stanchezza' || reason === 'schiena') {
                 for (let i = idx + 1; i < db.allenamenti_settimana.length; i++) {
                     if (db.allenamenti_settimana[i].km_previsti > 0 && db.allenamenti_settimana[i].stato === 'da_fare') {
@@ -1103,6 +1570,7 @@
         }
 
         function openAddWorkoutModal() {
+            populateShoeSelect('new-w-scarpa', db.scarpe[0] ? db.scarpe[0].nome : '-');
             const m = document.getElementById('modal-add-workout');
             m.classList.remove('hidden'); m.classList.add('flex');
         }
@@ -1145,6 +1613,7 @@
         }
 
         function exportJson() {
+            saveLocal();
             const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -1152,6 +1621,25 @@
             a.download = "dati.json";
             a.click();
             URL.revokeObjectURL(url);
+        }
+
+        function importJson(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    db = normalizeDb(imported);
+                    saveLocal();
+                    restoreSavedInputs();
+                    renderAll();
+                    switchTab(db.ui.activeTab || 'panoramica', false);
+                } catch (err) {
+                    alert("File JSON non valido.");
+                }
+            };
+            reader.readAsText(file);
         }
 
         initApp();
