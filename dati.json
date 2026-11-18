@@ -2,48 +2,61 @@
   "atleta": {
     "peso_kg": 69.0,
     "altezza_cm": 170,
-    "bmi": 23.88
+    "bmi": 23.88,
+    "fc_riposo": 60
   },
   "scarpe": {
     "mizuno_neo_zen": {
+      "nome": "Mizuno Neo Zen",
       "km_residui": 142,
-      "ruolo": "Corse facili e recupero"
+      "km_iniziali_residui": 150,
+      "ruolo": "Corse facili, lunghi lenti e recupero"
     },
     "adidas_evo_sl": {
+      "nome": "Adidas Evo SL",
       "km_totali_percorsi": 130,
+      "vita_utile_stimata": 600,
       "ruolo": "Gare e lavori di qualità"
     }
   },
   "gare": [
     {
-      "nome": "Test 10 km",
+      "nome": "Mezza Maratona Ortona-Fossacesia",
+      "data": "2026-10-25",
+      "distanza": "21.1 km",
+      "tipo": "Storico (1h41'38\")"
+    },
+    {
+      "nome": "Test / Gara 10 km",
       "data": "2027-02-14",
-      "tipo": "Test intermedio"
+      "distanza": "10 km",
+      "tipo": "Gara Test"
     },
     {
       "nome": "Mezza Maratona Obiettivo",
       "data": "2027-04-18",
+      "distanza": "21.1 km",
       "tipo": "Gara Principale"
     }
   ],
   "allenamenti_settimana": [
-    {
-      "data": "2026-11-19",
-      "tipo": "Corsa facile + allunghi",
-      "km_previsti": 9.0,
-      "stato": "da_fare"
-    },
-    {
-      "data": "2026-11-20",
-      "tipo": "Forza B (Stabilità)",
-      "km_previsti": 0.0,
-      "stato": "da_fare"
-    },
-    {
-      "data": "2026-11-21",
-      "tipo": "Lungo facile",
-      "km_previsti": 12.0,
-      "stato": "da_fare"
-    }
+    { "data": "2026-10-25", "giorno": "Dom", "tipo": "GARA", "dettaglio": "Mezza maratona Ortona-Fossacesia Marina, 1h41'38\"", "km_previsti": 21.1, "km_fatti": 21.21, "passo": "4'48\"/km", "scarpa": "Evo SL", "stato": "completato", "note": "Già fatto" },
+    { "data": "2026-10-29", "giorno": "Gio", "tipo": "Corsa facile", "dettaglio": "5 km facili (primo allenamento dopo la gara)", "km_previsti": 5.0, "km_fatti": 5.0, "passo": "5'33\"/km", "scarpa": "Neo Zen", "stato": "completato", "note": "Riferimento iniziale scarpe" },
+    { "data": "2026-11-02", "giorno": "Lun", "tipo": "Rulli", "dettaglio": "30' Z1 (105-124 bpm)", "km_previsti": 0, "km_fatti": 0, "passo": "-", "scarpa": "-", "stato": "completato", "note": "Fatto: 30' rulli" },
+    { "data": "2026-11-03", "giorno": "Mar", "tipo": "Corsa facile", "dettaglio": "8 km facili", "km_previsti": 8.0, "km_fatti": 8.0, "passo": "-", "scarpa": "Neo Zen", "stato": "completato", "note": "Fatto" },
+    { "data": "2026-11-04", "giorno": "Mer-Dom", "tipo": "Stop / Recupero", "dettaglio": "Fermo 4–8 Nov sostituito dal rientro del 9/11", "km_previsti": 0, "km_fatti": 0, "passo": "-", "scarpa": "-", "stato": "saltato", "note": "Non recuperare i km saltati" },
+    { "data": "2026-11-09", "giorno": "Lun", "tipo": "Corsa facile", "dettaglio": "Corsa facile 125-145 bpm + 800m camminata", "km_previsti": 10.0, "km_fatti": 10.0, "passo": "5'42\"/km", "scarpa": "Neo Zen", "stato": "completato", "note": "Ascesa 105m" },
+    { "data": "2026-11-10", "giorno": "Mar", "tipo": "Riposo", "dettaglio": "Riposo totale", "km_previsti": 0, "km_fatti": 0, "passo": "-", "scarpa": "-", "stato": "completato", "note": "" },
+    { "data": "2026-11-11", "giorno": "Mer", "tipo": "Rulli + Core leggero", "dettaglio": "Rulli Z1-Z2 40' (105-145 bpm) + 10' core leggero", "km_previsti": 0, "km_fatti": 0, "passo": "-", "scarpa": "-", "stato": "da_fare", "note": "" },
+    { "data": "2026-11-12", "giorno": "Gio", "tipo": "Corsa facile", "dettaglio": "8 km facili a 125-145 bpm", "km_previsti": 8.0, "km_fatti": null, "passo": "", "scarpa": "Neo Zen", "stato": "da_fare", "note": "" },
+    { "data": "2026-11-13", "giorno": "Ven", "tipo": "Riposo + Core leggero", "dettaglio": "20' core leggero e mobilità (solo se schiena OK)", "km_previsti": 0, "km_fatti": 0, "passo": "-", "scarpa": "-", "stato": "da_fare", "note": "" },
+    { "data": "2026-11-14", "giorno": "Sab", "tipo": "Corsa facile", "dettaglio": "10 km facili a 125-145 bpm, senza guardare il passo", "km_previsti": 10.0, "km_fatti": null, "passo": "", "scarpa": "Neo Zen", "stato": "da_fare", "note": "" },
+    { "data": "2026-11-15", "giorno": "Dom", "tipo": "Rulli", "dettaglio": "Z1-Z2 60' (fino a 90' se stai bene)", "km_previsti": 0, "km_fatti": 0, "passo": "-", "scarpa": "-", "stato": "da_fare", "note": "" },
+    { "data": "2026-11-16", "giorno": "Lun", "tipo": "Forza A + Rulli", "dettaglio": "Forza A gambe e core (30-35', 2 serie) + Rulli Z1 20-30'", "km_previsti": 0, "km_fatti": 0, "passo": "-", "scarpa": "-", "stato": "da_fare", "note": "Settimana 1 Forza" },
+    { "data": "2026-11-17", "giorno": "Mar", "tipo": "Corsa facile", "dettaglio": "8 km facili a 125-145 bpm", "km_previsti": 8.0, "km_fatti": null, "passo": "", "scarpa": "Neo Zen", "stato": "da_fare", "note": "" },
+    { "data": "2026-11-18", "giorno": "Mer", "tipo": "Rulli", "dettaglio": "Z2 40' (125-145 bpm), recupero attivo", "km_previsti": 0, "km_fatti": 0, "passo": "-", "scarpa": "-", "stato": "da_fare", "note": "" },
+    { "data": "2026-11-19", "giorno": "Gio", "tipo": "Corsa facile + Allunghi", "dettaglio": "9 km a 125-145 bpm + 4-5 allunghi da 80m negli ultimi 2 km", "km_previsti": 9.0, "km_fatti": null, "passo": "", "scarpa": "Neo Zen", "stato": "da_fare", "note": "" },
+    { "data": "2026-11-20", "giorno": "Ven", "tipo": "Forza B", "dettaglio": "Forza B stabilità e core (30') — niente carichi pesanti", "km_previsti": 0, "km_fatti": 0, "passo": "-", "scarpa": "-", "stato": "da_fare", "note": "" },
+    { "data": "2026-11-21", "giorno": "Sab", "tipo": "Lungo facile", "dettaglio": "12 km facili a 125-145 bpm, passo regolare (primo lungo base)", "km_previsti": 12.0, "km_fatti": null, "passo": "", "scarpa": "Neo Zen", "stato": "da_fare", "note": "" }
   ]
 }
