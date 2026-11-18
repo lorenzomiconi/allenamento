@@ -23,7 +23,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 
-    <!-- ==================== SCHERMATA DI LOGIN ==================== -->
+    <!-- SCHERMATA DI LOGIN (VISIBILE FINCHÉ NON ACCEDI) -->
     <div id="auth-screen" class="min-h-screen bg-slate-900 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
             <div class="flex items-center gap-3 mb-6">
@@ -34,6 +34,10 @@
                     <h1 class="font-bold text-xl text-slate-900">RunCoach Pro</h1>
                     <p class="text-xs text-slate-500">Accesso Riservato & Cloud Privato</p>
                 </div>
+            </div>
+
+            <div id="config-warning" class="hidden mb-4 p-3 rounded-lg bg-amber-50 border border-amber-300 text-xs text-amber-900">
+                <strong>Configurazione richiesta:</strong> Incolla i tuoi dati <code>firebaseConfig</code> dentro <code>index.html</code> per attivare il login.
             </div>
 
             <form onsubmit="handleLogin(event)" class="space-y-4">
@@ -57,7 +61,7 @@
         </div>
     </div>
 
-    <!-- ==================== DASHBOARD RISERVATA ==================== -->
+    <!-- DASHBOARD RISERVATA (SBLOCCATA DOPO LOGIN) -->
     <div id="app-shell" class="hidden flex-col md:flex-row min-h-screen">
 
         <!-- SIDEBAR -->
@@ -73,7 +77,6 @@
                     </div>
                 </div>
 
-                <!-- Profilo rapido nella sidebar -->
                 <div class="px-6 py-4 bg-slate-800/60 border-b border-slate-800 text-xs">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-slate-400">Atleta</span>
@@ -120,7 +123,6 @@
         <main class="flex-1 p-4 md:p-8 overflow-y-auto">
             <div class="max-w-6xl mx-auto">
 
-                <!-- BANNER ERRORE CLOUD (VISIBILE SOLO SE FIREBASE HA UN PROBLEMA DI PERMESSI/RETE) -->
                 <div id="cloud-error-banner" class="hidden mb-4 p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-start justify-between gap-3">
                     <div>
                         <strong class="block text-sm mb-0.5"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Errore di sincronizzazione Firebase Cloud</strong>
@@ -129,7 +131,6 @@
                     <button onclick="forceCloudPush()" class="shrink-0 bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-1.5 rounded-lg">Riprova</button>
                 </div>
 
-                <!-- HEADER TOP -->
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h2 class="text-2xl font-bold text-slate-900" id="page-title">Panoramica & Readiness</h2>
@@ -139,7 +140,7 @@
                         <span id="sync-badge" class="text-xs px-3 py-1.5 rounded-full bg-slate-200 text-slate-700 font-semibold transition-all">
                             <i class="fa-solid fa-spinner fa-spin mr-1"></i> Connessione Cloud...
                         </span>
-                        <button onclick="forceCloudPush()" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg shadow-2xs transition" title="Invia subito tutti i dati di questo PC sul Cloud">
+                        <button onclick="forceCloudPush()" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg transition">
                             <i class="fa-solid fa-cloud-arrow-up text-blue-600 mr-1"></i> Sincronizza Ora
                         </button>
                         <button onclick="openAddWorkoutModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm transition">
@@ -148,116 +149,70 @@
                     </div>
                 </div>
 
-                <!-- ==================== TAB 1: PANORAMICA ==================== -->
+                <!-- TAB 1: PANORAMICA -->
                 <div id="tab-panoramica" class="space-y-6">
-                    
-                    <!-- KPI CARDS -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                             <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-[11px] font-semibold uppercase text-slate-400">Corsa Sett. Corrente</p>
-                                    <h3 class="text-xl font-bold text-slate-900 mt-1" id="kpi-km-sett">0 / 0 km</h3>
-                                </div>
+                                <div><p class="text-[11px] font-semibold uppercase text-slate-400">Corsa Sett. Corrente</p><h3 class="text-xl font-bold text-slate-900 mt-1" id="kpi-km-sett">0 / 0 km</h3></div>
                                 <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-route"></i></span>
                             </div>
                             <p class="text-[11px] text-slate-500 mt-2">Sett. 16–22 Nov (Base)</p>
                         </div>
-
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-cyan-300 transition" onclick="switchTab('diario')">
                             <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-[11px] font-semibold uppercase text-slate-400">Km Rulli Totali</p>
-                                    <h3 class="text-xl font-bold text-cyan-600 mt-1" id="kpi-rulli-tot">0.0 km</h3>
-                                </div>
+                                <div><p class="text-[11px] font-semibold uppercase text-slate-400">Km Rulli Totali</p><h3 class="text-xl font-bold text-cyan-600 mt-1" id="kpi-rulli-tot">0.0 km</h3></div>
                                 <span class="p-2 bg-cyan-50 text-cyan-600 rounded-lg"><i class="fa-solid fa-bicycle"></i></span>
                             </div>
                             <p class="text-[11px] text-slate-500 mt-2" id="kpi-rulli-sub">Sett. corrente: 0.0 km</p>
                         </div>
-
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-emerald-300 transition" onclick="switchTab('scarpe')">
                             <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-[11px] font-semibold uppercase text-slate-400" id="kpi-shoe1-name">Scarpa 1</p>
-                                    <h3 class="text-xl font-bold text-emerald-600 mt-1" id="kpi-shoe1-rem">-- km</h3>
-                                </div>
+                                <div><p class="text-[11px] font-semibold uppercase text-slate-400" id="kpi-shoe1-name">Scarpa 1</p><h3 class="text-xl font-bold text-emerald-600 mt-1" id="kpi-shoe1-rem">-- km</h3></div>
                                 <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-shoe-prints"></i></span>
                             </div>
                             <p class="text-[11px] text-slate-500 mt-2" id="kpi-shoe1-sub">-- / -- km · Rimanenti</p>
                         </div>
-
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-blue-300 transition" onclick="switchTab('scarpe')">
                             <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-[11px] font-semibold uppercase text-slate-400" id="kpi-shoe2-name">Scarpa 2</p>
-                                    <h3 class="text-xl font-bold text-blue-600 mt-1" id="kpi-shoe2-rem">-- km</h3>
-                                </div>
+                                <div><p class="text-[11px] font-semibold uppercase text-slate-400" id="kpi-shoe2-name">Scarpa 2</p><h3 class="text-xl font-bold text-blue-600 mt-1" id="kpi-shoe2-rem">-- km</h3></div>
                                 <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-bolt"></i></span>
                             </div>
                             <p class="text-[11px] text-slate-500 mt-2" id="kpi-shoe2-sub">-- / -- km · Rimanenti</p>
                         </div>
-
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                             <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-[11px] font-semibold uppercase text-slate-400">Mezza Maratona '27</p>
-                                    <h3 class="text-xl font-bold text-indigo-600 mt-1" id="kpi-cd-21k">-- gg</h3>
-                                </div>
+                                <div><p class="text-[11px] font-semibold uppercase text-slate-400">Mezza Maratona '27</p><h3 class="text-xl font-bold text-indigo-600 mt-1" id="kpi-cd-21k">-- gg</h3></div>
                                 <span class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-flag-checkered"></i></span>
                             </div>
                             <p class="text-[11px] text-slate-500 mt-2" id="kpi-cd-sub">Test 10k tra -- gg</p>
                         </div>
                     </div>
 
-                    <!-- FASCIA SOGLIA CORRENTE GARMIN -->
                     <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-5 rounded-xl shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <div class="flex items-center gap-3.5">
-                            <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl shrink-0">
-                                <i class="fa-solid fa-fire-flame-curved"></i>
-                            </div>
+                            <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-fire-flame-curved"></i></div>
                             <div>
-                                <div class="flex items-center gap-2">
-                                    <h3 class="font-bold text-base">Soglia Anaerobica Corrente (Garmin)</h3>
-                                    <span class="text-[11px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-mono" id="pan-soglia-date">--</span>
-                                </div>
+                                <div class="flex items-center gap-2"><h3 class="font-bold text-base">Soglia Anaerobica Corrente (Garmin)</h3><span class="text-[11px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-mono" id="pan-soglia-date">--</span></div>
                                 <p class="text-xs text-slate-400">Valori utilizzati per calibrare passo, battiti e Watt delle tue zone.</p>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
-                                <div class="text-[10px] uppercase text-slate-400">FC Soglia</div>
-                                <div class="font-mono font-bold text-base text-rose-400" id="pan-soglia-fc">-- bpm</div>
-                            </div>
-                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
-                                <div class="text-[10px] uppercase text-slate-400">Passo Soglia</div>
-                                <div class="font-mono font-bold text-base text-blue-400" id="pan-soglia-passo">--/km</div>
-                            </div>
-                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
-                                <div class="text-[10px] uppercase text-slate-400">Potenza</div>
-                                <div class="font-mono font-bold text-base text-amber-400" id="pan-soglia-w">-- W</div>
-                            </div>
-                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
-                                <div class="text-[10px] uppercase text-slate-400">Rapporto W/kg</div>
-                                <div class="font-mono font-bold text-base text-emerald-400" id="pan-soglia-wkg">-- W/kg</div>
-                            </div>
+                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg"><div class="text-[10px] uppercase text-slate-400">FC Soglia</div><div class="font-mono font-bold text-base text-rose-400" id="pan-soglia-fc">-- bpm</div></div>
+                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg"><div class="text-[10px] uppercase text-slate-400">Passo Soglia</div><div class="font-mono font-bold text-base text-blue-400" id="pan-soglia-passo">--/km</div></div>
+                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg"><div class="text-[10px] uppercase text-slate-400">Potenza</div><div class="font-mono font-bold text-base text-amber-400" id="pan-soglia-w">-- W</div></div>
+                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg"><div class="text-[10px] uppercase text-slate-400">Rapporto W/kg</div><div class="font-mono font-bold text-base text-emerald-400" id="pan-soglia-wkg">-- W/kg</div></div>
                         </div>
-
                         <button onclick="openThresholdModal()" class="shrink-0 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition shadow">
                             <i class="fa-solid fa-pen mr-1"></i> Aggiorna Soglia
                         </button>
                     </div>
 
-                    <!-- SEMAFORO READINESS + PROSSIMA SEDUTA -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                             <div class="flex items-center justify-between mb-4">
-                                <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                                    <i class="fa-solid fa-heart-pulse text-rose-500"></i> Semaforo Readiness Mattutino (Garmin & Corpo)
-                                </h3>
-                                <span id="readiness-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-                                    SEMAFORO VERDE — OK PER CORRERE
-                                </span>
+                                <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-heart-pulse text-rose-500"></i> Semaforo Readiness Mattutino (Garmin & Corpo)</h3>
+                                <span id="readiness-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">SEMAFORO VERDE — OK PER CORRERE</span>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                                 <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
@@ -267,17 +222,13 @@
                                 <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
                                     <label class="text-xs text-slate-500 block mb-1">Stato Schiena / Lombare</label>
                                     <select id="input-schiena" onchange="updateReadiness(true)" class="w-full font-semibold text-sm bg-white border border-slate-300 rounded px-2.5 py-2">
-                                        <option value="ok">Nessun fastidio (OK)</option>
-                                        <option value="lieve">Leggera rigidità</option>
-                                        <option value="dolore">Fastidio / Dolore</option>
+                                        <option value="ok">Nessun fastidio (OK)</option><option value="lieve">Leggera rigidità</option><option value="dolore">Fastidio / Dolore</option>
                                     </select>
                                 </div>
                                 <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
                                     <label class="text-xs text-slate-500 block mb-1">Polpaccio Sx & Tendine</label>
                                     <select id="input-polpaccio" onchange="updateReadiness(true)" class="w-full font-semibold text-sm bg-white border border-slate-300 rounded px-2.5 py-2">
-                                        <option value="ok">Primi passi OK</option>
-                                        <option value="affaticato">Un po' carico</option>
-                                        <option value="dolore">Dolore ai primi passi</option>
+                                        <option value="ok">Primi passi OK</option><option value="affaticato">Un po' carico</option><option value="dolore">Dolore ai primi passi</option>
                                     </select>
                                 </div>
                             </div>
@@ -285,13 +236,10 @@
                                 Parametri nella norma: FC a riposo regolare. Puoi svolgere regolarmente la seduta prevista.
                             </div>
                         </div>
-
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center justify-between mb-3">
-                                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                                        <i class="fa-solid fa-calendar-day text-blue-600"></i> Prossime Sedute Piano
-                                    </h3>
+                                    <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-calendar-day text-blue-600"></i> Prossime Sedute Piano</h3>
                                     <span class="text-[11px] font-mono text-slate-400" id="upcoming-today-lbl">--</span>
                                 </div>
                                 <div id="upcoming-list" class="space-y-2.5"></div>
@@ -302,25 +250,15 @@
                         </div>
                     </div>
 
-                    <!-- RIEPILOGO SETTIMANALE -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                             <h3 class="font-bold text-slate-900">Riepilogo Chilometraggio Settimanale (Corsa & Rulli)</h3>
-                            <span class="text-xs font-semibold text-cyan-700 bg-cyan-50 border border-cyan-200 px-3 py-1 rounded-full" id="weekly-rulli-badge">
-                                Totale Rulli Accumulati: 0.0 km
-                            </span>
+                            <span class="text-xs font-semibold text-cyan-700 bg-cyan-50 border border-cyan-200 px-3 py-1 rounded-full" id="weekly-rulli-badge">Totale Rulli Accumulati: 0.0 km</span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
-                                    <tr>
-                                        <th class="p-3">Settimana</th>
-                                        <th class="p-3">Fase</th>
-                                        <th class="p-3">Corsa Prev.</th>
-                                        <th class="p-3">Corsa Fatta</th>
-                                        <th class="p-3 text-cyan-700">Km Rulli</th>
-                                        <th class="p-3">Avanzamento Corsa</th>
-                                    </tr>
+                                    <tr><th class="p-3">Settimana</th><th class="p-3">Fase</th><th class="p-3">Corsa Prev.</th><th class="p-3">Corsa Fatta</th><th class="p-3 text-cyan-700">Km Rulli</th><th class="p-3">Avanzamento Corsa</th></tr>
                                 </thead>
                                 <tbody id="weekly-summary-body" class="divide-y divide-slate-100"></tbody>
                                 <tfoot id="weekly-summary-foot" class="bg-slate-800 text-white font-semibold text-xs"></tfoot>
@@ -329,7 +267,7 @@
                     </div>
                 </div>
 
-                <!-- ==================== TAB 2: DIARIO & COACH DINAMICO ==================== -->
+                <!-- TAB 2: DIARIO -->
                 <div id="tab-diario" class="hidden space-y-6">
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
                         <div class="flex flex-wrap gap-2">
@@ -339,29 +277,15 @@
                             <button onclick="filterDiario('storico')" id="flt-storico" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">25 Ott – 8 Nov</button>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200" id="diario-tot-corsa">
-                                Totale Corsa: 0.0 km
-                            </span>
-                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200" id="diario-tot-rulli">
-                                <i class="fa-solid fa-bicycle mr-1"></i> Totale Km Rulli: 0.0 km
-                            </span>
+                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200" id="diario-tot-corsa">Totale Corsa: 0.0 km</span>
+                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200" id="diario-tot-rulli"><i class="fa-solid fa-bicycle mr-1"></i> Totale Km Rulli: 0.0 km</span>
                         </div>
                     </div>
-
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-slate-800 text-slate-200 text-xs uppercase">
-                                    <tr>
-                                        <th class="p-3.5">Data</th>
-                                        <th class="p-3.5">Attività & Dettaglio</th>
-                                        <th class="p-3.5">Corsa Prev.</th>
-                                        <th class="p-3.5">Corsa Fatta</th>
-                                        <th class="p-3.5 text-cyan-300">Km Rulli</th>
-                                        <th class="p-3.5">Scarpe</th>
-                                        <th class="p-3.5">Stato</th>
-                                        <th class="p-3.5 text-right">Azioni Coach</th>
-                                    </tr>
+                                    <tr><th class="p-3.5">Data</th><th class="p-3.5">Attività & Dettaglio</th><th class="p-3.5">Corsa Prev.</th><th class="p-3.5">Corsa Fatta</th><th class="p-3.5 text-cyan-300">Km Rulli</th><th class="p-3.5">Scarpe</th><th class="p-3.5">Stato</th><th class="p-3.5 text-right">Azioni Coach</th></tr>
                                 </thead>
                                 <tbody id="diario-tbody" class="divide-y divide-slate-100"></tbody>
                             </table>
@@ -369,91 +293,39 @@
                     </div>
                 </div>
 
-                <!-- ==================== TAB 3: GARE, SOGLIA & ZONE RITMO ==================== -->
+                <!-- TAB 3: GARE & SOGLIA -->
                 <div id="tab-gare" class="hidden space-y-6">
-                    
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
                             <div>
-                                <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                                    <i class="fa-solid fa-fire-flame-curved text-amber-500"></i> Soglia Corrente Garmin (Modificabile)
-                                </h3>
+                                <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-fire-flame-curved text-amber-500"></i> Soglia Corrente Garmin (Modificabile)</h3>
                                 <p class="text-xs text-slate-500">Aggiorna qui i parametri rilevati dal Garmin: ogni modifica si salva nel cloud e ricalcola le Zone.</p>
                             </div>
-                            <button onclick="archiveThresholdSnapshot()" class="shrink-0 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold px-3 py-2 rounded-lg transition">
-                                <i class="fa-solid fa-clock-rotate-left mr-1"></i> Salva nello storico
-                            </button>
+                            <button onclick="archiveThresholdSnapshot()" class="shrink-0 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold px-3 py-2 rounded-lg transition"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Salva nello storico</button>
                         </div>
-
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                            <div class="bg-rose-50/60 border border-rose-200/80 p-3.5 rounded-xl">
-                                <label class="text-[11px] font-bold uppercase text-rose-700 block mb-1">FC Soglia (bpm)</label>
-                                <input type="number" id="soglia-fc" value="180" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-rose-200 rounded-lg px-3 py-1.5">
-                            </div>
-
-                            <div class="bg-blue-50/60 border border-blue-200/80 p-3.5 rounded-xl">
-                                <label class="text-[11px] font-bold uppercase text-blue-700 block mb-1">Passo Soglia (min:sec)</label>
-                                <input type="text" id="soglia-passo" value="4:30" oninput="saveThresholdInline()" placeholder="4:23" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-blue-200 rounded-lg px-3 py-1.5">
-                            </div>
-
-                            <div class="bg-amber-50/60 border border-amber-200/80 p-3.5 rounded-xl">
-                                <label class="text-[11px] font-bold uppercase text-amber-700 block mb-1">Potenza Soglia (W)</label>
-                                <input type="number" id="soglia-w" value="350" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-amber-200 rounded-lg px-3 py-1.5">
-                            </div>
-
-                            <div class="bg-emerald-50/60 border border-emerald-200/80 p-3.5 rounded-xl">
-                                <label class="text-[11px] font-bold uppercase text-emerald-700 block mb-1">Potenza Relativa (W/kg)</label>
-                                <input type="number" step="0.01" id="soglia-wkg" value="5.00" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-emerald-200 rounded-lg px-3 py-1.5">
-                                <span class="text-[11px] text-slate-500 mt-1 block" id="soglia-wkg-calc">--</span>
-                            </div>
-
-                            <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
-                                <label class="text-[11px] font-bold uppercase text-slate-600 block mb-1">Data Rilevamento</label>
-                                <input type="date" id="soglia-data" value="2026-11-18" onchange="saveThresholdInline()" class="w-full font-mono font-semibold text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-2">
-                            </div>
+                            <div class="bg-rose-50/60 border border-rose-200/80 p-3.5 rounded-xl"><label class="text-[11px] font-bold uppercase text-rose-700 block mb-1">FC Soglia (bpm)</label><input type="number" id="soglia-fc" value="180" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-rose-200 rounded-lg px-3 py-1.5"></div>
+                            <div class="bg-blue-50/60 border border-blue-200/80 p-3.5 rounded-xl"><label class="text-[11px] font-bold uppercase text-blue-700 block mb-1">Passo Soglia (min:sec)</label><input type="text" id="soglia-passo" value="4:30" oninput="saveThresholdInline()" placeholder="4:23" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-blue-200 rounded-lg px-3 py-1.5"></div>
+                            <div class="bg-amber-50/60 border border-amber-200/80 p-3.5 rounded-xl"><label class="text-[11px] font-bold uppercase text-amber-700 block mb-1">Potenza Soglia (W)</label><input type="number" id="soglia-w" value="350" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-amber-200 rounded-lg px-3 py-1.5"></div>
+                            <div class="bg-emerald-50/60 border border-emerald-200/80 p-3.5 rounded-xl"><label class="text-[11px] font-bold uppercase text-emerald-700 block mb-1">Potenza Relativa (W/kg)</label><input type="number" step="0.01" id="soglia-wkg" value="5.00" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-emerald-200 rounded-lg px-3 py-1.5"><span class="text-[11px] text-slate-500 mt-1 block" id="soglia-wkg-calc">--</span></div>
+                            <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl"><label class="text-[11px] font-bold uppercase text-slate-600 block mb-1">Data Rilevamento</label><input type="date" id="soglia-data" value="2026-11-18" onchange="saveThresholdInline()" class="w-full font-mono font-semibold text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-2"></div>
                         </div>
-
-                        <div id="threshold-history-box" class="mt-4 hidden">
-                            <div class="text-xs font-bold text-slate-600 mb-2">Storico Soglie Rilevate:</div>
-                            <div id="threshold-history-list" class="flex flex-wrap gap-2"></div>
-                        </div>
+                        <div id="threshold-history-box" class="mt-4 hidden"><div class="text-xs font-bold text-slate-600 mb-2">Storico Soglie Rilevate:</div><div id="threshold-history-list" class="flex flex-wrap gap-2"></div></div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="font-bold text-slate-900">Gare Obiettivo & Test</h3>
-                                <button onclick="openAddRaceModal()" class="text-xs bg-blue-50 text-blue-600 font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-100">
-                                    + Aggiungi Gara
-                                </button>
-                            </div>
+                            <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900">Gare Obiettivo & Test</h3><button onclick="openAddRaceModal()" class="text-xs bg-blue-50 text-blue-600 font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-100">+ Aggiungi Gara</button></div>
                             <div id="races-list" class="space-y-3"></div>
                         </div>
-
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                             <h3 class="font-bold text-slate-900 mb-1">Personal Best (PB) & Previsioni Garmin</h3>
                             <p class="text-xs text-slate-500 mb-4">Ogni modifica viene salvata nel cloud.</p>
-                            <div class="grid grid-cols-3 gap-3 text-xs font-semibold text-slate-500 mb-2">
-                                <div>Distanza</div>
-                                <div>Tuo PB (mm:ss)</div>
-                                <div>Stima Garmin</div>
-                            </div>
+                            <div class="grid grid-cols-3 gap-3 text-xs font-semibold text-slate-500 mb-2"><div>Distanza</div><div>Tuo PB (mm:ss)</div><div>Stima Garmin</div></div>
                             <div class="space-y-3">
-                                <div class="grid grid-cols-3 gap-3 items-center">
-                                    <span class="font-bold text-sm">5 km</span>
-                                    <input type="text" id="pb-5k" value="22:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                    <input type="text" id="garmin-5k" value="21:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
-                                </div>
-                                <div class="grid grid-cols-3 gap-3 items-center">
-                                    <span class="font-bold text-sm">10 km</span>
-                                    <input type="text" id="pb-10k" value="45:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                    <input type="text" id="garmin-10k" value="44:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
-                                </div>
-                                <div class="grid grid-cols-3 gap-3 items-center">
-                                    <span class="font-bold text-sm">21.1 km</span>
-                                    <input type="text" id="pb-21k" value="1:42:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                    <input type="text" id="garmin-21k" value="1:39:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
-                                </div>
+                                <div class="grid grid-cols-3 gap-3 items-center"><span class="font-bold text-sm">5 km</span><input type="text" id="pb-5k" value="22:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono"><input type="text" id="garmin-5k" value="21:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40"></div>
+                                <div class="grid grid-cols-3 gap-3 items-center"><span class="font-bold text-sm">10 km</span><input type="text" id="pb-10k" value="45:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono"><input type="text" id="garmin-10k" value="44:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40"></div>
+                                <div class="grid grid-cols-3 gap-3 items-center"><span class="font-bold text-sm">21.1 km</span><input type="text" id="pb-21k" value="1:42:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono"><input type="text" id="garmin-21k" value="1:39:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40"></div>
                             </div>
                             <div id="endurance-index-box" class="mt-4 p-3.5 rounded-lg bg-indigo-50 border border-indigo-100 text-xs text-indigo-900"></div>
                         </div>
@@ -464,19 +336,11 @@
                             <h3 class="font-bold text-slate-900 mb-3" id="zones-table-title">Zone Dinamiche (Calibrate su Soglia Garmin)</h3>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm text-left">
-                                    <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
-                                        <tr>
-                                            <th class="p-2.5">Zona</th>
-                                            <th class="p-2.5">Passo Target</th>
-                                            <th class="p-2.5">FC Target</th>
-                                            <th class="p-2.5">Potenza (W)</th>
-                                        </tr>
-                                    </thead>
+                                    <thead class="bg-slate-50 text-slate-500 text-xs uppercase"><tr><th class="p-2.5">Zona</th><th class="p-2.5">Passo Target</th><th class="p-2.5">FC Target</th><th class="p-2.5">Potenza (W)</th></tr></thead>
                                     <tbody id="pace-zones-tbody" class="divide-y divide-slate-100"></tbody>
                                 </table>
                             </div>
                         </div>
-
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                             <h3 class="font-bold text-slate-900 mb-2"><i class="fa-solid fa-bottle-water text-blue-500 mr-1"></i> Strategia Lunghi (<span id="nutr-weight-lbl">70</span> kg)</h3>
                             <p class="text-xs text-slate-500 mb-4">Calcolata sul tuo peso attuale per uscite oltre i 75–90 minuti:</p>
@@ -485,34 +349,22 @@
                     </div>
                 </div>
 
-                <!-- ==================== TAB 4: FORZA GAMBE & UPPER ==================== -->
+                <!-- TAB 4: FORZA -->
                 <div id="tab-forza" class="hidden space-y-6">
                     <div class="bg-amber-50 border border-amber-200 text-amber-900 p-4 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div>
-                            <strong>Regole Forza:</strong> Sforzo facile/moderato con <strong>3 ripetizioni di riserva (RIR 3)</strong>. Clicca sull'illustrazione di qualsiasi esercizio per ingrandirla, spunta gli esercizi svolti e annota i chili.
-                        </div>
-                        <button onclick="resetStrengthChecks()" class="shrink-0 bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 font-semibold px-3 py-1.5 rounded-lg transition">
-                            <i class="fa-solid fa-rotate-left mr-1"></i> Azzera spunte seduta
-                        </button>
+                        <div><strong>Regole Forza:</strong> Sforzo facile/moderato con <strong>3 ripetizioni di riserva (RIR 3)</strong>. Clicca sull'illustrazione per ingrandirla, spunta gli esercizi e annota i chili.</div>
+                        <button onclick="resetStrengthChecks()" class="shrink-0 bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 font-semibold px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-rotate-left mr-1"></i> Azzera spunte seduta</button>
                     </div>
-
                     <div id="strength-cards-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
                 </div>
 
-                <!-- ==================== TAB 5: PARCO SCARPE & REGOLE ==================== -->
+                <!-- TAB 5: SCARPE -->
                 <div id="tab-scarpe" class="hidden space-y-6">
                     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                            <h3 class="font-bold text-slate-900 text-sm">Gestione Libera Parco Scarpe</h3>
-                            <p class="text-xs text-slate-500">Modifica direttamente i km percorsi o il limite massimo di ogni scarpa: ogni corsa registrata nel Diario aggiorna i totali in automatico.</p>
-                        </div>
-                        <button onclick="openAddShoeModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition">
-                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi Scarpa
-                        </button>
+                        <div><h3 class="font-bold text-slate-900 text-sm">Gestione Libera Parco Scarpe</h3><p class="text-xs text-slate-500">Modifica i km percorsi o il limite massimo: il Diario aggiorna i totali in automatico.</p></div>
+                        <button onclick="openAddShoeModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition"><i class="fa-solid fa-plus mr-1"></i> Aggiungi Scarpa</button>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="shoes-container"></div>
-
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="font-bold text-slate-900 mb-4">Protocollo & Regole del Piano</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="rules-container"></div>
@@ -523,36 +375,21 @@
         </main>
     </div>
 
-    <!-- MODALI -->
+    <!-- ==================== MODALI ==================== -->
     <div id="modal-threshold" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Aggiorna Soglia Corrente Garmin</h3>
             <p class="text-xs text-slate-500 mb-4">Modifica i valori rilevati dall'orologio.</p>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">FC Soglia (bpm)</label>
-                        <input type="number" id="m-soglia-fc" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Passo Soglia (min:sec)</label>
-                        <input type="text" id="m-soglia-passo" placeholder="4:23" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
-                    </div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">FC Soglia (bpm)</label><input type="number" id="m-soglia-fc" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Passo Soglia (min:sec)</label><input type="text" id="m-soglia-passo" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Potenza Soglia (W)</label>
-                        <input type="number" id="m-soglia-w" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Rapporto W/kg</label>
-                        <input type="number" step="0.01" id="m-soglia-wkg" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
-                    </div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Potenza Soglia (W)</label><input type="number" id="m-soglia-w" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Rapporto W/kg</label><input type="number" step="0.01" id="m-soglia-wkg" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Data Rilevamento</label>
-                    <input type="date" id="m-soglia-data" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono">
-                </div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data Rilevamento</label><input type="date" id="m-soglia-data" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono"></div>
             </div>
             <div class="flex justify-end gap-2 mt-6">
                 <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
@@ -564,25 +401,19 @@
     <div id="modal-exercise" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
             <div class="flex justify-between items-start mb-3">
-                <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600" id="ex-modal-muscle">Muscoli Target</span>
-                    <h3 class="text-xl font-bold text-slate-900" id="ex-modal-title">Nome Esercizio</h3>
-                </div>
+                <div><span class="text-xs font-bold uppercase tracking-wider text-blue-600" id="ex-modal-muscle">Muscoli</span><h3 class="text-xl font-bold text-slate-900" id="ex-modal-title">Esercizio</h3></div>
                 <button onclick="closeModals()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-center my-3" id="ex-modal-svg"></div>
             <div class="space-y-2 text-sm text-slate-700">
                 <div class="flex gap-4 text-xs font-mono bg-blue-50 text-blue-800 px-3 py-2 rounded-lg">
-                    <span><strong>Serie/Rip:</strong> <span id="ex-modal-serie">--</span></span>
-                    <span><strong>Recupero:</strong> <span id="ex-modal-rec">--</span></span>
+                    <span><strong>Serie/Rip:</strong> <span id="ex-modal-serie">--</span></span><span><strong>Recupero:</strong> <span id="ex-modal-rec">--</span></span>
                 </div>
                 <p class="text-xs leading-relaxed text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100" id="ex-modal-desc">--</p>
             </div>
             <div class="flex justify-between items-center mt-5 pt-3 border-t border-slate-100">
-                <a id="ex-modal-yt" href="#" target="_blank" class="text-xs font-semibold text-rose-600 hover:underline flex items-center gap-1.5">
-                    <i class="fa-brands fa-youtube text-base"></i> Guarda esecuzione video
-                </a>
-                <button onclick="closeModals()" class="px-4 py-2 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800">Chiudi Scheda</button>
+                <a id="ex-modal-yt" href="#" target="_blank" class="text-xs font-semibold text-rose-600 hover:underline flex items-center gap-1.5"><i class="fa-brands fa-youtube text-base"></i> Guarda su YouTube</a>
+                <button onclick="closeModals()" class="px-4 py-2 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800">Chiudi</button>
             </div>
         </div>
     </div>
@@ -593,39 +424,20 @@
             <p class="text-xs text-slate-500 mb-4">Imposta i km già percorsi e la vita utile massima.</p>
             <input type="hidden" id="modal-shoe-idx" value="-1">
             <div class="space-y-3 text-sm">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Modello Scarpa</label>
-                    <input type="text" id="shoe-input-nome" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-semibold">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Utilizzo / Ruolo</label>
-                    <input type="text" id="shoe-input-ruolo" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                </div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Modello Scarpa</label><input type="text" id="shoe-input-nome" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-semibold"></div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Utilizzo / Ruolo</label><input type="text" id="shoe-input-ruolo" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Km Percorsi Attuali</label>
-                        <input type="number" step="0.1" id="shoe-input-percorsi" oninput="previewShoeCalc()" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Vita Utile Max (km)</label>
-                        <input type="number" step="10" id="shoe-input-max" oninput="previewShoeCalc()" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
-                    </div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Km Percorsi Attuali</label><input type="number" step="0.1" id="shoe-input-percorsi" oninput="previewShoeCalc()" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Vita Utile Max (km)</label><input type="number" step="10" id="shoe-input-max" oninput="previewShoeCalc()" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
                 </div>
                 <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-2 rounded-lg text-xs font-semibold flex justify-between">
-                    <span>Rimanenti stimati:</span>
-                    <span id="shoe-preview-rem">-- km</span>
+                    <span>Rimanenti stimati:</span><span id="shoe-preview-rem">-- km</span>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Note</label>
-                    <input type="text" id="shoe-input-note" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                </div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Note</label><input type="text" id="shoe-input-note" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
             </div>
             <div class="flex justify-between items-center mt-6">
                 <button type="button" id="btn-delete-shoe" onclick="deleteShoe()" class="text-xs text-rose-600 hover:underline hidden">Elimina scarpa</button>
-                <div class="flex gap-2 ml-auto">
-                    <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
-                    <button onclick="saveShoe()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Scarpa</button>
-                </div>
+                <div class="flex gap-2 ml-auto"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="saveShoe()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Scarpa</button></div>
             </div>
         </div>
     </div>
@@ -637,38 +449,17 @@
             <input type="hidden" id="modal-comp-idx">
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Fatti</label>
-                        <input type="number" step="0.01" id="modal-comp-km" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-cyan-700 mb-1"><i class="fa-solid fa-bicycle mr-1"></i> Km Rulli Fatti</label>
-                        <input type="number" step="0.1" id="modal-comp-rulli" placeholder="es. 24.5" class="w-full border border-cyan-300 bg-cyan-50/40 rounded-lg px-3 py-2 font-mono font-bold">
-                    </div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Fatti</label><input type="number" step="0.01" id="modal-comp-km" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                    <div><label class="block text-xs font-semibold text-cyan-700 mb-1"><i class="fa-solid fa-bicycle mr-1"></i> Km Rulli Fatti</label><input type="number" step="0.1" id="modal-comp-rulli" class="w-full border border-cyan-300 bg-cyan-50/40 rounded-lg px-3 py-2 font-mono font-bold"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Passo Medio (Corsa)</label>
-                        <input type="text" id="modal-comp-passo" placeholder="es. 5'35&quot;/km" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">FC Media (bpm)</label>
-                        <input type="number" id="modal-comp-fc" placeholder="es. 138" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                    </div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Passo Medio (Corsa)</label><input type="text" id="modal-comp-passo" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">FC Media (bpm)</label><input type="number" id="modal-comp-fc" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Usate (solo per corsa)</label>
-                    <select id="modal-comp-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Note & Sensazioni</label>
-                    <input type="text" id="modal-comp-note" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                </div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Usate (solo corsa)</label><select id="modal-comp-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select></div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Note & Sensazioni</label><input type="text" id="modal-comp-note" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
             </div>
-            <div class="flex justify-end gap-2 mt-6">
-                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
-                <button onclick="saveCompletedWorkout()" class="px-4 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">Salva Seduta</button>
-            </div>
+            <div class="flex justify-end gap-2 mt-6"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="saveCompletedWorkout()" class="px-4 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">Salva Seduta</button></div>
         </div>
     </div>
 
@@ -684,14 +475,9 @@
                     <option value="stanchezza">Stanchezza / FC alta / Sonno scarso</option>
                     <option value="schiena">Fastidio fisico / Affaticamento muscolare</option>
                 </select>
-                <div class="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg">
-                    <strong>Azione automatica:</strong> I chilometri non corsi oggi verranno azzerati senza accumularli nei giorni successivi.
-                </div>
+                <div class="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg"><strong>Azione automatica:</strong> I km non corsi oggi verranno azzerati senza accumularli.</div>
             </div>
-            <div class="flex justify-end gap-2 mt-6">
-                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
-                <button onclick="confirmSkipWorkout()" class="px-4 py-2 text-sm font-semibold bg-amber-600 hover:bg-amber-700 text-white rounded-lg">Applica Rimodulazione</button>
-            </div>
+            <div class="flex justify-end gap-2 mt-6"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="confirmSkipWorkout()" class="px-4 py-2 text-sm font-semibold bg-amber-600 hover:bg-amber-700 text-white rounded-lg">Applica Rimodulazione</button></div>
         </div>
     </div>
 
@@ -699,23 +485,11 @@
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Profilo Atleta</h3>
             <div class="space-y-3 text-sm">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Peso attuale (kg)</label>
-                    <input type="number" step="0.1" id="prof-peso" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Altezza (cm)</label>
-                    <input type="number" id="prof-altezza" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">FC a riposo baseline (bpm)</label>
-                    <input type="number" id="prof-fc" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                </div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Peso attuale (kg)</label><input type="number" step="0.1" id="prof-peso" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Altezza (cm)</label><input type="number" id="prof-altezza" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">FC a riposo baseline (bpm)</label><input type="number" id="prof-fc" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
             </div>
-            <div class="flex justify-end gap-2 mt-6">
-                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
-                <button onclick="saveProfile()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Aggiorna</button>
-            </div>
+            <div class="flex justify-end gap-2 mt-6"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="saveProfile()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Aggiorna</button></div>
         </div>
     </div>
 
@@ -724,42 +498,21 @@
             <h3 class="text-lg font-bold text-slate-900 mb-4">Aggiungi Seduta al Diario</h3>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Data</label>
-                        <input type="date" id="new-w-data" value="2026-11-22" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                    </div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data</label><input type="date" id="new-w-data" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Tipo Attività</label>
                         <select id="new-w-tipo" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                            <option value="Corsa facile">Corsa facile</option>
-                            <option value="Lungo facile">Lungo facile</option>
-                            <option value="Medio / Tempo Run">Medio / Tempo Run</option>
-                            <option value="Ripetute">Ripetute</option>
-                            <option value="Rulli">Rulli</option>
-                            <option value="Forza">Forza</option>
-                            <option value="Riposo">Riposo</option>
+                            <option value="Corsa facile">Corsa facile</option><option value="Lungo facile">Lungo facile</option><option value="Medio / Tempo Run">Medio / Tempo Run</option><option value="Ripetute">Ripetute</option><option value="Rulli">Rulli</option><option value="Forza">Forza</option><option value="Riposo">Riposo</option>
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Dettaglio seduta</label>
-                    <input type="text" id="new-w-dettaglio" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                </div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Dettaglio seduta</label><input type="text" id="new-w-dettaglio" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Previsti</label>
-                        <input type="number" step="0.5" id="new-w-km" value="10" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Previste</label>
-                        <select id="new-w-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select>
-                    </div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Previsti</label><input type="number" step="0.5" id="new-w-km" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Previste</label><select id="new-w-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select></div>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 mt-6">
-                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
-                <button onclick="saveNewWorkout()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Inserisci</button>
-            </div>
+            <div class="flex justify-end gap-2 mt-6"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="saveNewWorkout()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Inserisci</button></div>
         </div>
     </div>
 
@@ -767,40 +520,21 @@
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Aggiungi Gara o Test</h3>
             <div class="space-y-3 text-sm">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nome Gara</label>
-                    <input type="text" id="new-r-nome" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                </div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Nome Gara</label><input type="text" id="new-r-nome" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Data</label>
-                        <input type="date" id="new-r-data" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                    </div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data</label><input type="date" id="new-r-data" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Distanza</label>
-                        <select id="new-r-dist" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                            <option value="5 km">5 km</option>
-                            <option value="10 km">10 km</option>
-                            <option value="21.1 km">21.1 km</option>
-                            <option value="42.2 km">42.2 km</option>
-                        </select>
+                        <select id="new-r-dist" class="w-full border border-slate-300 rounded-lg px-3 py-2"><option value="5 km">5 km</option><option value="10 km">10 km</option><option value="21.1 km">21.1 km</option><option value="42.2 km">42.2 km</option></select>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Ruolo</label>
-                    <select id="new-r-tipo" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                        <option value="Gara Test">Gara Test</option>
-                        <option value="Gara Principale">Gara Principale</option>
-                    </select>
-                </div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Ruolo</label><select id="new-r-tipo" class="w-full border border-slate-300 rounded-lg px-3 py-2"><option value="Gara Test">Gara Test</option><option value="Gara Principale">Gara Principale</option></select></div>
             </div>
-            <div class="flex justify-end gap-2 mt-6">
-                <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
-                <button onclick="saveNewRace()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Gara</button>
-            </div>
+            <div class="flex justify-end gap-2 mt-6"><button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button><button onclick="saveNewRace()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Gara</button></div>
         </div>
     </div>
 
+    <!-- ==================== SCRIPT PRINCIPALE ==================== -->
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyCUd8OG-52jOr59yEZqJBgD-hYQs9IClqw",
@@ -822,32 +556,13 @@
         let unsubscribeSnapshot = null;
 
         const NEUTRAL_TEMPLATE_DB = {
-            ui: {
-                activeTab: "panoramica",
-                diarioFilter: "all",
-                readiness: { fc: 60, schiena: "ok", polpaccio: "ok" }
-            },
-            atleta: {
-                peso_kg: 70.0,
-                altezza_cm: 175,
-                bmi: 22.86,
-                fc_riposo: 60
-            },
-            soglia: {
-                fc_bpm: 180,
-                passo: "4:30",
-                potenza_w: 350,
-                potenza_w_kg: 5.00,
-                data_rilevamento: "2026-11-18",
-                storico: []
-            },
-            pb: {
-                "5k": "22:00", "10k": "45:00", "21k": "1:42:00",
-                garmin_5k: "21:30", garmin_10k: "44:30", garmin_21k: "1:39:00"
-            },
+            ui: { activeTab: "panoramica", diarioFilter: "all", readiness: { fc: 60, schiena: "ok", polpaccio: "ok" } },
+            atleta: { peso_kg: 69.0, altezza_cm: 170, bmi: 23.88, fc_riposo: 60 },
+            soglia: { fc_bpm: 187, passo: "4:23", potenza_w: 360, potenza_w_kg: 5.26, data_rilevamento: "2026-11-18", storico: [] },
+            pb: { "5k": "21:30", "10k": "44:45", "21k": "1:41:38", garmin_5k: "21:10", garmin_10k: "44:00", garmin_21k: "1:38:30" },
             scarpe: [
-                { id: "shoe-1", nome: "Scarpa Lenti", ruolo: "Corse facili e recupero", km_percorsi: 0, vita_utile: 600, note: "Importa il tuo backup .json o modifica i km." },
-                { id: "shoe-2", nome: "Scarpa Qualità", ruolo: "Gare e lavori veloci", km_percorsi: 0, vita_utile: 650, note: "" }
+                { id: "shoe-1", nome: "Mizuno Neo Zen", ruolo: "Corse facili e recupero", km_percorsi: 458, vita_utile: 600, note: "Importa backup per ripristinare i chilometri completi." },
+                { id: "shoe-2", nome: "Adidas Evo SL", ruolo: "Gare e lavori veloci", km_percorsi: 130, vita_utile: 650, note: "Preservala per le gare." }
             ],
             gare: [
                 { nome: "Test / Gara 10 km", data: "2027-02-14", distanza: "10 km", tipo: "Gara Test" },
@@ -856,55 +571,49 @@
             allenamenti_settimana: [],
             forza: [
                 {
-                    titolo: "Core Leggero (Mobilità & Schiena)",
-                    badge: "Giorni Rulli / Riposo",
+                    titolo: "Core Leggero (Mobilità & Schiena)", badge: "Giorni Rulli / Riposo",
                     esercizi: [
-                        { nome: "Gatto-cammello", imgKey: "cat_cow", muscoli: "Mobilità colonna & lombare", serie: "1x10 lente", rec: "30\"", note: "In quadrupedia, inarca e arrotonda la schiena piano, senza forzare.", carico: "Corpo libero", fatto: false },
-                        { nome: "Ponte glutei", imgKey: "glute_bridge", muscoli: "Grande gluteo & ischiocrurali", serie: "2x10", rec: "45\"", note: "Supino, ginocchia piegate, spingi sui talloni senza inarcare la schiena.", carico: "Corpo libero", fatto: false },
-                        { nome: "Bird-dog", imgKey: "bird_dog", muscoli: "Core profondo & stabilizzatori schiena", serie: "2x10/lato (pausa 3\")", rec: "45\"", note: "Estendi braccio e gamba opposti tenendo il bacino fermo.", carico: "Corpo libero", fatto: false },
-                        { nome: "Plank frontale", imgKey: "plank", muscoli: "Trasverso addominale & retto", serie: "2x20-30\"", rec: "45\"", note: "Corpo in linea dai talloni alle spalle, schiena neutra.", carico: "Corpo libero", fatto: false },
-                        { nome: "Dead bug", imgKey: "dead_bug", muscoli: "Core profondo & controllo pelvico", serie: "2x10/lato", rec: "45\"", note: "Schiena sempre aderente al pavimento.", carico: "Corpo libero", fatto: false }
+                        { nome: "Gatto-cammello", imgKey: "cat_cow", muscoli: "Mobilità colonna", serie: "1x10 lente", rec: "30\"", note: "In quadrupedia, senza forzare.", carico: "Corpo libero", fatto: false },
+                        { nome: "Ponte glutei", imgKey: "glute_bridge", muscoli: "Grande gluteo", serie: "2x10", rec: "45\"", note: "Spingi sui talloni senza inarcare la schiena.", carico: "Corpo libero", fatto: false },
+                        { nome: "Bird-dog", imgKey: "bird_dog", muscoli: "Core profondo", serie: "2x10/lato", rec: "45\"", note: "Estendi braccio e gamba opposti.", carico: "Corpo libero", fatto: false },
+                        { nome: "Plank frontale", imgKey: "plank", muscoli: "Addome", serie: "2x20-30\"", rec: "45\"", note: "Schiena neutra.", carico: "Corpo libero", fatto: false },
+                        { nome: "Dead bug", imgKey: "dead_bug", muscoli: "Core profondo", serie: "2x10/lato", rec: "45\"", note: "Schiena aderente al pavimento.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
-                    titolo: "Forza A: Gambe & Core (Lunedì)",
-                    badge: "Sett. 1-2: 2 serie | Da Sett. 3: 3 serie",
+                    titolo: "Forza A: Gambe & Core (Lunedì)", badge: "Da Sett. 3: 3 serie",
                     esercizi: [
-                        { nome: "Squat o Goblet Squat leggero", imgKey: "squat", muscoli: "Quadricipiti, glutei, core", serie: "2-3 x 10", rec: "60-90\"", note: "Schiena neutra, ginocchia in linea con i piedi.", carico: "", fatto: false },
-                        { nome: "Affondi indietro", imgKey: "lunge", muscoli: "Glutei, quadricipiti, stabilità bacino", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Passo indietro controllato, busto dritto.", carico: "", fatto: false },
-                        { nome: "Ponte glutei su una gamba", imgKey: "single_bridge", muscoli: "Gluteo monolaterale & femorali", serie: "2-3 x 10/gamba", rec: "60\"", note: "Bacino alto e fermo, senza ruotare l'anca.", carico: "", fatto: false },
-                        { nome: "Alzate polpacci su una gamba", imgKey: "calf_raise", muscoli: "Gastrocnemio, soleo & tendine d'Achille", serie: "2-3 x 12/gamba", rec: "60\"", note: "Sul bordo di un gradino, discesa lenta in 3 secondi.", carico: "", fatto: false },
-                        { nome: "Plank frontale + Bird-dog", imgKey: "plank", muscoli: "Core & tenuta posturale", serie: "2-3 x 35\" / 8 lato", rec: "45\"", note: "Controllo posturale lento.", carico: "Corpo libero", fatto: false }
+                        { nome: "Squat o Goblet Squat", imgKey: "squat", muscoli: "Quadricipiti, glutei", serie: "2-3 x 10", rec: "60-90\"", note: "Schiena neutra, ginocchia in linea.", carico: "", fatto: false },
+                        { nome: "Affondi indietro", imgKey: "lunge", muscoli: "Glutei, quadricipiti", serie: "2-3 x 8/lato", rec: "60-90\"", note: "Passo indietro controllato.", carico: "", fatto: false },
+                        { nome: "Ponte glutei su una gamba", imgKey: "single_bridge", muscoli: "Gluteo monolaterale", serie: "2-3 x 10/lato", rec: "60\"", note: "Bacino alto e fermo.", carico: "", fatto: false },
+                        { nome: "Alzate polpacci su una gamba", imgKey: "calf_raise", muscoli: "Polpacci", serie: "2-3 x 12/lato", rec: "60\"", note: "Sul bordo del gradino.", carico: "", fatto: false },
+                        { nome: "Plank frontale + Bird-dog", imgKey: "plank", muscoli: "Core", serie: "2-3 x 35\" / 8 lato", rec: "45\"", note: "Controllo posturale lento.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
-                    titolo: "Forza B: Stabilità & Catena Posteriore (Venerdì)",
-                    badge: "Sett. 1-2: 2 serie | Da Sett. 3: 3 serie",
+                    titolo: "Forza B: Stabilità (Venerdì)", badge: "Da Sett. 3: 3 serie",
                     esercizi: [
-                        { nome: "Step-up su gradino (30-40 cm)", imgKey: "step_up", muscoli: "Glutei, quadricipiti, spinta di corsa", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Spingi con il tallone della gamba sul gradino.", carico: "", fatto: false },
-                        { nome: "Camminata laterale con elastico", imgKey: "band_walk", muscoli: "Medio gluteo (stabilità ginocchio/anca)", serie: "2 x 12 passi/lato", rec: "45\"", note: "Elastico sopra le ginocchia, ginocchia semiflesse.", carico: "Elastico", fatto: false },
-                        { nome: "Stacco rumeno con manubri leggeri", imgKey: "rdl", muscoli: "Ischiocrurali, glutei, erettori spinali", serie: "Solo da Sett. 3 (3x8)", rec: "60-90\"", note: "Solo dalla 3ª settimana se la schiena è senza fastidi.", carico: "", fatto: false },
-                        { nome: "Plank laterale + Dead bug", imgKey: "side_plank", muscoli: "Obliqui, quadrato dei lombi & core", serie: "2-3 x 30\" / 8 lato", rec: "45\"", note: "Corpo allineato, fianchi alti.", carico: "Corpo libero", fatto: false }
+                        { nome: "Step-up su gradino (30-40 cm)", imgKey: "step_up", muscoli: "Glutei", serie: "2-3 x 8/lato", rec: "60-90\"", note: "Spingi col tallone sul gradino.", carico: "", fatto: false },
+                        { nome: "Camminata laterale elastico", imgKey: "band_walk", muscoli: "Medio gluteo", serie: "2 x 12 passi/lato", rec: "45\"", note: "Elastico sopra le ginocchia.", carico: "Elastico", fatto: false },
+                        { nome: "Stacco rumeno con manubri", imgKey: "rdl", muscoli: "Ischiocrurali, erettori", serie: "Solo da Sett. 3 (3x8)", rec: "60-90\"", note: "Solo se la schiena è senza fastidi.", carico: "", fatto: false },
+                        { nome: "Plank laterale + Dead bug", imgKey: "side_plank", muscoli: "Obliqui, core", serie: "2-3 x 30\" / 8 lato", rec: "45\"", note: "Fianchi alti e corpo allineato.", carico: "Corpo libero", fatto: false }
                     ]
                 },
                 {
-                    titolo: "Forza C: Upper Body & Postura Runner",
-                    badge: "Giorni Facili / Rulli (2x/sett.)",
+                    titolo: "Forza C: Upper Body", badge: "Giorni Facili / Rulli",
                     esercizi: [
-                        { nome: "Piegamenti (Push-up) o Panca Manubri", imgKey: "pushup", muscoli: "Pettorali, deltoidi anteriori, tricipiti", serie: "3 x 10-12", rec: "60\"", note: "Spinta controllata, RIR 3 (lascia 3 ripetizioni di margine).", carico: "", fatto: false },
-                        { nome: "Rematore con manubrio / elastico", imgKey: "row", muscoli: "Gran dorsale, romboidi, bicipiti", serie: "3 x 10/lato", rec: "60\"", note: "Rinforza il dorso per mantenere il busto aperto.", carico: "", fatto: false },
-                        { nome: "Military Press / Alzate manubri", imgKey: "overhead_press", muscoli: "Deltoidi & stabilizzatori scapola", serie: "3 x 10", rec: "60\"", note: "Addome attivo per non inarcare la zona lombare.", carico: "", fatto: false },
-                        { nome: "Face-pull con elastico / Tirate", imgKey: "face_pull", muscoli: "Deltoidi posteriori & cuffia rotatori", serie: "3 x 12-15", rec: "45\"", note: "Tira l'elastico verso il viso avvicinando le scapole.", carico: "Elastico", fatto: false }
+                        { nome: "Piegamenti o Panca Manubri", imgKey: "pushup", muscoli: "Pettorali, tricipiti", serie: "3 x 10-12", rec: "60\"", note: "Spinta controllata, RIR 3.", carico: "", fatto: false },
+                        { nome: "Rematore con manubrio", imgKey: "row", muscoli: "Gran dorsale", serie: "3 x 10/lato", rec: "60\"", note: "Mantieni il busto aperto.", carico: "", fatto: false },
+                        { nome: "Military Press", imgKey: "overhead_press", muscoli: "Deltoidi", serie: "3 x 10", rec: "60\"", note: "Addome attivo.", carico: "", fatto: false },
+                        { nome: "Face-pull con elastico", imgKey: "face_pull", muscoli: "Deltoidi post.", serie: "3 x 12-15", rec: "45\"", note: "Avvicina le scapole.", carico: "Elastico", fatto: false }
                     ]
                 }
             ],
             regole: [
-                { tema: "Rientro graduale", desc: "Solo volume facile e rulli finché non hai 7-10 giorni senza intoppi. I km saltati non si recuperano." },
-                { tema: "Schiena", desc: "Se una seduta dà fastidio, fermati o passa ai rulli. Niente stacco rumeno nelle prime 2 settimane." },
-                { tema: "Ritmo corse facili", desc: "125-145 bpm, ritmo conversazionale. Non guardare l'orologio." },
-                { tema: "Frequenza a riposo", desc: "Se per più giorni è 7-10 bpm sopra il valore normale, aggiungi un giorno di riposo." },
-                { tema: "Polpaccio & tendini", desc: "Controlla i primi passi del mattino. Se qualcosa fa male, niente corsa finché non passa." },
-                { tema: "Rotazione scarpe", desc: "Alterna scarpe protettive per i fondi lenti e scarpe reattive per qualità e gare." }
+                { tema: "Rientro graduale", desc: "Volume facile e rulli finché non hai 7-10 gg senza intoppi. Km saltati non si recuperano." },
+                { tema: "Schiena", desc: "Se una seduta dà fastidio, passa ai rulli. Niente stacco rumeno all'inizio." },
+                { tema: "Ritmo corse facili", desc: "125-145 bpm, conversazionale. Non guardare l'orologio." },
+                { tema: "Polpaccio", desc: "Controlla i primi passi del mattino. Se fa male, niente corsa." }
             ]
         };
 
@@ -913,19 +622,9 @@
             const text = document.getElementById('cloud-error-text');
             const badge = document.getElementById('sync-badge');
             let msg = err && err.message ? err.message : "Impossibile raggiungere Firestore.";
-            if (err && err.code === 'permission-denied') {
-                msg = "Permessi negati da Firestore: vai su Firebase Console > Firestore Database > Regole, incolla le regole per /users/{userId} e clicca Pubblica.";
-            } else if (err && (err.code === 'not-found' || msg.includes('database'))) {
-                msg = "Database Firestore non trovato: vai su Firebase Console > Build > Firestore Database e clicca Crea database.";
-            }
-            if (banner && text) {
-                text.textContent = msg;
-                banner.classList.remove('hidden');
-            }
-            if (badge) {
-                badge.className = "text-xs px-3 py-1.5 rounded-full bg-rose-100 text-rose-800 font-semibold";
-                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Errore Cloud`;
-            }
+            if (err && err.code === 'permission-denied') msg = "Permessi negati da Firestore: vai su Firebase Console > Firestore Database > Regole, incolla le regole e pubblica.";
+            if (banner && text) { text.textContent = msg; banner.classList.remove('hidden'); }
+            if (badge) { badge.className = "text-xs px-3 py-1.5 rounded-full bg-rose-100 text-rose-800 font-semibold"; badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Errore Cloud`; }
         }
 
         function clearCloudError() {
@@ -939,18 +638,11 @@
             const password = document.getElementById('login-password').value;
             const errBox = document.getElementById('login-error');
             const btn = document.getElementById('login-btn');
-
-            errBox.classList.add('hidden');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Accesso in corso...`;
-
+            errBox.classList.add('hidden'); btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Accesso in corso...`;
             try {
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (err) {
-                errBox.textContent = "Credenziali non valide o utente non trovato (" + err.code + ").";
-                errBox.classList.remove('hidden');
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-lock-open mr-1.5"></i> Accedi alla Dashboard`;
+                errBox.textContent = "Credenziali non valide (" + err.code + ")."; errBox.classList.remove('hidden'); btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-lock-open mr-1.5"></i> Accedi alla Dashboard`;
             }
         }
 
@@ -982,10 +674,8 @@
                 const raw = localStorage.getItem(k);
                 if (raw) {
                     try {
-                        const parsed = normalizeDb(JSON.parse(raw));
-                        if (parsed.allenamenti_settimana && parsed.allenamenti_settimana.length > 0) {
-                            return parsed;
-                        }
+                        const p = normalizeDb(JSON.parse(raw));
+                        if (p.allenamenti_settimana && p.allenamenti_settimana.length > 0) return p;
                     } catch (e) {}
                 }
             }
@@ -1010,9 +700,7 @@
                     db = cloudData;
                     localStorage.setItem(localCacheKey, JSON.stringify(db));
                 } else if (localPopulated) {
-                    // Recupera i dati salvati sul Primo PC e li invia subito al Cloud!
-                    db = localPopulated;
-                    db.lastSaved = new Date().toISOString();
+                    db = localPopulated; db.lastSaved = new Date().toISOString();
                     await docRef.set(db);
                     localStorage.setItem(localCacheKey, JSON.stringify(db));
                 } else {
@@ -1020,34 +708,26 @@
                 }
 
                 clearCloudError();
-                const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                 badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
-                badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Sincronizzato · ${now}`;
+                badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Sincronizzato · ` + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
 
-                // Listener in tempo reale tra più dispositivi
                 if (unsubscribeSnapshot) unsubscribeSnapshot();
                 unsubscribeSnapshot = docRef.onSnapshot((snap) => {
                     if (!snap.exists || snap.metadata.hasPendingWrites) return;
                     const incoming = normalizeDb(snap.data());
                     if (incoming.lastSaved && db && incoming.lastSaved !== db.lastSaved) {
-                        db = incoming;
-                        localStorage.setItem(localCacheKey, JSON.stringify(db));
-                        restoreSavedInputs();
-                        renderAll();
-                        const t = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        db = incoming; localStorage.setItem(localCacheKey, JSON.stringify(db));
+                        restoreSavedInputs(); renderAll();
                         badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
-                        badge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down mr-1"></i> Aggiornato Live · ${t}`;
+                        badge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down mr-1"></i> Aggiornato Live · ` + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     }
                 }, (err) => showCloudError(err));
             } catch (err) {
-                console.error("Errore lettura Firestore:", err);
                 db = localPopulated || structuredClone(NEUTRAL_TEMPLATE_DB);
                 showCloudError(err);
             }
 
-            restoreSavedInputs();
-            renderAll();
-            switchTab(db.ui.activeTab || 'panoramica', false);
+            restoreSavedInputs(); renderAll(); switchTab(db.ui.activeTab || 'panoramica', false);
         }
 
         async function forceCloudPush() {
@@ -1055,19 +735,14 @@
             const badge = document.getElementById('sync-badge');
             badge.className = "text-xs px-3 py-1.5 rounded-full bg-blue-100 text-blue-800 font-semibold";
             badge.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin mr-1"></i> Invio al Cloud...`;
-
             try {
                 db.lastSaved = new Date().toISOString();
                 localStorage.setItem('runcoach_cloud_' + currentUser.uid, JSON.stringify(db));
                 await firestore.collection('users').doc(currentUser.uid).set(db);
                 clearCloudError();
-                const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
-                badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ${now}`;
-            } catch (err) {
-                console.error("Errore invio Firestore:", err);
-                showCloudError(err);
-            }
+                badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ` + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            } catch (err) { showCloudError(err); }
         }
 
         function saveLocal() {
@@ -1075,52 +750,45 @@
             const localCacheKey = 'runcoach_cloud_' + currentUser.uid;
             db.lastSaved = new Date().toISOString();
             localStorage.setItem(localCacheKey, JSON.stringify(db));
-
             const badge = document.getElementById('sync-badge');
             if (badge) {
                 badge.className = "text-xs px-3 py-1.5 rounded-full bg-blue-100 text-blue-800 font-semibold";
                 badge.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin mr-1"></i> Salvataggio Cloud...`;
             }
-
             clearTimeout(cloudSaveTimer);
             cloudSaveTimer = setTimeout(async () => {
                 try {
                     await firestore.collection('users').doc(currentUser.uid).set(db);
                     clearCloudError();
-                    const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     if (badge) {
                         badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
-                        badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ${now}`;
+                        badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ` + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     }
-                } catch (err) {
-                    console.error("Errore salvataggio Firestore:", err);
-                    showCloudError(err);
-                }
+                } catch (err) { showCloudError(err); }
             }, 400);
         }
 
         function getExerciseSVG(key, large = false) {
             const cls = large ? "w-72 h-48" : "w-20 h-14 shrink-0";
-            const base = `<svg viewBox="0 0 160 110" class="${cls} rounded-lg bg-white border border-slate-200 shadow-xs" fill="none" xmlns="http://www.w3.org/2000/svg">`;
-            const floor = `<line x1="10" y1="96" x2="150" y2="96" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>`;
+            const base = `<svg viewBox="0 0 160 110" class="${cls} rounded-lg bg-white border border-slate-200" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="96" x2="150" y2="96" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>`;
             const shapes = {
-                cat_cow: `${floor}<circle cx="122" cy="54" r="7" fill="#334155"/><path d="M52 60 Q84 36 115 58" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><path d="M52 60 Q84 74 115 58" stroke="#93c5fd" stroke-width="3" stroke-dasharray="3 3"/><line x1="54" y1="60" x2="54" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="54" y1="95" x2="36" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="112" y1="59" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><path d="M84 30 L84 20 M80 24 L84 20 L88 24" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
-                glute_bridge: `${floor}<circle cx="30" cy="88" r="7" fill="#334155"/><line x1="38" y1="90" x2="55" y2="90" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="55" y1="90" x2="92" y2="62" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="92" y1="62" x2="116" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><path d="M88 52 L88 40 M84 44 L88 40 L92 44" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
-                bird_dog: `${floor}<circle cx="114" cy="54" r="7" fill="#334155"/><line x1="64" y1="60" x2="108" y2="60" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="106" y1="60" x2="144" y2="54" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="60" x2="22" y2="54" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="60" x2="64" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="104" y1="60" x2="104" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
-                plank: `${floor}<circle cx="128" cy="64" r="7" fill="#334155"/><line x1="34" y1="84" x2="120" y2="68" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="116" y1="70" x2="116" y2="94" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="116" y1="94" x2="132" y2="94" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="34" y1="84" x2="28" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
-                dead_bug: `${floor}<circle cx="34" cy="88" r="7" fill="#334155"/><line x1="42" y1="90" x2="96" y2="90" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="56" y1="88" x2="32" y2="66" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/><line x1="56" y1="88" x2="60" y2="52" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/><polyline points="96,90 96,64 120,64" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/><line x1="96" y1="90" x2="134" y2="78" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>`,
-                squat: `${floor}<circle cx="88" cy="28" r="7" fill="#334155"/><line x1="86" y1="36" x2="72" y2="64" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="84" y1="44" x2="106" y2="48" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/><circle cx="109" cy="48" r="4" fill="#10b981"/><polyline points="72,64 102,68 92,95" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>`,
-                lunge: `${floor}<circle cx="78" cy="24" r="7" fill="#334155"/><line x1="78" y1="32" x2="78" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/><polyline points="78,62 110,62 110,95" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="78,62 52,82 40,95" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
-                single_bridge: `${floor}<circle cx="30" cy="88" r="7" fill="#334155"/><line x1="38" y1="90" x2="55" y2="90" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="55" y1="90" x2="90" y2="62" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="90" y1="62" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="62" x2="128" y2="34" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/>`,
-                calf_raise: `${floor}<rect x="64" y="84" width="32" height="12" rx="2" fill="#94a3b8"/><circle cx="80" cy="18" r="7" fill="#334155"/><line x1="80" y1="26" x2="80" y2="54" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="80" y1="54" x2="82" y2="82" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><path d="M98 76 L98 62 M94 66 L98 62 L102 66" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
-                step_up: `${floor}<rect x="92" y="72" width="44" height="24" rx="2" fill="#94a3b8"/><circle cx="96" cy="18" r="7" fill="#334155"/><line x1="96" y1="26" x2="94" y2="50" stroke="#334155" stroke-width="6" stroke-linecap="round"/><polyline points="94,50 112,54 112,72" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><line x1="94" y1="50" x2="76" y2="95" stroke="#64748b" stroke-width="4.5" stroke-linecap="round"/>`,
-                band_walk: `${floor}<circle cx="80" cy="22" r="7" fill="#334155"/><line x1="80" y1="30" x2="78" y2="56" stroke="#334155" stroke-width="6" stroke-linecap="round"/><polyline points="78,56 64,74 60,95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><polyline points="78,56 98,74 104,95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="63" y1="73" x2="99" y2="73" stroke="#10b981" stroke-width="4" stroke-linecap="round"/><path d="M112 60 L126 60 M122 56 L126 60 L122 64" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>`,
-                rdl: `${floor}<circle cx="114" cy="46" r="7" fill="#334155"/><line x1="66" y1="56" x2="106" y2="48" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="66" y1="56" x2="62" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="100" y1="50" x2="100" y2="76" stroke="#334155" stroke-width="4" stroke-linecap="round"/><rect x="94" y="75" width="12" height="5" rx="1" fill="#10b981"/>`,
-                side_plank: `${floor}<circle cx="126" cy="54" r="7" fill="#334155"/><line x1="34" y1="92" x2="118" y2="60" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="112" y1="64" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
-                pushup: `${floor}<circle cx="128" cy="58" r="7" fill="#334155"/><line x1="32" y1="88" x2="120" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="114" y1="65" x2="114" y2="95" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><path d="M138 66 L138 80 M134 76 L138 80 L142 76" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
-                row: `${floor}<rect x="44" y="72" width="54" height="24" rx="3" fill="#e2e8f0" stroke="#94a3b8"/><circle cx="114" cy="48" r="7" fill="#334155"/><line x1="64" y1="58" x2="106" y2="50" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="64" y1="58" x2="54" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><polyline points="100,52 92,66 96,80" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/><rect x="90" y="79" width="12" height="5" rx="1" fill="#10b981"/>`,
-                overhead_press: `${floor}<circle cx="80" cy="34" r="7" fill="#334155"/><line x1="80" y1="42" x2="80" y2="68" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="76" y1="68" x2="72" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="84" y1="68" x2="88" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="74" y1="46" x2="66" y2="20" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/><line x1="86" y1="46" x2="94" y2="20" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/><rect x="61" y="16" width="10" height="4" fill="#10b981"/><rect x="89" y="16" width="10" height="4" fill="#10b981"/>`,
-                face_pull: `${floor}<circle cx="88" cy="24" r="7" fill="#334155"/><line x1="88" y1="32" x2="88" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="88" y1="62" x2="84" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="88" y1="62" x2="96" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="32" x2="76" y2="30" stroke="#10b981" stroke-width="3" stroke-dasharray="3 2"/><polyline points="88,38 74,30 82,24" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>`
+                cat_cow: `<circle cx="122" cy="54" r="7" fill="#334155"/><path d="M52 60 Q84 36 115 58" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="54" y1="60" x2="54" y2="95" stroke="#334155" stroke-width="5"/><line x1="112" y1="59" x2="112" y2="95" stroke="#334155" stroke-width="5"/><path d="M84 30 L84 20 M80 24 L84 20 L88 24" stroke="#10b981" stroke-width="2.5"/>`,
+                glute_bridge: `<circle cx="30" cy="88" r="7" fill="#334155"/><line x1="38" y1="90" x2="55" y2="90" stroke="#334155" stroke-width="5"/><line x1="55" y1="90" x2="92" y2="62" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="92" y1="62" x2="116" y2="95" stroke="#334155" stroke-width="5"/>`,
+                bird_dog: `<circle cx="114" cy="54" r="7" fill="#334155"/><line x1="64" y1="60" x2="108" y2="60" stroke="#334155" stroke-width="5"/><line x1="106" y1="60" x2="144" y2="54" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="60" x2="22" y2="54" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="60" x2="64" y2="95" stroke="#334155" stroke-width="5"/><line x1="104" y1="60" x2="104" y2="95" stroke="#334155" stroke-width="5"/>`,
+                plank: `<circle cx="128" cy="64" r="7" fill="#334155"/><line x1="34" y1="84" x2="120" y2="68" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="116" y1="70" x2="116" y2="94" stroke="#334155" stroke-width="5"/>`,
+                dead_bug: `<circle cx="34" cy="88" r="7" fill="#334155"/><line x1="42" y1="90" x2="96" y2="90" stroke="#334155" stroke-width="6"/><line x1="56" y1="88" x2="32" y2="66" stroke="#2563eb" stroke-width="4.5"/><polyline points="96,90 96,64 120,64" stroke="#94a3b8" stroke-width="4.5"/><line x1="96" y1="90" x2="134" y2="78" stroke="#2563eb" stroke-width="5"/>`,
+                squat: `<circle cx="88" cy="28" r="7" fill="#334155"/><line x1="86" y1="36" x2="72" y2="64" stroke="#334155" stroke-width="6"/><line x1="84" y1="44" x2="106" y2="48" stroke="#10b981" stroke-width="4.5"/><polyline points="72,64 102,68 92,95" stroke="#2563eb" stroke-width="5.5" stroke-linejoin="round"/>`,
+                lunge: `<circle cx="78" cy="24" r="7" fill="#334155"/><line x1="78" y1="32" x2="78" y2="62" stroke="#334155" stroke-width="6"/><polyline points="78,62 110,62 110,95" stroke="#2563eb" stroke-width="5" stroke-linejoin="round"/><polyline points="78,62 52,82 40,95" stroke="#2563eb" stroke-width="5" stroke-linejoin="round"/>`,
+                single_bridge: `<circle cx="30" cy="88" r="7" fill="#334155"/><line x1="38" y1="90" x2="55" y2="90" stroke="#334155" stroke-width="5"/><line x1="55" y1="90" x2="90" y2="62" stroke="#2563eb" stroke-width="6"/><line x1="90" y1="62" x2="112" y2="95" stroke="#334155" stroke-width="5"/><line x1="90" y1="62" x2="128" y2="34" stroke="#10b981" stroke-width="4.5"/>`,
+                calf_raise: `<rect x="64" y="84" width="32" height="12" rx="2" fill="#94a3b8"/><circle cx="80" cy="18" r="7" fill="#334155"/><line x1="80" y1="26" x2="80" y2="54" stroke="#334155" stroke-width="6"/><line x1="80" y1="54" x2="82" y2="82" stroke="#2563eb" stroke-width="5"/>`,
+                step_up: `<rect x="92" y="72" width="44" height="24" rx="2" fill="#94a3b8"/><circle cx="96" cy="18" r="7" fill="#334155"/><line x1="96" y1="26" x2="94" y2="50" stroke="#334155" stroke-width="6"/><polyline points="94,50 112,54 112,72" stroke="#2563eb" stroke-width="5"/><line x1="94" y1="50" x2="76" y2="95" stroke="#64748b" stroke-width="4.5"/>`,
+                band_walk: `<circle cx="80" cy="22" r="7" fill="#334155"/><line x1="80" y1="30" x2="78" y2="56" stroke="#334155" stroke-width="6"/><polyline points="78,56 64,74 60,95" stroke="#334155" stroke-width="5"/><polyline points="78,56 98,74 104,95" stroke="#334155" stroke-width="5"/><line x1="63" y1="73" x2="99" y2="73" stroke="#10b981" stroke-width="4"/>`,
+                rdl: `<circle cx="114" cy="46" r="7" fill="#334155"/><line x1="66" y1="56" x2="106" y2="48" stroke="#2563eb" stroke-width="6"/><line x1="66" y1="56" x2="62" y2="95" stroke="#334155" stroke-width="5"/><line x1="100" y1="50" x2="100" y2="76" stroke="#334155" stroke-width="4"/><rect x="94" y="75" width="12" height="5" fill="#10b981"/>`,
+                side_plank: `<circle cx="126" cy="54" r="7" fill="#334155"/><line x1="34" y1="92" x2="118" y2="60" stroke="#2563eb" stroke-width="6"/><line x1="112" y1="64" x2="112" y2="95" stroke="#334155" stroke-width="5"/>`,
+                pushup: `<circle cx="128" cy="58" r="7" fill="#334155"/><line x1="32" y1="88" x2="120" y2="62" stroke="#334155" stroke-width="6"/><line x1="114" y1="65" x2="114" y2="95" stroke="#2563eb" stroke-width="5"/>`,
+                row: `<rect x="44" y="72" width="54" height="24" rx="3" fill="#e2e8f0" stroke="#94a3b8"/><circle cx="114" cy="48" r="7" fill="#334155"/><line x1="64" y1="58" x2="106" y2="50" stroke="#334155" stroke-width="6"/><line x1="64" y1="58" x2="54" y2="95" stroke="#334155" stroke-width="5"/><polyline points="100,52 92,66 96,80" stroke="#2563eb" stroke-width="4.5"/><rect x="90" y="79" width="12" height="5" fill="#10b981"/>`,
+                overhead_press: `<circle cx="80" cy="34" r="7" fill="#334155"/><line x1="80" y1="42" x2="80" y2="68" stroke="#334155" stroke-width="6"/><line x1="76" y1="68" x2="72" y2="95" stroke="#334155" stroke-width="5"/><line x1="84" y1="68" x2="88" y2="95" stroke="#334155" stroke-width="5"/><line x1="74" y1="46" x2="66" y2="20" stroke="#2563eb" stroke-width="4.5"/><line x1="86" y1="46" x2="94" y2="20" stroke="#2563eb" stroke-width="4.5"/><rect x="61" y="16" width="10" height="4" fill="#10b981"/><rect x="89" y="16" width="10" height="4" fill="#10b981"/>`,
+                face_pull: `<circle cx="88" cy="24" r="7" fill="#334155"/><line x1="88" y1="32" x2="88" y2="62" stroke="#334155" stroke-width="6"/><line x1="88" y1="62" x2="84" y2="95" stroke="#334155" stroke-width="5"/><line x1="88" y1="62" x2="96" y2="95" stroke="#334155" stroke-width="5"/><line x1="20" y1="32" x2="76" y2="30" stroke="#10b981" stroke-width="3" stroke-dasharray="3 2"/><polyline points="88,38 74,30 82,24" stroke="#2563eb" stroke-width="4.5"/>`
             };
             return base + (shapes[key] || shapes.squat) + `</svg>`;
         }
@@ -1139,7 +807,6 @@
         function normalizeDb(raw) {
             const merged = structuredClone(NEUTRAL_TEMPLATE_DB);
             if (!raw || typeof raw !== 'object') return merged;
-
             if (raw.ui) merged.ui = { ...merged.ui, ...raw.ui, readiness: { ...merged.ui.readiness, ...(raw.ui.readiness || {}) } };
             if (raw.atleta) merged.atleta = { ...merged.atleta, ...raw.atleta };
             if (raw.soglia) merged.soglia = { ...merged.soglia, ...raw.soglia, storico: Array.isArray(raw.soglia.storico) ? raw.soglia.storico : [] };
@@ -1148,7 +815,6 @@
             if (Array.isArray(raw.allenamenti_settimana)) merged.allenamenti_settimana = raw.allenamenti_settimana.map(item => ({ km_rulli: null, ...item }));
             if (Array.isArray(raw.regole) && raw.regole.length) merged.regole = raw.regole;
             if (Array.isArray(raw.scarpe) && raw.scarpe.length) merged.scarpe = raw.scarpe;
-
             if (Array.isArray(raw.forza) && raw.forza.length) {
                 merged.forza.forEach((scheda, sIdx) => {
                     if (raw.forza[sIdx] && Array.isArray(raw.forza[sIdx].esercizi)) {
@@ -1208,16 +874,12 @@
             document.getElementById('page-title').textContent = titles[tabId][0];
             document.getElementById('page-subtitle').textContent = titles[tabId][1];
 
-            if (persist && db) {
-                db.ui.activeTab = tabId;
-                saveLocal();
-            }
+            if (persist && db) { db.ui.activeTab = tabId; saveLocal(); }
         }
 
         function updateTotalsUI() {
             const totRulli = db.allenamenti_settimana.reduce((sum, a) => sum + (Number(a.km_rulli) || 0), 0);
             const totCorsa = db.allenamenti_settimana.reduce((sum, a) => sum + (Number(a.km_fatti) || 0), 0);
-
             const settBase = db.allenamenti_settimana.filter(a => a.data >= "2026-11-16" && a.data <= "2026-11-22");
             const kmPrevBase = settBase.reduce((s, a) => s + (Number(a.km_previsti) || 0), 0);
             const kmFattiBase = settBase.reduce((s, a) => s + (Number(a.km_fatti) || 0), 0);
@@ -1248,35 +910,20 @@
             renderThresholdDisplays();
 
             if (db.scarpe[0]) {
-                const s1 = db.scarpe[0];
-                const rem1 = Math.max(0, +(s1.vita_utile - s1.km_percorsi).toFixed(1));
-                document.getElementById('kpi-shoe1-name').textContent = s1.nome;
-                document.getElementById('kpi-shoe1-rem').textContent = `${rem1} km`;
-                document.getElementById('kpi-shoe1-sub').textContent = `${s1.km_percorsi} / ${s1.vita_utile} km · Rimanenti`;
+                const s1 = db.scarpe[0]; const rem1 = Math.max(0, +(s1.vita_utile - s1.km_percorsi).toFixed(1));
+                document.getElementById('kpi-shoe1-name').textContent = s1.nome; document.getElementById('kpi-shoe1-rem').textContent = `${rem1} km`; document.getElementById('kpi-shoe1-sub').textContent = `${s1.km_percorsi} / ${s1.vita_utile} km · Rimanenti`;
             }
             if (db.scarpe[1]) {
-                const s2 = db.scarpe[1];
-                const rem2 = Math.max(0, +(s2.vita_utile - s2.km_percorsi).toFixed(1));
-                document.getElementById('kpi-shoe2-name').textContent = s2.nome;
-                document.getElementById('kpi-shoe2-rem').textContent = `${rem2} km`;
-                document.getElementById('kpi-shoe2-sub').textContent = `${s2.km_percorsi} / ${s2.vita_utile} km · Rimanenti`;
+                const s2 = db.scarpe[1]; const rem2 = Math.max(0, +(s2.vita_utile - s2.km_percorsi).toFixed(1));
+                document.getElementById('kpi-shoe2-name').textContent = s2.nome; document.getElementById('kpi-shoe2-rem').textContent = `${rem2} km`; document.getElementById('kpi-shoe2-sub').textContent = `${s2.km_percorsi} / ${s2.vita_utile} km · Rimanenti`;
             }
 
             const today = new Date();
             const d10k = Math.max(0, Math.ceil((new Date("2027-02-14") - today) / (1000 * 60 * 60 * 24)));
             const d21k = Math.max(0, Math.ceil((new Date("2027-04-18") - today) / (1000 * 60 * 60 * 24)));
-            document.getElementById('kpi-cd-21k').textContent = `${d21k} gg`;
-            document.getElementById('kpi-cd-sub').textContent = `Test 10k tra ${d10k} gg`;
+            document.getElementById('kpi-cd-21k').textContent = `${d21k} gg`; document.getElementById('kpi-cd-sub').textContent = `Test 10k tra ${d10k} gg`;
 
-            updateTotalsUI();
-            updateReadiness(false);
-            renderUpcoming();
-            renderWeeklySummary();
-            renderDiario();
-            renderRaces();
-            recalcZones();
-            renderStrength();
-            renderShoesAndRules();
+            updateTotalsUI(); updateReadiness(false); renderUpcoming(); renderWeeklySummary(); renderDiario(); renderRaces(); recalcZones(); renderStrength(); renderShoesAndRules();
         }
 
         function renderThresholdDisplays() {
@@ -1295,15 +942,8 @@
             const histList = document.getElementById('threshold-history-list');
             if (s.storico && s.storico.length > 0) {
                 histBox.classList.remove('hidden');
-                histList.innerHTML = s.storico.map((item, idx) => `
-                    <span class="inline-flex items-center gap-2 text-xs bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg font-mono text-slate-700">
-                        <span><strong>${item.data}</strong>: ${item.fc_bpm} bpm · ${item.passo}/km · ${item.potenza_w}W (${item.potenza_w_kg} W/kg)</span>
-                        <button onclick="deleteThresholdHistory(${idx})" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-xmark"></i></button>
-                    </span>
-                `).join('');
-            } else {
-                histBox.classList.add('hidden');
-            }
+                histList.innerHTML = s.storico.map((item, idx) => `<span class="inline-flex items-center gap-2 text-xs bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg font-mono text-slate-700"><span><strong>${item.data}</strong>: ${item.fc_bpm} bpm · ${item.passo}/km · ${item.potenza_w}W (${item.potenza_w_kg} W/kg)</span><button onclick="deleteThresholdHistory(${idx})" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-xmark"></i></button></span>`).join('');
+            } else { histBox.classList.add('hidden'); }
         }
 
         function saveThresholdInline() {
@@ -1312,30 +952,17 @@
             db.soglia.potenza_w = parseInt(document.getElementById('soglia-w').value) || 350;
             db.soglia.potenza_w_kg = parseFloat(document.getElementById('soglia-wkg').value) || 5.00;
             db.soglia.data_rilevamento = document.getElementById('soglia-data').value || getLocalTodayISO();
-            saveLocal();
-            renderThresholdDisplays();
-            recalcZones();
+            saveLocal(); renderThresholdDisplays(); recalcZones();
         }
 
         function archiveThresholdSnapshot() {
             db.soglia.storico = db.soglia.storico || [];
-            db.soglia.storico.unshift({
-                data: db.soglia.data_rilevamento || getLocalTodayISO(),
-                fc_bpm: db.soglia.fc_bpm,
-                passo: db.soglia.passo,
-                potenza_w: db.soglia.potenza_w,
-                potenza_w_kg: db.soglia.potenza_w_kg
-            });
-            saveLocal();
-            renderThresholdDisplays();
+            db.soglia.storico.unshift({ data: db.soglia.data_rilevamento || getLocalTodayISO(), fc_bpm: db.soglia.fc_bpm, passo: db.soglia.passo, potenza_w: db.soglia.potenza_w, potenza_w_kg: db.soglia.potenza_w_kg });
+            saveLocal(); renderThresholdDisplays();
         }
 
         function deleteThresholdHistory(idx) {
-            if (db.soglia.storico) {
-                db.soglia.storico.splice(idx, 1);
-                saveLocal();
-                renderThresholdDisplays();
-            }
+            if (db.soglia.storico) { db.soglia.storico.splice(idx, 1); saveLocal(); renderThresholdDisplays(); }
         }
 
         function openThresholdModal() {
@@ -1345,8 +972,7 @@
             document.getElementById('m-soglia-w').value = s.potenza_w;
             document.getElementById('m-soglia-wkg').value = s.potenza_w_kg;
             document.getElementById('m-soglia-data').value = s.data_rilevamento || getLocalTodayISO();
-            const m = document.getElementById('modal-threshold');
-            m.classList.remove('hidden'); m.classList.add('flex');
+            const m = document.getElementById('modal-threshold'); m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function saveThresholdModal() {
@@ -1355,10 +981,7 @@
             db.soglia.potenza_w = parseInt(document.getElementById('m-soglia-w').value) || 350;
             db.soglia.potenza_w_kg = parseFloat(document.getElementById('m-soglia-wkg').value) || 5.00;
             db.soglia.data_rilevamento = document.getElementById('m-soglia-data').value || getLocalTodayISO();
-            restoreSavedInputs();
-            saveLocal();
-            closeModals();
-            renderAll();
+            restoreSavedInputs(); saveLocal(); closeModals(); renderAll();
         }
 
         function updateReadiness(shouldSave = true) {
@@ -1367,89 +990,48 @@
             const polpaccio = document.getElementById('input-polpaccio').value;
             const baseFc = db.atleta.fc_riposo || 60;
 
-            if (shouldSave) {
-                db.ui.readiness = { fc, schiena, polpaccio };
-                saveLocal();
-            }
+            if (shouldSave) { db.ui.readiness = { fc, schiena, polpaccio }; saveLocal(); }
 
             const badge = document.getElementById('readiness-badge');
             const advice = document.getElementById('readiness-advice');
 
             if (schiena === 'dolore' || polpaccio === 'dolore' || fc >= baseFc + 8) {
-                badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800";
-                badge.textContent = "SEMAFORO ROSSO — RIPOSO / RULLI";
-                advice.className = "text-sm bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-lg";
-                advice.innerHTML = `<strong>Stop precauzionale attivo:</strong> Hai segnalato dolore o un aumento della FC a riposo di +${fc - baseFc} bpm. Niente corsa oggi.`;
+                badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800"; badge.textContent = "SEMAFORO ROSSO — RIPOSO / RULLI";
+                advice.className = "text-sm bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-lg"; advice.innerHTML = `<strong>Stop precauzionale attivo:</strong> Niente corsa oggi.`;
             } else if (schiena === 'lieve' || polpaccio === 'affaticato' || fc >= baseFc + 5) {
-                badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800";
-                badge.textContent = "SEMAFORO GIALLO — CAUTELA";
-                advice.className = "text-sm bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-lg";
-                advice.innerHTML = `<strong>Attenzione al carico:</strong> Leggero affaticamento rilevato. Mantieni i battiti sotto i <strong>135 bpm</strong> ed evita gli allunghi.`;
+                badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800"; badge.textContent = "SEMAFORO GIALLO — CAUTELA";
+                advice.className = "text-sm bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-lg"; advice.innerHTML = `<strong>Attenzione al carico:</strong> Mantieni i battiti sotto i <strong>135 bpm</strong> ed evita gli allunghi.`;
             } else {
-                badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800";
-                badge.textContent = "SEMAFORO VERDE — OK PER CORRERE";
-                advice.className = "text-sm bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-lg";
-                advice.innerHTML = `Parametri nella norma (${fc} bpm). Puoi svolgere regolarmente la seduta prevista mantenendo i battiti tra <strong>125 e 145 bpm</strong> nelle corse facili.`;
+                badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800"; badge.textContent = "SEMAFORO VERDE — OK PER CORRERE";
+                advice.className = "text-sm bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-lg"; advice.innerHTML = `Parametri nella norma (${fc} bpm). Puoi correre tra <strong>125 e 145 bpm</strong> nelle corse facili.`;
             }
         }
 
         function renderUpcoming() {
-            const oggiIso = getLocalTodayISO();
-            const domaniIso = addDaysISO(oggiIso, 1);
-            const dopoDomaniIso = addDaysISO(oggiIso, 2);
+            const oggiIso = getLocalTodayISO(); const domaniIso = addDaysISO(oggiIso, 1); const dopoDomaniIso = addDaysISO(oggiIso, 2);
             document.getElementById('upcoming-today-lbl').textContent = `Oggi: ${oggiIso}`;
 
-            const windowItems = db.allenamenti_settimana
-                .map((a, idx) => ({ ...a, idx }))
-                .filter(a => a.data >= oggiIso && a.data <= dopoDomaniIso);
-
+            const windowItems = db.allenamenti_settimana.map((a, idx) => ({ ...a, idx })).filter(a => a.data >= oggiIso && a.data <= dopoDomaniIso);
             const container = document.getElementById('upcoming-list');
-            if (!windowItems.length) {
-                container.innerHTML = `<p class="text-xs text-slate-400">Nessuna seduta per oggi (${oggiIso}) e i prossimi 2 giorni. Clicca su <strong>Importa Backup (.json)</strong> nella sidebar se stai facendo il primo accesso.</p>`;
-                return;
-            }
+            if (!windowItems.length) { container.innerHTML = `<p class="text-xs text-slate-400">Nessuna seduta per oggi (${oggiIso}) e i prossimi 2 giorni.</p>`; return; }
 
             container.innerHTML = windowItems.map(a => {
                 let dayTag = `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-700">TRA 2 GIORNI</span>`;
                 let cardStyle = "bg-slate-50 border-slate-200";
-                if (a.data === oggiIso) {
-                    dayTag = `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-blue-600 text-white">OGGI</span>`;
-                    cardStyle = "bg-blue-50/70 border-blue-300 ring-1 ring-blue-200";
-                } else if (a.data === domaniIso) {
-                    dayTag = `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-100 text-indigo-700">DOMANI</span>`;
-                }
+                if (a.data === oggiIso) { dayTag = `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-blue-600 text-white">OGGI</span>`; cardStyle = "bg-blue-50/70 border-blue-300 ring-1 ring-blue-200"; } 
+                else if (a.data === domaniIso) { dayTag = `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-100 text-indigo-700">DOMANI</span>`; }
 
-                const statusIcon = a.stato === 'completato'
-                    ? `<i class="fa-solid fa-circle-check text-emerald-600 ml-1"></i>`
-                    : (a.stato === 'saltato' ? `<i class="fa-solid fa-circle-xmark text-rose-500 ml-1"></i>` : '');
+                const statusIcon = a.stato === 'completato' ? `<i class="fa-solid fa-circle-check text-emerald-600 ml-1"></i>` : (a.stato === 'saltato' ? `<i class="fa-solid fa-circle-xmark text-rose-500 ml-1"></i>` : '');
+                const targetBadge = a.km_previsti > 0 ? `${a.km_previsti} km` : (Number(a.km_rulli) > 0 ? `${a.km_rulli} km rulli` : 'Cross/Forza');
 
-                const targetBadge = a.km_previsti > 0
-                    ? `${a.km_previsti} km`
-                    : (Number(a.km_rulli) > 0 ? `${a.km_rulli} km rulli` : 'Cross/Forza');
-
-                return `
-                    <div onclick="openCompleteModal(${a.idx})" class="p-3 rounded-lg border ${cardStyle} flex justify-between items-center cursor-pointer hover:shadow-xs transition">
-                        <div class="min-w-0 pr-2">
-                            <div class="flex items-center gap-1.5 mb-0.5">
-                                ${dayTag}
-                                <span class="text-[11px] font-mono text-slate-500">${a.data} (${a.giorno || ''})</span>
-                                ${statusIcon}
-                            </div>
-                            <div class="font-bold text-sm text-slate-900 truncate">${a.tipo}</div>
-                            <div class="text-[11px] text-slate-500 truncate">${a.dettaglio || ''}</div>
-                        </div>
-                        <span class="shrink-0 text-xs font-bold px-2.5 py-1 rounded bg-white border border-slate-200 text-blue-700">${targetBadge}</span>
-                    </div>
-                `;
+                return `<div onclick="openCompleteModal(${a.idx})" class="p-3 rounded-lg border ${cardStyle} flex justify-between items-center cursor-pointer hover:shadow-xs transition"><div class="min-w-0 pr-2"><div class="flex items-center gap-1.5 mb-0.5">${dayTag}<span class="text-[11px] font-mono text-slate-500">${a.data} (${a.giorno || ''})</span>${statusIcon}</div><div class="font-bold text-sm text-slate-900 truncate">${a.tipo}</div><div class="text-[11px] text-slate-500 truncate">${a.dettaglio || ''}</div></div><span class="shrink-0 text-xs font-bold px-2.5 py-1 rounded bg-white border border-slate-200 text-blue-700">${targetBadge}</span></div>`;
             }).join('');
         }
 
         function renderWeeklySummary() {
             const weeks = [
-                { label: "26 Ott – 1 Nov", fase: "Recupero post-gara", da: "2026-10-26", a: "2026-11-01" },
-                { label: "2 Nov – 8 Nov", fase: "Fermo / Rientro", da: "2026-11-02", a: "2026-11-08" },
-                { label: "9 Nov – 15 Nov", fase: "Settimana Rientro", da: "2026-11-09", a: "2026-11-15" },
-                { label: "16 Nov – 22 Nov", fase: "Inizio Base", da: "2026-11-16", a: "2026-11-22" }
+                { label: "26 Ott – 1 Nov", fase: "Recupero", da: "2026-10-26", a: "2026-11-01" }, { label: "2 Nov – 8 Nov", fase: "Fermo", da: "2026-11-02", a: "2026-11-08" },
+                { label: "9 Nov – 15 Nov", fase: "Rientro", da: "2026-11-09", a: "2026-11-15" }, { label: "16 Nov – 22 Nov", fase: "Inizio Base", da: "2026-11-16", a: "2026-11-22" }
             ];
 
             document.getElementById('weekly-summary-body').innerHTML = weeks.map(w => {
@@ -1458,64 +1040,30 @@
                 const fatti = items.reduce((s, x) => s + (Number(x.km_fatti) || 0), 0);
                 const rulli = items.reduce((s, x) => s + (Number(x.km_rulli) || 0), 0);
                 const pct = prev > 0 ? Math.min(100, Math.round((fatti / prev) * 100)) : 100;
-                return `
-                    <tr>
-                        <td class="p-3 font-semibold text-slate-800">${w.label}</td>
-                        <td class="p-3 text-slate-500">${w.fase}</td>
-                        <td class="p-3 font-mono">${prev.toFixed(1)} km</td>
-                        <td class="p-3 font-mono font-bold text-blue-600">${fatti.toFixed(1)} km</td>
-                        <td class="p-3 font-mono font-bold text-cyan-700">${rulli.toFixed(1)} km</td>
-                        <td class="p-3 w-40">
-                            <div class="w-full bg-slate-200 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width:${pct}%"></div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+                return `<tr><td class="p-3 font-semibold text-slate-800">${w.label}</td><td class="p-3 text-slate-500">${w.fase}</td><td class="p-3 font-mono">${prev.toFixed(1)} km</td><td class="p-3 font-mono font-bold text-blue-600">${fatti.toFixed(1)} km</td><td class="p-3 font-mono font-bold text-cyan-700">${rulli.toFixed(1)} km</td><td class="p-3 w-40"><div class="w-full bg-slate-200 rounded-full h-2"><div class="bg-blue-600 h-2 rounded-full" style="width:${pct}%"></div></div></td></tr>`;
             }).join('');
 
             const allPrev = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_previsti) || 0), 0);
             const allFatti = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_fatti) || 0), 0);
             const allRulli = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_rulli) || 0), 0);
 
-            document.getElementById('weekly-summary-foot').innerHTML = `
-                <tr>
-                    <td class="p-3 rounded-bl-lg" colspan="2">TOTALE GENERALE DIARIO</td>
-                    <td class="p-3 font-mono">${allPrev.toFixed(1)} km</td>
-                    <td class="p-3 font-mono text-blue-300">${allFatti.toFixed(1)} km</td>
-                    <td class="p-3 font-mono text-cyan-300">${allRulli.toFixed(1)} km</td>
-                    <td class="p-3 rounded-br-lg text-slate-300">Corsa + Rulli: ${(allFatti + allRulli).toFixed(1)} km</td>
-                </tr>
-            `;
+            document.getElementById('weekly-summary-foot').innerHTML = `<tr><td class="p-3 rounded-bl-lg" colspan="2">TOTALE GENERALE DIARIO</td><td class="p-3 font-mono">${allPrev.toFixed(1)} km</td><td class="p-3 font-mono text-blue-300">${allFatti.toFixed(1)} km</td><td class="p-3 font-mono text-cyan-300">${allRulli.toFixed(1)} km</td><td class="p-3 rounded-br-lg text-slate-300">Corsa + Rulli: ${(allFatti + allRulli).toFixed(1)} km</td></tr>`;
         }
 
-        function filterDiario(f) {
-            db.ui.diarioFilter = f;
-            saveLocal();
-            renderDiario();
-        }
+        function filterDiario(f) { db.ui.diarioFilter = f; saveLocal(); renderDiario(); }
 
         function updateRulliKm(idx, rawVal) {
             const val = rawVal === '' ? null : parseFloat(rawVal);
             db.allenamenti_settimana[idx].km_rulli = isNaN(val) ? null : val;
-            if (val && val > 0 && db.allenamenti_settimana[idx].stato === 'da_fare') {
-                db.allenamenti_settimana[idx].stato = 'completato';
-            }
-            saveLocal();
-            updateTotalsUI();
-            renderWeeklySummary();
-            renderUpcoming();
+            if (val && val > 0 && db.allenamenti_settimana[idx].stato === 'da_fare') db.allenamenti_settimana[idx].stato = 'completato';
+            saveLocal(); updateTotalsUI(); renderWeeklySummary(); renderUpcoming();
         }
 
         function renderDiario() {
-            const currentFilter = db.ui.diarioFilter || 'all';
-            const oggiIso = getLocalTodayISO();
+            const currentFilter = db.ui.diarioFilter || 'all'; const oggiIso = getLocalTodayISO();
             ['all', 'nov_rientro', 'nov_base', 'storico'].forEach(key => {
                 const btn = document.getElementById('flt-' + key);
-                if (!btn) return;
-                btn.className = key === currentFilter
-                    ? "filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white"
-                    : "filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200";
+                if (btn) btn.className = key === currentFilter ? "filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white" : "filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200";
             });
 
             const tbody = document.getElementById('diario-tbody');
@@ -1526,10 +1074,7 @@
                 return true;
             });
 
-            if (!rows.length) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-sm text-slate-400">Nessuna seduta presente. Usa <strong>Importa Backup (.json)</strong> nella sidebar oppure <strong>+ Nuova Seduta</strong>.</td></tr>`;
-                return;
-            }
+            if (!rows.length) { tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-sm text-slate-400">Nessuna seduta presente.</td></tr>`; return; }
 
             tbody.innerHTML = rows.map(a => {
                 let badge = `<span class="px-2 py-1 rounded text-xs font-semibold bg-amber-100 text-amber-800">DA FARE</span>`;
@@ -1540,519 +1085,149 @@
                 const rulliVal = (a.km_rulli !== null && a.km_rulli !== undefined && a.km_rulli !== 0) ? a.km_rulli : '';
                 const isRulliRow = a.tipo.toLowerCase().includes('rulli');
 
-                return `
-                    <tr class="${isToday ? 'bg-blue-50/60' : 'hover:bg-slate-50'} transition">
-                        <td class="p-3.5 font-mono text-xs whitespace-nowrap">
-                            <div class="font-bold text-slate-800 flex items-center gap-1.5">
-                                ${a.data}
-                                ${isToday ? '<span class="px-1.5 py-0.5 text-[9px] bg-blue-600 text-white rounded font-sans">OGGI</span>' : ''}
-                            </div>
-                            <div class="text-slate-400">${a.giorno || ''}</div>
-                        </td>
-                        <td class="p-3.5">
-                            <div class="font-bold text-slate-900">${a.tipo}</div>
-                            <div class="text-xs text-slate-500">${a.dettaglio || ''}</div>
-                            ${a.note ? `<div class="text-xs text-blue-600 mt-0.5"><i class="fa-solid fa-note-sticky mr-1"></i>${a.note}</div>` : ''}
-                        </td>
-                        <td class="p-3.5 font-mono font-semibold">${a.km_previsti > 0 ? a.km_previsti + ' km' : '-'}</td>
-                        <td class="p-3.5 font-mono text-xs">
-                            ${a.km_fatti !== null && a.km_fatti !== undefined && a.km_fatti > 0 ? `<strong>${a.km_fatti} km</strong>` : '<span class="text-slate-400">--</span>'}
-                            ${a.passo && a.passo !== '-' ? `<div class="text-slate-500">${a.passo}</div>` : ''}
-                        </td>
-                        <td class="p-3.5 whitespace-nowrap">
-                            <div class="flex items-center gap-1">
-                                <input type="number" step="0.1" value="${rulliVal}" oninput="updateRulliKm(${a.idx}, this.value)" placeholder="${isRulliRow ? 'km' : '-'}" class="w-16 text-xs font-mono font-bold text-right border ${isRulliRow ? 'border-cyan-300 bg-cyan-50/50 text-cyan-900' : 'border-slate-200 bg-white text-slate-700'} rounded px-2 py-1">
-                                <span class="text-[11px] text-slate-400">km</span>
-                            </div>
-                        </td>
-                        <td class="p-3.5 text-xs font-medium">${a.scarpa || '-'}</td>
-                        <td class="p-3.5">${badge}</td>
-                        <td class="p-3.5 text-right whitespace-nowrap space-x-1">
-                            <button onclick="openCompleteModal(${a.idx})" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded text-xs font-semibold transition">
-                                <i class="fa-solid fa-check"></i> Sync
-                            </button>
-                            <button onclick="openSkipModal(${a.idx})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-xs font-semibold transition">
-                                <i class="fa-solid fa-xmark"></i> Salta
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                return `<tr class="${isToday ? 'bg-blue-50/60' : 'hover:bg-slate-50'} transition"><td class="p-3.5 font-mono text-xs whitespace-nowrap"><div class="font-bold text-slate-800 flex items-center gap-1.5">${a.data} ${isToday ? '<span class="px-1.5 py-0.5 text-[9px] bg-blue-600 text-white rounded font-sans">OGGI</span>' : ''}</div><div class="text-slate-400">${a.giorno || ''}</div></td><td class="p-3.5"><div class="font-bold text-slate-900">${a.tipo}</div><div class="text-xs text-slate-500">${a.dettaglio || ''}</div>${a.note ? `<div class="text-xs text-blue-600 mt-0.5"><i class="fa-solid fa-note-sticky mr-1"></i>${a.note}</div>` : ''}</td><td class="p-3.5 font-mono font-semibold">${a.km_previsti > 0 ? a.km_previsti + ' km' : '-'}</td><td class="p-3.5 font-mono text-xs">${a.km_fatti !== null && a.km_fatti !== undefined && a.km_fatti > 0 ? `<strong>${a.km_fatti} km</strong>` : '<span class="text-slate-400">--</span>'} ${a.passo && a.passo !== '-' ? `<div class="text-slate-500">${a.passo}</div>` : ''}</td><td class="p-3.5 whitespace-nowrap"><div class="flex items-center gap-1"><input type="number" step="0.1" value="${rulliVal}" oninput="updateRulliKm(${a.idx}, this.value)" placeholder="${isRulliRow ? 'km' : '-'}" class="w-16 text-xs font-mono font-bold text-right border ${isRulliRow ? 'border-cyan-300 bg-cyan-50/50 text-cyan-900' : 'border-slate-200 bg-white text-slate-700'} rounded px-2 py-1"><span class="text-[11px] text-slate-400">km</span></div></td><td class="p-3.5 text-xs font-medium">${a.scarpa || '-'}</td><td class="p-3.5">${badge}</td><td class="p-3.5 text-right whitespace-nowrap space-x-1"><button onclick="openCompleteModal(${a.idx})" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded text-xs font-semibold transition"><i class="fa-solid fa-check"></i> Sync</button><button onclick="openSkipModal(${a.idx})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-xs font-semibold transition"><i class="fa-solid fa-xmark"></i> Salta</button></td></tr>`;
             }).join('');
         }
 
         function renderRaces() {
             document.getElementById('races-list').innerHTML = db.gare.map(g => {
-                const isMain = g.tipo.includes('Principale');
-                const isTest = g.tipo.includes('Test');
-                const color = isMain ? 'border-indigo-500 bg-indigo-50/40' : (isTest ? 'border-amber-500 bg-amber-50/40' : 'border-slate-300 bg-slate-50');
-                return `
-                    <div class="p-4 rounded-xl border-l-4 ${color} flex justify-between items-center">
-                        <div>
-                            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">${g.tipo} · ${g.distanza}</span>
-                            <h4 class="font-bold text-slate-900">${g.nome}</h4>
-                        </div>
-                        <div class="text-right font-mono font-bold text-sm text-slate-700">${g.data}</div>
-                    </div>
-                `;
+                const isMain = g.tipo.includes('Principale'); const color = isMain ? 'border-indigo-500 bg-indigo-50/40' : (g.tipo.includes('Test') ? 'border-amber-500 bg-amber-50/40' : 'border-slate-300 bg-slate-50');
+                return `<div class="p-4 rounded-xl border-l-4 ${color} flex justify-between items-center"><div><span class="text-xs font-bold uppercase tracking-wider text-slate-500">${g.tipo} · ${g.distanza}</span><h4 class="font-bold text-slate-900">${g.nome}</h4></div><div class="text-right font-mono font-bold text-sm text-slate-700">${g.data}</div></div>`;
             }).join('');
         }
 
-        function timeToSec(str) {
-            const parts = str.trim().split(':').map(Number);
-            if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
-            if (parts.length === 2) return parts[0]*60 + parts[1];
-            return 270;
-        }
-
-        function secToPace(secPerKm) {
-            const m = Math.floor(Math.round(secPerKm) / 60);
-            const s = (Math.round(secPerKm) % 60).toString().padStart(2, '0');
-            return `${m}'${s}"/km`;
-        }
+        function timeToSec(str) { const p = str.trim().split(':').map(Number); return p.length === 3 ? p[0]*3600 + p[1]*60 + p[2] : (p.length === 2 ? p[0]*60 + p[1] : 270); }
+        function secToPace(sec) { const m = Math.floor(Math.round(sec) / 60); const s = (Math.round(sec) % 60).toString().padStart(2, '0'); return `${m}'${s}"/km`; }
 
         function savePbAndRecalc() {
-            db.pb["5k"] = document.getElementById('pb-5k').value;
-            db.pb["10k"] = document.getElementById('pb-10k').value;
-            db.pb["21k"] = document.getElementById('pb-21k').value;
-            db.pb.garmin_5k = document.getElementById('garmin-5k').value;
-            db.pb.garmin_10k = document.getElementById('garmin-10k').value;
-            db.pb.garmin_21k = document.getElementById('garmin-21k').value;
-            saveLocal();
-            recalcZones();
+            db.pb["5k"] = document.getElementById('pb-5k').value; db.pb["10k"] = document.getElementById('pb-10k').value; db.pb["21k"] = document.getElementById('pb-21k').value;
+            db.pb.garmin_5k = document.getElementById('garmin-5k').value; db.pb.garmin_10k = document.getElementById('garmin-10k').value; db.pb.garmin_21k = document.getElementById('garmin-21k').value;
+            saveLocal(); recalcZones();
         }
 
         function recalcZones() {
-            const t10 = timeToSec(document.getElementById('pb-10k').value);
-            const t21 = timeToSec(document.getElementById('pb-21k').value);
-            const pace10 = t10 / 10;
-            const pace21 = t21 / 21.0975;
+            const ratio = (timeToSec(document.getElementById('pb-21k').value) / 21.0975) / (timeToSec(document.getElementById('pb-10k').value) / 10);
+            document.getElementById('endurance-index-box').innerHTML = `<strong>Indice di Resistenza: ${ratio.toFixed(2)}</strong><br>${ratio > 1.07 ? "Profilo veloce: dopo il 21/11 lavoreremo sull'estensione dei lunghi." : "Ottima resistenza aerobica."}`;
 
-            const ratio = (pace21 / pace10).toFixed(2);
-            let profileMsg = ratio > 1.07
-                ? "Profilo veloce con ottimo motore anaerobico (soglia " + db.soglia.passo + "/km): dopo il 21/11 lavoreremo sull'estensione graduale dei lunghi."
-                : "Ottimo indice di resistenza aerobica: reggi molto bene il passaggio dai 10 km alla mezza maratona.";
-
-            document.getElementById('endurance-index-box').innerHTML = `
-                <strong>Indice di Resistenza (Passo 21k / Passo 10k): ${ratio}</strong> (Passo 10k: ${secToPace(pace10)} vs Passo 21k: ${secToPace(pace21)}).<br>${profileMsg}
-            `;
-
-            const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
-            const lthr = Number(s.fc_bpm) || 180;
-            const ltSec = timeToSec(s.passo || "4:30");
-            const ltW = Number(s.potenza_w) || 350;
-
-            const titleEl = document.getElementById('zones-table-title');
-            if (titleEl) titleEl.textContent = `Zone Dinamiche (Calibrate su Soglia ${lthr} bpm · ${s.passo}/km · ${ltW} W)`;
+            const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia; const lthr = Number(s.fc_bpm) || 180; const ltSec = timeToSec(s.passo || "4:30"); const ltW = Number(s.potenza_w) || 350;
+            const titleEl = document.getElementById('zones-table-title'); if (titleEl) titleEl.textContent = `Zone (Soglia ${lthr} bpm · ${s.passo}/km · ${ltW} W)`;
 
             const zones = [
                 { z: "Z1 — Recupero Attivo", passo: `> ${secToPace(ltSec * 1.25)}`, fc: `< ${Math.round(lthr * 0.80)} bpm`, watt: `< ${Math.round(ltW * 0.75)} W` },
-                { z: "Z2 — Fondo Lento (Base)", passo: `${secToPace(ltSec * 1.15)} – ${secToPace(ltSec * 1.25)}`, fc: `${Math.round(lthr * 0.80)}–${Math.round(lthr * 0.88)} bpm (rientro 125–145)`, watt: `${Math.round(ltW * 0.75)}–${Math.round(ltW * 0.86)} W` },
+                { z: "Z2 — Fondo Lento (Base)", passo: `${secToPace(ltSec * 1.15)} – ${secToPace(ltSec * 1.25)}`, fc: `${Math.round(lthr * 0.80)}–${Math.round(lthr * 0.88)} bpm`, watt: `${Math.round(ltW * 0.75)}–${Math.round(ltW * 0.86)} W` },
                 { z: "Z3 — Medio / Ritmo Mezza", passo: `${secToPace(ltSec * 1.06)} – ${secToPace(ltSec * 1.14)}`, fc: `${Math.round(lthr * 0.89)}–${Math.round(lthr * 0.94)} bpm`, watt: `${Math.round(ltW * 0.87)}–${Math.round(ltW * 0.95)} W` },
                 { z: "Z4 — Soglia Anaerobica", passo: `${secToPace(ltSec * 0.99)} – ${secToPace(ltSec * 1.05)}`, fc: `${Math.round(lthr * 0.95)}–${lthr} bpm`, watt: `${Math.round(ltW * 0.96)}–${Math.round(ltW * 1.02)} W` },
-                { z: "Z5 — VO2max / Ripetute Brevi", passo: `< ${secToPace(ltSec * 0.98)}`, fc: `> ${lthr} bpm`, watt: `> ${Math.round(ltW * 1.02)} W` }
+                { z: "Z5 — VO2max", passo: `< ${secToPace(ltSec * 0.98)}`, fc: `> ${lthr} bpm`, watt: `> ${Math.round(ltW * 1.02)} W` }
             ];
 
-            document.getElementById('pace-zones-tbody').innerHTML = zones.map(z => `
-                <tr>
-                    <td class="p-2.5 font-bold text-slate-800">${z.z}</td>
-                    <td class="p-2.5 font-mono font-bold text-blue-600">${z.passo}</td>
-                    <td class="p-2.5 font-mono text-xs text-rose-600 font-semibold">${z.fc}</td>
-                    <td class="p-2.5 font-mono text-xs text-amber-700 font-semibold">${z.watt}</td>
-                </tr>
-            `).join('');
+            document.getElementById('pace-zones-tbody').innerHTML = zones.map(z => `<tr><td class="p-2.5 font-bold text-slate-800">${z.z}</td><td class="p-2.5 font-mono font-bold text-blue-600">${z.passo}</td><td class="p-2.5 font-mono text-xs text-rose-600 font-semibold">${z.fc}</td><td class="p-2.5 font-mono text-xs text-amber-700 font-semibold">${z.watt}</td></tr>`).join('');
 
             const w = db.atleta.peso_kg;
-            const carbs = Math.round(w * 0.7);
-            const water = Math.round(w * 7.5);
-            document.getElementById('nutrition-list').innerHTML = `
-                <li class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                    <div class="text-xs text-slate-500">Carboidrati target (> 90 min)</div>
-                    <div class="font-bold text-slate-900">~${carbs} g / ora (2 gel ogni 40-45')</div>
-                </li>
-                <li class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                    <div class="text-xs text-slate-500">Idratazione stimata</div>
-                    <div class="font-bold text-slate-900">~${water} ml / ora + elettroliti</div>
-                </li>
-                <li class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                    <div class="text-xs text-slate-500">Recupero post-lungo (entro 45')</div>
-                    <div class="font-bold text-slate-900">${Math.round(w * 1.0)}g carbo + ${Math.round(w * 0.3)}g proteine</div>
-                </li>
-            `;
+            document.getElementById('nutrition-list').innerHTML = `<li class="p-3 rounded-lg bg-slate-50 border border-slate-200"><div class="text-xs text-slate-500">Carboidrati target (> 90 min)</div><div class="font-bold text-slate-900">~${Math.round(w * 0.7)} g / ora</div></li><li class="p-3 rounded-lg bg-slate-50 border border-slate-200"><div class="text-xs text-slate-500">Idratazione stimata</div><div class="font-bold text-slate-900">~${Math.round(w * 7.5)} ml / ora + elettroliti</div></li><li class="p-3 rounded-lg bg-slate-50 border border-slate-200"><div class="text-xs text-slate-500">Recupero post-lungo (entro 45')</div><div class="font-bold text-slate-900">${Math.round(w * 1.0)}g carbo + ${Math.round(w * 0.3)}g proteine</div></li>`;
         }
 
         function renderStrength() {
-            document.getElementById('strength-cards-container').innerHTML = db.forza.map((scheda, sIdx) => `
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
-                        <h4 class="font-bold text-slate-900">${scheda.titolo}</h4>
-                        <span class="text-xs px-2.5 py-1 rounded bg-blue-50 text-blue-700 font-semibold">${scheda.badge}</span>
-                    </div>
-                    <div class="space-y-3">
-                        ${scheda.esercizi.map((ex, eIdx) => `
-                            <div class="p-3 rounded-xl ${ex.fatto ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 border-slate-200/80'} border flex items-center justify-between gap-3 hover:border-blue-300 transition">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <input type="checkbox" ${ex.fatto ? 'checked' : ''} onchange="toggleExerciseDone(${sIdx}, ${eIdx}, this.checked)" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0">
-                                    <button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="group relative shrink-0 focus:outline-none">
-                                        ${getExerciseSVG(ex.imgKey || 'squat', false)}
-                                        <span class="absolute bottom-0.5 right-0.5 bg-slate-900/75 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 transition">
-                                            <i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        </span>
-                                    </button>
-                                    <div class="min-w-0">
-                                        <button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="font-bold text-sm ${ex.fatto ? 'line-through text-slate-400' : 'text-slate-900 hover:text-blue-600'} text-left block truncate">
-                                            ${ex.nome}
-                                        </button>
-                                        <div class="text-xs font-mono text-blue-600">${ex.serie} · rec ${ex.rec}</div>
-                                        <div class="text-xs text-slate-500 line-clamp-2 mt-0.5">${ex.note}</div>
-                                    </div>
-                                </div>
-                                <input type="text" value="${ex.carico || ''}" oninput="updateLoad(${sIdx}, ${eIdx}, this.value)" placeholder="kg / note" class="w-24 shrink-0 text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-right font-mono">
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
+            document.getElementById('strength-cards-container').innerHTML = db.forza.map((scheda, sIdx) => `<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200"><div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100"><h4 class="font-bold text-slate-900">${scheda.titolo}</h4><span class="text-xs px-2.5 py-1 rounded bg-blue-50 text-blue-700 font-semibold">${scheda.badge}</span></div><div class="space-y-3">${scheda.esercizi.map((ex, eIdx) => `<div class="p-3 rounded-xl ${ex.fatto ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 border-slate-200/80'} border flex items-center justify-between gap-3 hover:border-blue-300 transition"><div class="flex items-center gap-3 min-w-0"><input type="checkbox" ${ex.fatto ? 'checked' : ''} onchange="toggleExerciseDone(${sIdx}, ${eIdx}, this.checked)" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"><button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="group relative shrink-0 focus:outline-none">${getExerciseSVG(ex.imgKey || 'squat', false)}<span class="absolute bottom-0.5 right-0.5 bg-slate-900/75 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-magnifying-glass-plus"></i></span></button><div class="min-w-0"><button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="font-bold text-sm ${ex.fatto ? 'line-through text-slate-400' : 'text-slate-900 hover:text-blue-600'} text-left block truncate">${ex.nome}</button><div class="text-xs font-mono text-blue-600">${ex.serie} · rec ${ex.rec}</div><div class="text-xs text-slate-500 line-clamp-2 mt-0.5">${ex.note}</div></div></div><input type="text" value="${ex.carico || ''}" oninput="updateLoad(${sIdx}, ${eIdx}, this.value)" placeholder="kg/note" class="w-24 shrink-0 text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-right font-mono"></div>`).join('')}</div></div>`).join('');
         }
 
-        function toggleExerciseDone(sIdx, eIdx, checked) {
-            db.forza[sIdx].esercizi[eIdx].fatto = checked;
-            saveLocal();
-            renderStrength();
-        }
-
-        function resetStrengthChecks() {
-            db.forza.forEach(s => s.esercizi.forEach(ex => ex.fatto = false));
-            saveLocal();
-            renderStrength();
-        }
+        function toggleExerciseDone(sIdx, eIdx, checked) { db.forza[sIdx].esercizi[eIdx].fatto = checked; saveLocal(); renderStrength(); }
+        function resetStrengthChecks() { db.forza.forEach(s => s.esercizi.forEach(ex => ex.fatto = false)); saveLocal(); renderStrength(); }
+        function updateLoad(sIdx, eIdx, val) { db.forza[sIdx].esercizi[eIdx].carico = val; saveLocal(); }
 
         function openExerciseModal(sIdx, eIdx) {
             const ex = db.forza[sIdx].esercizi[eIdx];
-            document.getElementById('ex-modal-muscle').textContent = ex.muscoli || "Forza & Stabilità Runner";
-            document.getElementById('ex-modal-title').textContent = ex.nome;
-            document.getElementById('ex-modal-svg').innerHTML = getExerciseSVG(ex.imgKey || 'squat', true);
-            document.getElementById('ex-modal-serie').textContent = ex.serie;
-            document.getElementById('ex-modal-rec').textContent = ex.rec;
-            document.getElementById('ex-modal-desc').textContent = ex.note;
-            document.getElementById('ex-modal-yt').href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(ex.nome + " esecuzione corretta");
-            const m = document.getElementById('modal-exercise');
-            m.classList.remove('hidden'); m.classList.add('flex');
-        }
-
-        function updateLoad(sIdx, eIdx, val) {
-            db.forza[sIdx].esercizi[eIdx].carico = val;
-            saveLocal();
+            document.getElementById('ex-modal-muscle').textContent = ex.muscoli || "Forza Runner"; document.getElementById('ex-modal-title').textContent = ex.nome; document.getElementById('ex-modal-svg').innerHTML = getExerciseSVG(ex.imgKey || 'squat', true);
+            document.getElementById('ex-modal-serie').textContent = ex.serie; document.getElementById('ex-modal-rec').textContent = ex.rec; document.getElementById('ex-modal-desc').textContent = ex.note; document.getElementById('ex-modal-yt').href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(ex.nome + " esecuzione corretta");
+            const m = document.getElementById('modal-exercise'); m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function renderShoesAndRules() {
             document.getElementById('shoes-container').innerHTML = db.scarpe.map((s, idx) => {
-                const percorsi = Number(s.km_percorsi) || 0;
-                const max = Number(s.vita_utile) || 600;
-                const rimanenti = Math.max(0, +(max - percorsi).toFixed(1));
-                const pctUsura = Math.min(100, Math.max(0, Math.round((percorsi / max) * 100)));
-                const barColor = rimanenti <= 80 ? 'bg-rose-500' : (rimanenti <= 160 ? 'bg-amber-500' : 'bg-emerald-500');
-                const badgeColor = rimanenti <= 80 ? 'bg-rose-100 text-rose-800' : (rimanenti <= 160 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800');
-
-                return `
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start gap-2 mb-3">
-                                <div>
-                                    <span class="text-xs font-bold uppercase text-blue-600">${s.ruolo}</span>
-                                    <h3 class="text-xl font-bold text-slate-900 mt-0.5">${s.nome}</h3>
-                                </div>
-                                <button onclick="openEditShoeModal(${idx})" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold transition">
-                                    <i class="fa-solid fa-pen mr-1"></i> Modifica Km
-                                </button>
-                            </div>
-
-                            <div class="flex flex-wrap items-baseline justify-between gap-2 my-3">
-                                <div class="text-2xl font-extrabold text-slate-900 font-mono">
-                                    ${percorsi} <span class="text-sm font-normal text-slate-400">su ${max} km</span>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-xs font-bold ${badgeColor}">
-                                    Rimanenti: ${rimanenti} km
-                                </span>
-                            </div>
-
-                            <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                                <div class="${barColor} h-3 rounded-full transition-all duration-300" style="width:${pctUsura}%"></div>
-                            </div>
-                            <div class="flex justify-between text-[11px] text-slate-400 mt-1 font-mono">
-                                <span>Usura: ${pctUsura}%</span>
-                                <span>Disponibile: ${100 - pctUsura}%</span>
-                            </div>
-                        </div>
-
-                        <p class="text-xs text-slate-500 mt-4 pt-3 border-t border-slate-100">${s.note || ''}</p>
-                    </div>
-                `;
+                const percorsi = Number(s.km_percorsi) || 0; const max = Number(s.vita_utile) || 600; const rimanenti = Math.max(0, +(max - percorsi).toFixed(1)); const pctUsura = Math.min(100, Math.max(0, Math.round((percorsi / max) * 100)));
+                const barColor = rimanenti <= 80 ? 'bg-rose-500' : (rimanenti <= 160 ? 'bg-amber-500' : 'bg-emerald-500'); const badgeColor = rimanenti <= 80 ? 'bg-rose-100 text-rose-800' : (rimanenti <= 160 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800');
+                return `<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between"><div><div class="flex justify-between items-start gap-2 mb-3"><div><span class="text-xs font-bold uppercase text-blue-600">${s.ruolo}</span><h3 class="text-xl font-bold text-slate-900 mt-0.5">${s.nome}</h3></div><button onclick="openEditShoeModal(${idx})" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold transition"><i class="fa-solid fa-pen mr-1"></i> Modifica Km</button></div><div class="flex flex-wrap items-baseline justify-between gap-2 my-3"><div class="text-2xl font-extrabold text-slate-900 font-mono">${percorsi} <span class="text-sm font-normal text-slate-400">su ${max} km</span></div><span class="px-3 py-1 rounded-full text-xs font-bold ${badgeColor}">Rimanenti: ${rimanenti} km</span></div><div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden"><div class="${barColor} h-3 rounded-full transition-all duration-300" style="width:${pctUsura}%"></div></div><div class="flex justify-between text-[11px] text-slate-400 mt-1 font-mono"><span>Usura: ${pctUsura}%</span><span>Disponibile: ${100 - pctUsura}%</span></div></div><p class="text-xs text-slate-500 mt-4 pt-3 border-t border-slate-100">${s.note || ''}</p></div>`;
             }).join('');
-
-            document.getElementById('rules-container').innerHTML = db.regole.map(r => `
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                    <div class="font-bold text-sm text-slate-900 mb-1"><i class="fa-solid fa-shield-halved text-blue-600 mr-1.5"></i>${r.tema}</div>
-                    <p class="text-xs text-slate-600 leading-relaxed">${r.desc}</p>
-                </div>
-            `).join('');
+            document.getElementById('rules-container').innerHTML = db.regole.map(r => `<div class="p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="font-bold text-sm text-slate-900 mb-1"><i class="fa-solid fa-shield-halved text-blue-600 mr-1.5"></i>${r.tema}</div><p class="text-xs text-slate-600 leading-relaxed">${r.desc}</p></div>`).join('');
         }
 
         function openEditShoeModal(idx) {
-            const s = db.scarpe[idx];
-            document.getElementById('modal-shoe-title').textContent = "Modifica Scarpa & Chilometraggio";
-            document.getElementById('modal-shoe-idx').value = idx;
-            document.getElementById('shoe-input-nome').value = s.nome;
-            document.getElementById('shoe-input-ruolo').value = s.ruolo;
-            document.getElementById('shoe-input-percorsi').value = s.km_percorsi;
-            document.getElementById('shoe-input-max').value = s.vita_utile;
-            document.getElementById('shoe-input-note').value = s.note || "";
-            document.getElementById('btn-delete-shoe').classList.toggle('hidden', db.scarpe.length <= 1);
-            previewShoeCalc();
-            const m = document.getElementById('modal-shoe');
-            m.classList.remove('hidden'); m.classList.add('flex');
+            const s = db.scarpe[idx]; document.getElementById('modal-shoe-title').textContent = "Modifica Scarpa & Chilometraggio"; document.getElementById('modal-shoe-idx').value = idx;
+            document.getElementById('shoe-input-nome').value = s.nome; document.getElementById('shoe-input-ruolo').value = s.ruolo; document.getElementById('shoe-input-percorsi').value = s.km_percorsi; document.getElementById('shoe-input-max').value = s.vita_utile; document.getElementById('shoe-input-note').value = s.note || "";
+            document.getElementById('btn-delete-shoe').classList.toggle('hidden', db.scarpe.length <= 1); previewShoeCalc();
+            const m = document.getElementById('modal-shoe'); m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function openAddShoeModal() {
-            document.getElementById('modal-shoe-title').textContent = "Aggiungi Nuova Scarpa";
-            document.getElementById('modal-shoe-idx').value = -1;
-            document.getElementById('shoe-input-nome').value = "";
-            document.getElementById('shoe-input-ruolo').value = "Corse facili / Lenti";
-            document.getElementById('shoe-input-percorsi').value = 0;
-            document.getElementById('shoe-input-max').value = 650;
-            document.getElementById('shoe-input-note').value = "";
-            document.getElementById('btn-delete-shoe').classList.add('hidden');
-            previewShoeCalc();
-            const m = document.getElementById('modal-shoe');
-            m.classList.remove('hidden'); m.classList.add('flex');
+            document.getElementById('modal-shoe-title').textContent = "Aggiungi Nuova Scarpa"; document.getElementById('modal-shoe-idx').value = -1;
+            document.getElementById('shoe-input-nome').value = ""; document.getElementById('shoe-input-ruolo').value = "Corse facili / Lenti"; document.getElementById('shoe-input-percorsi').value = 0; document.getElementById('shoe-input-max').value = 650; document.getElementById('shoe-input-note').value = "";
+            document.getElementById('btn-delete-shoe').classList.add('hidden'); previewShoeCalc();
+            const m = document.getElementById('modal-shoe'); m.classList.remove('hidden'); m.classList.add('flex');
         }
 
-        function previewShoeCalc() {
-            const p = parseFloat(document.getElementById('shoe-input-percorsi').value) || 0;
-            const max = parseFloat(document.getElementById('shoe-input-max').value) || 0;
-            const rem = Math.max(0, +(max - p).toFixed(1));
-            document.getElementById('shoe-preview-rem').textContent = `${rem} km (${p} su ${max} km)`;
-        }
+        function previewShoeCalc() { const p = parseFloat(document.getElementById('shoe-input-percorsi').value) || 0; const max = parseFloat(document.getElementById('shoe-input-max').value) || 0; document.getElementById('shoe-preview-rem').textContent = `${Math.max(0, +(max - p).toFixed(1))} km (${p} su ${max} km)`; }
 
         function saveShoe() {
             const idx = parseInt(document.getElementById('modal-shoe-idx').value);
-            const nome = document.getElementById('shoe-input-nome').value.trim() || "Nuova Scarpa";
-            const ruolo = document.getElementById('shoe-input-ruolo').value.trim() || "Corsa";
-            const km_percorsi = parseFloat(document.getElementById('shoe-input-percorsi').value) || 0;
-            const vita_utile = parseFloat(document.getElementById('shoe-input-max').value) || 600;
-            const note = document.getElementById('shoe-input-note').value.trim();
-
-            if (idx >= 0 && db.scarpe[idx]) {
-                const oldName = db.scarpe[idx].nome;
-                db.scarpe[idx] = { ...db.scarpe[idx], nome, ruolo, km_percorsi, vita_utile, note };
-                if (oldName !== nome) {
-                    db.allenamenti_settimana.forEach(a => { if (a.scarpa === oldName) a.scarpa = nome; });
-                }
-            } else {
-                db.scarpe.push({ id: 'shoe-' + Date.now(), nome, ruolo, km_percorsi, vita_utile, note });
-            }
-            saveLocal();
-            closeModals();
-            renderAll();
+            const nome = document.getElementById('shoe-input-nome').value.trim() || "Nuova Scarpa"; const ruolo = document.getElementById('shoe-input-ruolo').value.trim() || "Corsa"; const km_percorsi = parseFloat(document.getElementById('shoe-input-percorsi').value) || 0; const vita_utile = parseFloat(document.getElementById('shoe-input-max').value) || 600; const note = document.getElementById('shoe-input-note').value.trim();
+            if (idx >= 0 && db.scarpe[idx]) { const oldName = db.scarpe[idx].nome; db.scarpe[idx] = { ...db.scarpe[idx], nome, ruolo, km_percorsi, vita_utile, note }; if (oldName !== nome) { db.allenamenti_settimana.forEach(a => { if (a.scarpa === oldName) a.scarpa = nome; }); } } else { db.scarpe.push({ id: 'shoe-' + Date.now(), nome, ruolo, km_percorsi, vita_utile, note }); }
+            saveLocal(); closeModals(); renderAll();
         }
 
-        function deleteShoe() {
-            const idx = parseInt(document.getElementById('modal-shoe-idx').value);
-            if (idx >= 0 && db.scarpe.length > 1) {
-                db.scarpe.splice(idx, 1);
-                saveLocal();
-                closeModals();
-                renderAll();
-            }
-        }
-
-        function populateShoeSelect(selectId, selectedVal) {
-            const sel = document.getElementById(selectId);
-            const options = db.scarpe.map(s => `<option value="${s.nome}">${s.nome}</option>`).join('') + `<option value="-">Nessuna (Rulli / Forza)</option>`;
-            sel.innerHTML = options;
-            if (selectedVal && [...sel.options].some(o => o.value === selectedVal)) sel.value = selectedVal;
-        }
-
-        function closeModals() {
-            ['modal-complete', 'modal-skip', 'modal-profile', 'modal-add-workout', 'modal-add-race', 'modal-exercise', 'modal-shoe', 'modal-threshold'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-                document.getElementById(id).classList.remove('flex');
-            });
-        }
+        function deleteShoe() { const idx = parseInt(document.getElementById('modal-shoe-idx').value); if (idx >= 0 && db.scarpe.length > 1) { db.scarpe.splice(idx, 1); saveLocal(); closeModals(); renderAll(); } }
+        function populateShoeSelect(selectId, selectedVal) { const sel = document.getElementById(selectId); sel.innerHTML = db.scarpe.map(s => `<option value="${s.nome}">${s.nome}</option>`).join('') + `<option value="-">Nessuna (Rulli / Forza)</option>`; if (selectedVal && [...sel.options].some(o => o.value === selectedVal)) sel.value = selectedVal; }
+        
+        function closeModals() { ['modal-complete', 'modal-skip', 'modal-profile', 'modal-add-workout', 'modal-add-race', 'modal-exercise', 'modal-shoe', 'modal-threshold'].forEach(id => { const el = document.getElementById(id); if (el) { el.classList.add('hidden'); el.classList.remove('flex'); } }); }
 
         function openCompleteModal(idx) {
-            const a = db.allenamenti_settimana[idx];
-            document.getElementById('modal-comp-idx').value = idx;
-            document.getElementById('modal-comp-subtitle').textContent = `${a.data} — ${a.tipo}`;
-            document.getElementById('modal-comp-km').value = a.km_fatti ?? a.km_previsti;
-            document.getElementById('modal-comp-rulli').value = a.km_rulli ?? "";
-            document.getElementById('modal-comp-passo').value = a.passo || "";
-            document.getElementById('modal-comp-fc').value = "";
-            populateShoeSelect('modal-comp-scarpa', a.scarpa);
-            document.getElementById('modal-comp-note').value = a.note || "";
-            const m = document.getElementById('modal-complete');
-            m.classList.remove('hidden'); m.classList.add('flex');
+            const a = db.allenamenti_settimana[idx]; document.getElementById('modal-comp-idx').value = idx; document.getElementById('modal-comp-subtitle').textContent = `${a.data} — ${a.tipo}`;
+            document.getElementById('modal-comp-km').value = a.km_fatti ?? a.km_previsti; document.getElementById('modal-comp-rulli').value = a.km_rulli ?? ""; document.getElementById('modal-comp-passo').value = a.passo || ""; document.getElementById('modal-comp-fc').value = "";
+            populateShoeSelect('modal-comp-scarpa', a.scarpa); document.getElementById('modal-comp-note').value = a.note || "";
+            const m = document.getElementById('modal-complete'); m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function saveCompletedWorkout() {
-            const idx = parseInt(document.getElementById('modal-comp-idx').value);
-            const km = parseFloat(document.getElementById('modal-comp-km').value) || 0;
-            const rulliRaw = document.getElementById('modal-comp-rulli').value;
-            const kmRulli = rulliRaw === '' ? 0 : (parseFloat(rulliRaw) || 0);
-            const passo = document.getElementById('modal-comp-passo').value;
-            const fc = document.getElementById('modal-comp-fc').value;
-            const scarpa = document.getElementById('modal-comp-scarpa').value;
-            const note = document.getElementById('modal-comp-note').value;
-
-            const oldItem = db.allenamenti_settimana[idx];
-            const prevKm = (oldItem.stato === 'completato' && oldItem.km_fatti) ? oldItem.km_fatti : 0;
-            const prevShoeName = oldItem.scarpa;
-
-            if (prevKm > 0 && prevShoeName && prevShoeName !== '-') {
-                const oldShoeObj = db.scarpe.find(s => s.nome === prevShoeName);
-                if (oldShoeObj) oldShoeObj.km_percorsi = Math.max(0, +(oldShoeObj.km_percorsi - prevKm).toFixed(1));
-            }
-            if (km > 0 && scarpa && scarpa !== '-') {
-                const newShoeObj = db.scarpe.find(s => s.nome === scarpa);
-                if (newShoeObj) newShoeObj.km_percorsi = +(newShoeObj.km_percorsi + km).toFixed(1);
-            }
-
-            oldItem.km_fatti = km;
-            oldItem.km_rulli = kmRulli;
-            oldItem.passo = passo || "-";
-            oldItem.scarpa = scarpa;
-            oldItem.stato = 'completato';
-            oldItem.note = fc ? `FC media: ${fc} bpm. ${note}` : note;
-
-            saveLocal();
-            closeModals();
-            renderAll();
+            const idx = parseInt(document.getElementById('modal-comp-idx').value); const km = parseFloat(document.getElementById('modal-comp-km').value) || 0; const rulliRaw = document.getElementById('modal-comp-rulli').value; const kmRulli = rulliRaw === '' ? 0 : (parseFloat(rulliRaw) || 0); const passo = document.getElementById('modal-comp-passo').value; const fc = document.getElementById('modal-comp-fc').value; const scarpa = document.getElementById('modal-comp-scarpa').value; const note = document.getElementById('modal-comp-note').value;
+            const oldItem = db.allenamenti_settimana[idx]; const prevKm = (oldItem.stato === 'completato' && oldItem.km_fatti) ? oldItem.km_fatti : 0; const prevShoeName = oldItem.scarpa;
+            if (prevKm > 0 && prevShoeName && prevShoeName !== '-') { const oldShoeObj = db.scarpe.find(s => s.nome === prevShoeName); if (oldShoeObj) oldShoeObj.km_percorsi = Math.max(0, +(oldShoeObj.km_percorsi - prevKm).toFixed(1)); }
+            if (km > 0 && scarpa && scarpa !== '-') { const newShoeObj = db.scarpe.find(s => s.nome === scarpa); if (newShoeObj) newShoeObj.km_percorsi = +(newShoeObj.km_percorsi + km).toFixed(1); }
+            oldItem.km_fatti = km; oldItem.km_rulli = kmRulli; oldItem.passo = passo || "-"; oldItem.scarpa = scarpa; oldItem.stato = 'completato'; oldItem.note = fc ? `FC media: ${fc} bpm. ${note}` : note;
+            saveLocal(); closeModals(); renderAll();
         }
 
-        function openSkipModal(idx) {
-            const a = db.allenamenti_settimana[idx];
-            document.getElementById('modal-skip-idx').value = idx;
-            document.getElementById('modal-skip-subtitle').textContent = `${a.data} — ${a.tipo}`;
-            const m = document.getElementById('modal-skip');
-            m.classList.remove('hidden'); m.classList.add('flex');
-        }
+        function openSkipModal(idx) { const a = db.allenamenti_settimana[idx]; document.getElementById('modal-skip-idx').value = idx; document.getElementById('modal-skip-subtitle').textContent = `${a.data} — ${a.tipo}`; const m = document.getElementById('modal-skip'); m.classList.remove('hidden'); m.classList.add('flex'); }
 
         function confirmSkipWorkout() {
-            const idx = parseInt(document.getElementById('modal-skip-idx').value);
-            const reason = document.getElementById('modal-skip-reason').value;
-            const item = db.allenamenti_settimana[idx];
-            item.stato = 'saltato';
-            item.km_fatti = 0;
-            item.km_rulli = 0;
-
-            const labels = {
-                imprevisto: "Saltato per imprevisto. Km non recuperati.",
-                stanchezza: "Saltato per stanchezza/FC alta. Prossima uscita alleggerita.",
-                schiena: "Saltato per fastidio fisico. Priorità recupero."
-            };
-            item.note = labels[reason];
-
-            if (reason === 'stanchezza' || reason === 'schiena') {
-                for (let i = idx + 1; i < db.allenamenti_settimana.length; i++) {
-                    if (db.allenamenti_settimana[i].km_previsti > 0 && db.allenamenti_settimana[i].stato === 'da_fare') {
-                        db.allenamenti_settimana[i].tipo = "Corsa rigenerante (Rimodulata)";
-                        db.allenamenti_settimana[i].km_previsti = Math.max(6, Math.round(db.allenamenti_settimana[i].km_previsti * 0.75));
-                        db.allenamenti_settimana[i].dettaglio = "Rimodulata dal Coach: ritmo facilissimo < 135 bpm.";
-                        break;
-                    }
-                }
-            }
-            saveLocal();
-            closeModals();
-            renderAll();
+            const idx = parseInt(document.getElementById('modal-skip-idx').value); const reason = document.getElementById('modal-skip-reason').value; const item = db.allenamenti_settimana[idx];
+            item.stato = 'saltato'; item.km_fatti = 0; item.km_rulli = 0;
+            const labels = { imprevisto: "Saltato per imprevisto. Km non recuperati.", stanchezza: "Saltato per stanchezza/FC alta. Prossima uscita alleggerita.", schiena: "Saltato per fastidio fisico. Priorità recupero." }; item.note = labels[reason];
+            if (reason === 'stanchezza' || reason === 'schiena') { for (let i = idx + 1; i < db.allenamenti_settimana.length; i++) { if (db.allenamenti_settimana[i].km_previsti > 0 && db.allenamenti_settimana[i].stato === 'da_fare') { db.allenamenti_settimana[i].tipo = "Corsa rigenerante (Rimodulata)"; db.allenamenti_settimana[i].km_previsti = Math.max(6, Math.round(db.allenamenti_settimana[i].km_previsti * 0.75)); db.allenamenti_settimana[i].dettaglio = "Rimodulata dal Coach: ritmo facilissimo < 135 bpm."; break; } } }
+            saveLocal(); closeModals(); renderAll();
         }
 
-        function openProfileModal() {
-            document.getElementById('prof-peso').value = db.atleta.peso_kg;
-            document.getElementById('prof-altezza').value = db.atleta.altezza_cm;
-            document.getElementById('prof-fc').value = db.atleta.fc_riposo || 60;
-            const m = document.getElementById('modal-profile');
-            m.classList.remove('hidden'); m.classList.add('flex');
-        }
-
-        function saveProfile() {
-            db.atleta.peso_kg = parseFloat(document.getElementById('prof-peso').value) || 70.0;
-            db.atleta.altezza_cm = parseInt(document.getElementById('prof-altezza').value) || 175;
-            db.atleta.fc_riposo = parseInt(document.getElementById('prof-fc').value) || 60;
-            saveLocal();
-            closeModals();
-            renderAll();
-        }
-
-        function openAddWorkoutModal() {
-            populateShoeSelect('new-w-scarpa', db.scarpe[0] ? db.scarpe[0].nome : '-');
-            const m = document.getElementById('modal-add-workout');
-            m.classList.remove('hidden'); m.classList.add('flex');
-        }
-
+        function openProfileModal() { document.getElementById('prof-peso').value = db.atleta.peso_kg; document.getElementById('prof-altezza').value = db.atleta.altezza_cm; document.getElementById('prof-fc').value = db.atleta.fc_riposo || 60; const m = document.getElementById('modal-profile'); m.classList.remove('hidden'); m.classList.add('flex'); }
+        function saveProfile() { db.atleta.peso_kg = parseFloat(document.getElementById('prof-peso').value) || 70.0; db.atleta.altezza_cm = parseInt(document.getElementById('prof-altezza').value) || 175; db.atleta.fc_riposo = parseInt(document.getElementById('prof-fc').value) || 60; saveLocal(); closeModals(); renderAll(); }
+        
+        function openAddWorkoutModal() { populateShoeSelect('new-w-scarpa', db.scarpe[0] ? db.scarpe[0].nome : '-'); const m = document.getElementById('modal-add-workout'); m.classList.remove('hidden'); m.classList.add('flex'); }
         function saveNewWorkout() {
-            const data = document.getElementById('new-w-data').value;
-            const tipo = document.getElementById('new-w-tipo').value;
-            const dettaglio = document.getElementById('new-w-dettaglio').value;
-            const km = parseFloat(document.getElementById('new-w-km').value) || 0;
-            const scarpa = document.getElementById('new-w-scarpa').value;
-            const giorni = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
-            const gName = data ? giorni[new Date(data).getDay()] : "";
-
-            db.allenamenti_settimana.push({
-                data, giorno: gName, tipo, dettaglio,
-                km_previsti: km, km_fatti: null, km_rulli: null, passo: "", scarpa, stato: "da_fare", note: ""
-            });
-            db.allenamenti_settimana.sort((a, b) => a.data.localeCompare(b.data));
-            saveLocal();
-            closeModals();
-            renderAll();
+            const data = document.getElementById('new-w-data').value; const tipo = document.getElementById('new-w-tipo').value; const dettaglio = document.getElementById('new-w-dettaglio').value; const km = parseFloat(document.getElementById('new-w-km').value) || 0; const scarpa = document.getElementById('new-w-scarpa').value; const giorni = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"]; const gName = data ? giorni[new Date(data).getDay()] : "";
+            db.allenamenti_settimana.push({ data, giorno: gName, tipo, dettaglio, km_previsti: km, km_fatti: null, km_rulli: null, passo: "", scarpa, stato: "da_fare", note: "" }); db.allenamenti_settimana.sort((a, b) => a.data.localeCompare(b.data));
+            saveLocal(); closeModals(); renderAll();
         }
 
-        function openAddRaceModal() {
-            const m = document.getElementById('modal-add-race');
-            m.classList.remove('hidden'); m.classList.add('flex');
-        }
-
+        function openAddRaceModal() { const m = document.getElementById('modal-add-race'); m.classList.remove('hidden'); m.classList.add('flex'); }
         function saveNewRace() {
-            db.gare.push({
-                nome: document.getElementById('new-r-nome').value || "Nuova Gara",
-                data: document.getElementById('new-r-data').value || "2027-03-14",
-                distanza: document.getElementById('new-r-dist').value,
-                tipo: document.getElementById('new-r-tipo').value
-            });
-            db.gare.sort((a, b) => a.data.localeCompare(b.data));
-            saveLocal();
-            closeModals();
-            renderAll();
+            db.gare.push({ nome: document.getElementById('new-r-nome').value || "Nuova Gara", data: document.getElementById('new-r-data').value || "2027-03-14", distanza: document.getElementById('new-r-dist').value, tipo: document.getElementById('new-r-tipo').value }); db.gare.sort((a, b) => a.data.localeCompare(b.data));
+            saveLocal(); closeModals(); renderAll();
         }
 
         function exportJson() {
-            saveLocal();
-            const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "dati.json";
-            a.click();
-            URL.revokeObjectURL(url);
+            saveLocal(); const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "dati.json"; a.click(); URL.revokeObjectURL(url);
         }
 
         function importJson(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+            const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    db = normalizeDb(imported);
-                    saveLocal();
-                    restoreSavedInputs();
-                    renderAll();
-                    switchTab(db.ui.activeTab || 'panoramica', false);
-                } catch (err) {
-                    alert("File JSON non valido.");
-                }
-            };
+            reader.onload = function(e) { try { const imported = JSON.parse(e.target.result); db = normalizeDb(imported); saveLocal(); restoreSavedInputs(); renderAll(); switchTab(db.ui.activeTab || 'panoramica', false); } catch (err) { alert("File JSON non valido."); } };
             reader.readAsText(file);
         }
     </script>
