@@ -23,7 +23,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 
-    <!-- ==================== SCHERMATA DI LOGIN (VISIBILE FINCHÉ NON ACCEDI) ==================== -->
+    <!-- ==================== SCHERMATA DI LOGIN ==================== -->
     <div id="auth-screen" class="min-h-screen bg-slate-900 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
             <div class="flex items-center gap-3 mb-6">
@@ -34,10 +34,6 @@
                     <h1 class="font-bold text-xl text-slate-900">RunCoach Pro</h1>
                     <p class="text-xs text-slate-500">Accesso Riservato & Cloud Privato</p>
                 </div>
-            </div>
-
-            <div id="config-warning" class="hidden mb-4 p-3 rounded-lg bg-amber-50 border border-amber-300 text-xs text-amber-900">
-                <strong>Configurazione richiesta:</strong> Incolla i tuoi dati <code>firebaseConfig</code> dentro <code>index.html</code> per attivare il login.
             </div>
 
             <form onsubmit="handleLogin(event)" class="space-y-4">
@@ -61,7 +57,7 @@
         </div>
     </div>
 
-    <!-- ==================== DASHBOARD RISERVATA (SBLOCCATA DOPO LOGIN) ==================== -->
+    <!-- ==================== DASHBOARD RISERVATA ==================== -->
     <div id="app-shell" class="hidden flex-col md:flex-row min-h-screen">
 
         <!-- SIDEBAR -->
@@ -124,16 +120,28 @@
         <main class="flex-1 p-4 md:p-8 overflow-y-auto">
             <div class="max-w-6xl mx-auto">
 
+                <!-- BANNER ERRORE CLOUD (VISIBILE SOLO SE FIREBASE HA UN PROBLEMA DI PERMESSI/RETE) -->
+                <div id="cloud-error-banner" class="hidden mb-4 p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-start justify-between gap-3">
+                    <div>
+                        <strong class="block text-sm mb-0.5"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Errore di sincronizzazione Firebase Cloud</strong>
+                        <span id="cloud-error-text">--</span>
+                    </div>
+                    <button onclick="forceCloudPush()" class="shrink-0 bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-1.5 rounded-lg">Riprova</button>
+                </div>
+
                 <!-- HEADER TOP -->
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h2 class="text-2xl font-bold text-slate-900" id="page-title">Panoramica & Readiness</h2>
                         <p class="text-sm text-slate-500" id="page-subtitle">Monitoraggio condizione, soglia Garmin e prevenzione infortuni</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span id="sync-badge" class="text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold transition-all">
-                            <i class="fa-solid fa-cloud-check mr-1"></i> Cloud Sincronizzato
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <span id="sync-badge" class="text-xs px-3 py-1.5 rounded-full bg-slate-200 text-slate-700 font-semibold transition-all">
+                            <i class="fa-solid fa-spinner fa-spin mr-1"></i> Connessione Cloud...
                         </span>
+                        <button onclick="forceCloudPush()" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg shadow-2xs transition" title="Invia subito tutti i dati di questo PC sul Cloud">
+                            <i class="fa-solid fa-cloud-arrow-up text-blue-600 mr-1"></i> Sincronizza Ora
+                        </button>
                         <button onclick="openAddWorkoutModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm transition">
                             <i class="fa-solid fa-plus mr-1"></i> Nuova Seduta
                         </button>
@@ -515,7 +523,7 @@
         </main>
     </div>
 
-    <!-- MODALI (SOGLIA, ESERCIZI, SCARPE, COMPLETA, SALTA, PROFILO, NUOVA SEDUTA, NUOVA GARA) -->
+    <!-- MODALI -->
     <div id="modal-threshold" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Aggiorna Soglia Corrente Garmin</h3>
@@ -794,9 +802,6 @@
     </div>
 
     <script>
-        // =========================================================================
-        // INCOLLA QUI IL TUO BLOCCO firebaseConfig COPIATO DALLA CONSOLE FIREBASE:
-        // =========================================================================
         const firebaseConfig = {
           apiKey: "AIzaSyCUd8OG-52jOr59yEZqJBgD-hYQs9IClqw",
           authDomain: "allenamento-run.firebaseapp.com",
@@ -806,24 +811,16 @@
           appId: "1:56304532766:web:80a2ecae89ee35c7da9d0f",
           measurementId: "G-PTLF1TWEFM"
         };
-        // =========================================================================
 
-        let auth = null;
-        let firestore = null;
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const firestore = firebase.firestore();
+
         let currentUser = null;
         let db = null;
         let cloudSaveTimer = null;
+        let unsubscribeSnapshot = null;
 
-        const isConfigured = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("INCOLLA_QUI");
-        if (isConfigured) {
-            firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            firestore = firebase.firestore();
-        } else {
-            document.getElementById('config-warning').classList.remove('hidden');
-        }
-
-        // TEMPLATE NEUTRO (ZERO DATI PERSONALI NEL CODICE PUBBLICO SU GITHUB)
         const NEUTRAL_TEMPLATE_DB = {
             ui: {
                 activeTab: "panoramica",
@@ -849,7 +846,7 @@
                 garmin_5k: "21:30", garmin_10k: "44:30", garmin_21k: "1:39:00"
             },
             scarpe: [
-                { id: "shoe-1", nome: "Scarpa Lenti", ruolo: "Corse facili e recupero", km_percorsi: 0, vita_utile: 600, note: "Importa il tuo backup .json per caricare i tuoi dati." },
+                { id: "shoe-1", nome: "Scarpa Lenti", ruolo: "Corse facili e recupero", km_percorsi: 0, vita_utile: 600, note: "Importa il tuo backup .json o modifica i km." },
                 { id: "shoe-2", nome: "Scarpa Qualità", ruolo: "Gare e lavori veloci", km_percorsi: 0, vita_utile: 650, note: "" }
             ],
             gare: [
@@ -911,10 +908,33 @@
             ]
         };
 
-        // GESTIONE LOGIN / LOGOUT FIREBASE
+        function showCloudError(err) {
+            const banner = document.getElementById('cloud-error-banner');
+            const text = document.getElementById('cloud-error-text');
+            const badge = document.getElementById('sync-badge');
+            let msg = err && err.message ? err.message : "Impossibile raggiungere Firestore.";
+            if (err && err.code === 'permission-denied') {
+                msg = "Permessi negati da Firestore: vai su Firebase Console > Firestore Database > Regole, incolla le regole per /users/{userId} e clicca Pubblica.";
+            } else if (err && (err.code === 'not-found' || msg.includes('database'))) {
+                msg = "Database Firestore non trovato: vai su Firebase Console > Build > Firestore Database e clicca Crea database.";
+            }
+            if (banner && text) {
+                text.textContent = msg;
+                banner.classList.remove('hidden');
+            }
+            if (badge) {
+                badge.className = "text-xs px-3 py-1.5 rounded-full bg-rose-100 text-rose-800 font-semibold";
+                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Errore Cloud`;
+            }
+        }
+
+        function clearCloudError() {
+            const banner = document.getElementById('cloud-error-banner');
+            if (banner) banner.classList.add('hidden');
+        }
+
         async function handleLogin(e) {
             e.preventDefault();
-            if (!isConfigured) return;
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
             const errBox = document.getElementById('login-error');
@@ -935,55 +955,119 @@
         }
 
         async function handleLogout() {
-            if (auth) await auth.signOut();
+            if (unsubscribeSnapshot) unsubscribeSnapshot();
+            await auth.signOut();
             location.reload();
         }
 
-        if (auth) {
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    currentUser = user;
-                    document.getElementById('auth-screen').classList.add('hidden');
-                    document.getElementById('app-shell').classList.remove('hidden');
-                    document.getElementById('app-shell').classList.add('flex');
-                    document.getElementById('side-user-email').textContent = user.email;
-                    await loadUserFromCloud(user.uid);
-                } else {
-                    currentUser = null;
-                    document.getElementById('auth-screen').classList.remove('hidden');
-                    document.getElementById('app-shell').classList.add('hidden');
-                    document.getElementById('app-shell').classList.remove('flex');
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-shell').classList.remove('hidden');
+                document.getElementById('app-shell').classList.add('flex');
+                document.getElementById('side-user-email').textContent = user.email;
+                await loadUserFromCloud(user.uid);
+            } else {
+                currentUser = null;
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-shell').classList.add('hidden');
+                document.getElementById('app-shell').classList.remove('flex');
+            }
+        });
+
+        function findBestLocalBackup(uid) {
+            const keys = ['runcoach_cloud_' + uid, 'runcoach_db_v2', 'runcoach_db'];
+            for (const k of keys) {
+                const raw = localStorage.getItem(k);
+                if (raw) {
+                    try {
+                        const parsed = normalizeDb(JSON.parse(raw));
+                        if (parsed.allenamenti_settimana && parsed.allenamenti_settimana.length > 0) {
+                            return parsed;
+                        }
+                    } catch (e) {}
                 }
-            });
+            }
+            return null;
         }
 
         async function loadUserFromCloud(uid) {
             const localCacheKey = 'runcoach_cloud_' + uid;
             const badge = document.getElementById('sync-badge');
-            badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Caricamento Cloud...`;
+            badge.className = "text-xs px-3 py-1.5 rounded-full bg-blue-100 text-blue-800 font-semibold";
+            badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Lettura Cloud...`;
+
+            const docRef = firestore.collection('users').doc(uid);
+            const localPopulated = findBestLocalBackup(uid);
 
             try {
-                const docRef = firestore.collection('users').doc(uid);
                 const docSnap = await docRef.get();
-                if (docSnap.exists) {
-                    db = normalizeDb(docSnap.data());
+                const cloudData = docSnap.exists ? normalizeDb(docSnap.data()) : null;
+                const cloudIsEmpty = !cloudData || !cloudData.allenamenti_settimana || cloudData.allenamenti_settimana.length === 0;
+
+                if (!cloudIsEmpty) {
+                    db = cloudData;
+                    localStorage.setItem(localCacheKey, JSON.stringify(db));
+                } else if (localPopulated) {
+                    // Recupera i dati salvati sul Primo PC e li invia subito al Cloud!
+                    db = localPopulated;
+                    db.lastSaved = new Date().toISOString();
+                    await docRef.set(db);
                     localStorage.setItem(localCacheKey, JSON.stringify(db));
                 } else {
-                    // Primo accesso: controlla se hai dati salvati in locale, altrimenti usa template vuoto
-                    const prevLocal = localStorage.getItem(localCacheKey) || localStorage.getItem('runcoach_db_v2');
-                    db = prevLocal ? normalizeDb(JSON.parse(prevLocal)) : structuredClone(NEUTRAL_TEMPLATE_DB);
-                    await docRef.set(db);
+                    db = cloudData || structuredClone(NEUTRAL_TEMPLATE_DB);
                 }
+
+                clearCloudError();
+                const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+                badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
+                badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Sincronizzato · ${now}`;
+
+                // Listener in tempo reale tra più dispositivi
+                if (unsubscribeSnapshot) unsubscribeSnapshot();
+                unsubscribeSnapshot = docRef.onSnapshot((snap) => {
+                    if (!snap.exists || snap.metadata.hasPendingWrites) return;
+                    const incoming = normalizeDb(snap.data());
+                    if (incoming.lastSaved && db && incoming.lastSaved !== db.lastSaved) {
+                        db = incoming;
+                        localStorage.setItem(localCacheKey, JSON.stringify(db));
+                        restoreSavedInputs();
+                        renderAll();
+                        const t = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
+                        badge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down mr-1"></i> Aggiornato Live · ${t}`;
+                    }
+                }, (err) => showCloudError(err));
             } catch (err) {
                 console.error("Errore lettura Firestore:", err);
-                const fallback = localStorage.getItem(localCacheKey) || localStorage.getItem('runcoach_db_v2');
-                db = fallback ? normalizeDb(JSON.parse(fallback)) : structuredClone(NEUTRAL_TEMPLATE_DB);
+                db = localPopulated || structuredClone(NEUTRAL_TEMPLATE_DB);
+                showCloudError(err);
             }
 
             restoreSavedInputs();
             renderAll();
             switchTab(db.ui.activeTab || 'panoramica', false);
-            badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Sincronizzato`;
+        }
+
+        async function forceCloudPush() {
+            if (!db || !currentUser) return;
+            const badge = document.getElementById('sync-badge');
+            badge.className = "text-xs px-3 py-1.5 rounded-full bg-blue-100 text-blue-800 font-semibold";
+            badge.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin mr-1"></i> Invio al Cloud...`;
+
+            try {
+                db.lastSaved = new Date().toISOString();
+                localStorage.setItem('runcoach_cloud_' + currentUser.uid, JSON.stringify(db));
+                await firestore.collection('users').doc(currentUser.uid).set(db);
+                clearCloudError();
+                const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
+                badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ${now}`;
+            } catch (err) {
+                console.error("Errore invio Firestore:", err);
+                showCloudError(err);
+            }
         }
 
         function saveLocal() {
@@ -993,22 +1077,28 @@
             localStorage.setItem(localCacheKey, JSON.stringify(db));
 
             const badge = document.getElementById('sync-badge');
-            if (badge) badge.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin mr-1"></i> Salvataggio Cloud...`;
+            if (badge) {
+                badge.className = "text-xs px-3 py-1.5 rounded-full bg-blue-100 text-blue-800 font-semibold";
+                badge.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin mr-1"></i> Salvataggio Cloud...`;
+            }
 
             clearTimeout(cloudSaveTimer);
             cloudSaveTimer = setTimeout(async () => {
                 try {
                     await firestore.collection('users').doc(currentUser.uid).set(db);
+                    clearCloudError();
                     const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    if (badge) badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ${now}`;
+                    if (badge) {
+                        badge.className = "text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold";
+                        badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ${now}`;
+                    }
                 } catch (err) {
                     console.error("Errore salvataggio Firestore:", err);
-                    if (badge) badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1"></i> Salvato in locale`;
+                    showCloudError(err);
                 }
-            }, 500);
+            }, 400);
         }
 
-        // ILLUSTRAZIONI ANATOMICHE PER OGNI ESERCIZIO
         function getExerciseSVG(key, large = false) {
             const cls = large ? "w-72 h-48" : "w-20 h-14 shrink-0";
             const base = `<svg viewBox="0 0 160 110" class="${cls} rounded-lg bg-white border border-slate-200 shadow-xs" fill="none" xmlns="http://www.w3.org/2000/svg">`;
