@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RunCoach Pro — Dashboard Allenamenti & Performance</title>
+    <title>RunCoach Pro — Area Riservata</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK (Login & Database Cloud Privato) -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -17,468 +21,505 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 flex flex-col md:flex-row min-h-screen">
+<body class="bg-slate-100 text-slate-800 min-h-screen">
 
-    <!-- SIDEBAR -->
-    <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col justify-between shrink-0">
-        <div>
-            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+    <!-- ==================== SCHERMATA DI LOGIN (VISIBILE FINCHÉ NON ACCEDI) ==================== -->
+    <div id="auth-screen" class="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
                     <i class="fa-solid fa-person-running"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg tracking-tight">RunCoach Pro</h1>
-                    <p class="text-xs text-slate-400">Road to Half Marathon '27</p>
+                    <h1 class="font-bold text-xl text-slate-900">RunCoach Pro</h1>
+                    <p class="text-xs text-slate-500">Accesso Riservato & Cloud Privato</p>
                 </div>
             </div>
 
-            <!-- Profilo rapido nella sidebar -->
-            <div class="px-6 py-4 bg-slate-800/60 border-b border-slate-800 text-xs">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-slate-400">Atleta</span>
-                    <button onclick="openProfileModal()" class="text-blue-400 hover:underline"><i class="fa-solid fa-pen"></i> Modifica</button>
-                </div>
-                <div class="font-semibold text-sm text-white" id="side-atleta">69.0 kg · 170 cm</div>
-                <div class="text-slate-400 mt-0.5">BMI: <span id="side-bmi" class="text-emerald-400 font-semibold">23.88</span> · FC Riposo: <span id="side-fc" class="text-slate-200">60 bpm</span></div>
+            <div id="config-warning" class="hidden mb-4 p-3 rounded-lg bg-amber-50 border border-amber-300 text-xs text-amber-900">
+                <strong>Configurazione richiesta:</strong> Incolla i tuoi dati <code>firebaseConfig</code> dentro <code>index.html</code> per attivare il login.
             </div>
 
-            <nav class="p-4 space-y-1.5" id="nav-menu">
-                <button onclick="switchTab('panoramica')" id="btn-panoramica" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-active">
-                    <i class="fa-solid fa-gauge-high w-5"></i> Panoramica & Readiness
-                </button>
-                <button onclick="switchTab('diario')" id="btn-diario" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
-                    <i class="fa-solid fa-calendar-check w-5"></i> Diario & Coach Dinamico
-                </button>
-                <button onclick="switchTab('gare')" id="btn-gare" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
-                    <i class="fa-solid fa-trophy w-5"></i> Gare, Soglia & Zone
-                </button>
-                <button onclick="switchTab('forza')" id="btn-forza" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
-                    <i class="fa-solid fa-dumbbell w-5"></i> Forza Gambe & Upper
-                </button>
-                <button onclick="switchTab('scarpe')" id="btn-scarpe" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
-                    <i class="fa-solid fa-shoe-prints w-5"></i> Parco Scarpe & Regole
-                </button>
-            </nav>
-        </div>
-
-        <div class="p-4 border-t border-slate-800 space-y-2">
-            <button onclick="exportJson()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition shadow">
-                <i class="fa-solid fa-download"></i> Esporta dati.json (GitHub)
-            </button>
-            <label class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition cursor-pointer">
-                <i class="fa-solid fa-upload"></i> Importa dati.json
-                <input type="file" accept=".json" onchange="importJson(event)" class="hidden">
-            </label>
-            <button onclick="resetToGitHub()" class="w-full bg-slate-800/60 hover:bg-rose-900/50 text-slate-400 hover:text-rose-200 text-[11px] py-1.5 px-3 rounded-lg flex items-center justify-center gap-1.5 transition">
-                <i class="fa-solid fa-rotate"></i> Ripristina dati iniziali
-            </button>
-        </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
-        <div class="max-w-6xl mx-auto">
-
-            <!-- HEADER TOP -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-900" id="page-title">Panoramica & Readiness</h2>
-                    <p class="text-sm text-slate-500" id="page-subtitle">Monitoraggio condizione, soglia Garmin e prevenzione infortuni</p>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                    <input type="email" id="login-email" required placeholder="la-tua-email@esempio.it" class="w-full border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-blue-600">
                 </div>
-                <div class="flex items-center gap-3">
-                    <span id="sync-badge" class="text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold transition-all">
-                        <i class="fa-solid fa-check-circle mr-1"></i> Salvataggio automatico attivo
-                    </span>
-                    <button onclick="openAddWorkoutModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm transition">
-                        <i class="fa-solid fa-plus mr-1"></i> Nuova Seduta
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-blue-600">
+                </div>
+                <div id="login-error" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 p-2.5 rounded-lg"></div>
+                <button type="submit" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow transition">
+                    <i class="fa-solid fa-lock-open mr-1.5"></i> Accedi alla Dashboard
+                </button>
+            </form>
+
+            <p class="text-[11px] text-slate-400 text-center mt-6">
+                <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Nessun dato personale è salvato su GitHub: tutti i parametri sono protetti nel tuo database privato.
+            </p>
+        </div>
+    </div>
+
+    <!-- ==================== DASHBOARD RISERVATA (SBLOCCATA DOPO LOGIN) ==================== -->
+    <div id="app-shell" class="hidden flex-col md:flex-row min-h-screen">
+
+        <!-- SIDEBAR -->
+        <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col justify-between shrink-0">
+            <div>
+                <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                        <i class="fa-solid fa-person-running"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg tracking-tight">RunCoach Pro</h1>
+                        <p class="text-xs text-slate-400 truncate max-w-[140px]" id="side-user-email">Cloud Privato</p>
+                    </div>
+                </div>
+
+                <!-- Profilo rapido nella sidebar -->
+                <div class="px-6 py-4 bg-slate-800/60 border-b border-slate-800 text-xs">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-slate-400">Atleta</span>
+                        <button onclick="openProfileModal()" class="text-blue-400 hover:underline"><i class="fa-solid fa-pen"></i> Modifica</button>
+                    </div>
+                    <div class="font-semibold text-sm text-white" id="side-atleta">-- kg · -- cm</div>
+                    <div class="text-slate-400 mt-0.5">BMI: <span id="side-bmi" class="text-emerald-400 font-semibold">--</span> · FC Riposo: <span id="side-fc" class="text-slate-200">-- bpm</span></div>
+                </div>
+
+                <nav class="p-4 space-y-1.5" id="nav-menu">
+                    <button onclick="switchTab('panoramica')" id="btn-panoramica" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-active">
+                        <i class="fa-solid fa-gauge-high w-5"></i> Panoramica & Readiness
                     </button>
-                </div>
+                    <button onclick="switchTab('diario')" id="btn-diario" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
+                        <i class="fa-solid fa-calendar-check w-5"></i> Diario & Coach Dinamico
+                    </button>
+                    <button onclick="switchTab('gare')" id="btn-gare" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
+                        <i class="fa-solid fa-trophy w-5"></i> Gare, Soglia & Zone
+                    </button>
+                    <button onclick="switchTab('forza')" id="btn-forza" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
+                        <i class="fa-solid fa-dumbbell w-5"></i> Forza Gambe & Upper
+                    </button>
+                    <button onclick="switchTab('scarpe')" id="btn-scarpe" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
+                        <i class="fa-solid fa-shoe-prints w-5"></i> Parco Scarpe & Regole
+                    </button>
+                </nav>
             </div>
 
-            <!-- ==================== TAB 1: PANORAMICA ==================== -->
-            <div id="tab-panoramica" class="space-y-6">
-                
-                <!-- KPI CARDS -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-[11px] font-semibold uppercase text-slate-400">Corsa Sett. Corrente</p>
-                                <h3 class="text-xl font-bold text-slate-900 mt-1" id="kpi-km-sett">0 / 29 km</h3>
-                            </div>
-                            <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-route"></i></span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-2">Sett. 16–22 Nov (Base)</p>
+            <div class="p-4 border-t border-slate-800 space-y-2">
+                <label class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition cursor-pointer shadow">
+                    <i class="fa-solid fa-upload"></i> Importa Backup (.json)
+                    <input type="file" accept=".json" onchange="importJson(event)" class="hidden">
+                </label>
+                <button onclick="exportJson()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-download"></i> Esporta Backup (.json)
+                </button>
+                <button onclick="handleLogout()" class="w-full bg-rose-950/60 hover:bg-rose-900 text-rose-200 text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Esci (Logout)
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+            <div class="max-w-6xl mx-auto">
+
+                <!-- HEADER TOP -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900" id="page-title">Panoramica & Readiness</h2>
+                        <p class="text-sm text-slate-500" id="page-subtitle">Monitoraggio condizione, soglia Garmin e prevenzione infortuni</p>
                     </div>
-
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-cyan-300 transition" onclick="switchTab('diario')">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-[11px] font-semibold uppercase text-slate-400">Km Rulli Totali</p>
-                                <h3 class="text-xl font-bold text-cyan-600 mt-1" id="kpi-rulli-tot">0.0 km</h3>
-                            </div>
-                            <span class="p-2 bg-cyan-50 text-cyan-600 rounded-lg"><i class="fa-solid fa-bicycle"></i></span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-2" id="kpi-rulli-sub">Questa sett: 0.0 km</p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-emerald-300 transition" onclick="switchTab('scarpe')">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-[11px] font-semibold uppercase text-slate-400" id="kpi-shoe1-name">Mizuno Neo Zen</p>
-                                <h3 class="text-xl font-bold text-emerald-600 mt-1" id="kpi-shoe1-rem">142 km</h3>
-                            </div>
-                            <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-shoe-prints"></i></span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-2" id="kpi-shoe1-sub">458 / 600 km · Rimanenti</p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-blue-300 transition" onclick="switchTab('scarpe')">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-[11px] font-semibold uppercase text-slate-400" id="kpi-shoe2-name">Adidas Evo SL</p>
-                                <h3 class="text-xl font-bold text-blue-600 mt-1" id="kpi-shoe2-rem">520 km</h3>
-                            </div>
-                            <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-bolt"></i></span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-2" id="kpi-shoe2-sub">130 / 650 km · Rimanenti</p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-[11px] font-semibold uppercase text-slate-400">Mezza Maratona '27</p>
-                                <h3 class="text-xl font-bold text-indigo-600 mt-1" id="kpi-cd-21k">-- gg</h3>
-                            </div>
-                            <span class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-flag-checkered"></i></span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-2" id="kpi-cd-sub">Test 10k tra -- gg</p>
-                    </div>
-                </div>
-
-                <!-- FASCIA SOGLIA CORRENTE GARMIN -->
-                <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-5 rounded-xl shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl shrink-0">
-                            <i class="fa-solid fa-fire-flame-curved"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-base">Soglia Anaerobica Corrente (Garmin)</h3>
-                                <span class="text-[11px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-mono" id="pan-soglia-date">Agg. 2026-11-18</span>
-                            </div>
-                            <p class="text-xs text-slate-400">Valori di riferimento utilizzati per calibrare passo, battiti e Watt delle tue zone.</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                        <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
-                            <div class="text-[10px] uppercase text-slate-400">FC Soglia</div>
-                            <div class="font-mono font-bold text-base text-rose-400" id="pan-soglia-fc">187 bpm</div>
-                        </div>
-                        <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
-                            <div class="text-[10px] uppercase text-slate-400">Passo Soglia</div>
-                            <div class="font-mono font-bold text-base text-blue-400" id="pan-soglia-passo">4'23"/km</div>
-                        </div>
-                        <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
-                            <div class="text-[10px] uppercase text-slate-400">Potenza</div>
-                            <div class="font-mono font-bold text-base text-amber-400" id="pan-soglia-w">360 W</div>
-                        </div>
-                        <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
-                            <div class="text-[10px] uppercase text-slate-400">Rapporto W/kg</div>
-                            <div class="font-mono font-bold text-base text-emerald-400" id="pan-soglia-wkg">5.26 W/kg</div>
-                        </div>
-                    </div>
-
-                    <button onclick="openThresholdModal()" class="shrink-0 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition shadow">
-                        <i class="fa-solid fa-pen mr-1"></i> Aggiorna Soglia
-                    </button>
-                </div>
-
-                <!-- SEMAFORO READINESS + PROSSIMA SEDUTA (SINCRONIZZATO CON LA DATA ODIERNA) -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                                <i class="fa-solid fa-heart-pulse text-rose-500"></i> Semaforo Readiness Mattutino (Garmin & Corpo)
-                            </h3>
-                            <span id="readiness-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-                                SEMAFORO VERDE — OK PER CORRERE
-                            </span>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                            <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-                                <label class="text-xs text-slate-500 block mb-1">FC a riposo oggi (baseline <span id="lbl-base-fc">60</span>)</label>
-                                <input type="number" id="input-fc-riposo" value="60" oninput="updateReadiness(true)" class="w-full font-bold text-lg bg-white border border-slate-300 rounded px-2.5 py-1">
-                            </div>
-                            <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-                                <label class="text-xs text-slate-500 block mb-1">Stato Schiena / Lombare</label>
-                                <select id="input-schiena" onchange="updateReadiness(true)" class="w-full font-semibold text-sm bg-white border border-slate-300 rounded px-2.5 py-2">
-                                    <option value="ok">Nessun fastidio (OK)</option>
-                                    <option value="lieve">Leggera rigidità</option>
-                                    <option value="dolore">Fastidio / Dolore</option>
-                                </select>
-                            </div>
-                            <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-                                <label class="text-xs text-slate-500 block mb-1">Polpaccio Sx & Tendine</label>
-                                <select id="input-polpaccio" onchange="updateReadiness(true)" class="w-full font-semibold text-sm bg-white border border-slate-300 rounded px-2.5 py-2">
-                                    <option value="ok">Primi passi OK</option>
-                                    <option value="affaticato">Un po' carico</option>
-                                    <option value="dolore">Dolore ai primi passi</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="readiness-advice" class="text-sm bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-lg">
-                            Parametri nella norma: FC a riposo regolare e nessun segnale da schiena o polpaccio sinistro. Puoi svolgere regolarmente la seduta prevista mantenendo i battiti tra <strong>125 e 145 bpm</strong> nelle corse facili.
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                                    <i class="fa-solid fa-calendar-day text-blue-600"></i> Prossime Sedute Piano
-                                </h3>
-                                <span class="text-[11px] font-mono text-slate-400" id="upcoming-today-lbl">--</span>
-                            </div>
-                            <div id="upcoming-list" class="space-y-2.5"></div>
-                        </div>
-                        <button onclick="switchTab('diario')" class="mt-4 w-full text-center text-xs font-semibold text-blue-600 hover:text-blue-800 py-2 border border-blue-200 rounded-lg hover:bg-blue-50 transition">
-                            Apri Diario Completo <i class="fa-solid fa-arrow-right ml-1"></i>
+                    <div class="flex items-center gap-3">
+                        <span id="sync-badge" class="text-xs px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold transition-all">
+                            <i class="fa-solid fa-cloud-check mr-1"></i> Cloud Sincronizzato
+                        </span>
+                        <button onclick="openAddWorkoutModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Nuova Seduta
                         </button>
                     </div>
                 </div>
 
-                <!-- RIEPILOGO SETTIMANALE (CORSA + KM RULLI + TOTALE) -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                        <h3 class="font-bold text-slate-900">Riepilogo Chilometraggio Settimanale (Corsa & Rulli)</h3>
-                        <span class="text-xs font-semibold text-cyan-700 bg-cyan-50 border border-cyan-200 px-3 py-1 rounded-full" id="weekly-rulli-badge">
-                            Totale Rulli Accumulati: 0.0 km
-                        </span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
-                                <tr>
-                                    <th class="p-3">Settimana</th>
-                                    <th class="p-3">Fase</th>
-                                    <th class="p-3">Corsa Prev.</th>
-                                    <th class="p-3">Corsa Fatta</th>
-                                    <th class="p-3 text-cyan-700">Km Rulli</th>
-                                    <th class="p-3">Avanzamento Corsa</th>
-                                </tr>
-                            </thead>
-                            <tbody id="weekly-summary-body" class="divide-y divide-slate-100"></tbody>
-                            <tfoot id="weekly-summary-foot" class="bg-slate-800 text-white font-semibold text-xs"></tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== TAB 2: DIARIO & COACH DINAMICO ==================== -->
-            <div id="tab-diario" class="hidden space-y-6">
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="filterDiario('all')" id="flt-all" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white">Tutte le date</button>
-                        <button onclick="filterDiario('nov_rientro')" id="flt-nov_rientro" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">9–15 Nov (Rientro)</button>
-                        <button onclick="filterDiario('nov_base')" id="flt-nov_base" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">16–21 Nov (Inizio Base)</button>
-                        <button onclick="filterDiario('storico')" id="flt-storico" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">25 Ott – 8 Nov</button>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200" id="diario-tot-corsa">
-                            Totale Corsa: 0.0 km
-                        </span>
-                        <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200" id="diario-tot-rulli">
-                            <i class="fa-solid fa-bicycle mr-1"></i> Totale Km Rulli: 0.0 km
-                        </span>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead class="bg-slate-800 text-slate-200 text-xs uppercase">
-                                <tr>
-                                    <th class="p-3.5">Data</th>
-                                    <th class="p-3.5">Attività & Dettaglio</th>
-                                    <th class="p-3.5">Corsa Prev.</th>
-                                    <th class="p-3.5">Corsa Fatta</th>
-                                    <th class="p-3.5 text-cyan-300">Km Rulli</th>
-                                    <th class="p-3.5">Scarpe</th>
-                                    <th class="p-3.5">Stato</th>
-                                    <th class="p-3.5 text-right">Azioni Coach</th>
-                                </tr>
-                            </thead>
-                            <tbody id="diario-tbody" class="divide-y divide-slate-100"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== TAB 3: GARE, SOGLIA & ZONE RITMO ==================== -->
-            <div id="tab-gare" class="hidden space-y-6">
-                
-                <!-- CARD SOGLIA CORRENTE GARMIN (MODIFICABILE DIRETTAMENTE) -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
-                        <div>
-                            <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                                <i class="fa-solid fa-fire-flame-curved text-amber-500"></i> Soglia Corrente Garmin (Modificabile)
-                            </h3>
-                            <p class="text-xs text-slate-500">Aggiorna qui i parametri rilevati dal Garmin: ogni modifica si salva in automatico e ricalcola le Zone di Passo, FC e Potenza.</p>
-                        </div>
-                        <button onclick="archiveThresholdSnapshot()" class="shrink-0 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold px-3 py-2 rounded-lg transition">
-                            <i class="fa-solid fa-clock-rotate-left mr-1"></i> Salva nello storico
-                        </button>
-                    </div>
-
+                <!-- ==================== TAB 1: PANORAMICA ==================== -->
+                <div id="tab-panoramica" class="space-y-6">
+                    
+                    <!-- KPI CARDS -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                        <div class="bg-rose-50/60 border border-rose-200/80 p-3.5 rounded-xl">
-                            <label class="text-[11px] font-bold uppercase text-rose-700 block mb-1">FC Soglia (bpm)</label>
-                            <input type="number" id="soglia-fc" value="187" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-rose-200 rounded-lg px-3 py-1.5">
-                            <span class="text-[11px] text-slate-500 mt-1 block">Lactate Threshold HR</span>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-[11px] font-semibold uppercase text-slate-400">Corsa Sett. Corrente</p>
+                                    <h3 class="text-xl font-bold text-slate-900 mt-1" id="kpi-km-sett">0 / 0 km</h3>
+                                </div>
+                                <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-route"></i></span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-2">Sett. 16–22 Nov (Base)</p>
                         </div>
 
-                        <div class="bg-blue-50/60 border border-blue-200/80 p-3.5 rounded-xl">
-                            <label class="text-[11px] font-bold uppercase text-blue-700 block mb-1">Passo Soglia (min:sec)</label>
-                            <input type="text" id="soglia-passo" value="4:23" oninput="saveThresholdInline()" placeholder="4:23" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-blue-200 rounded-lg px-3 py-1.5">
-                            <span class="text-[11px] text-slate-500 mt-1 block">min/km in soglia</span>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-cyan-300 transition" onclick="switchTab('diario')">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-[11px] font-semibold uppercase text-slate-400">Km Rulli Totali</p>
+                                    <h3 class="text-xl font-bold text-cyan-600 mt-1" id="kpi-rulli-tot">0.0 km</h3>
+                                </div>
+                                <span class="p-2 bg-cyan-50 text-cyan-600 rounded-lg"><i class="fa-solid fa-bicycle"></i></span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-2" id="kpi-rulli-sub">Sett. corrente: 0.0 km</p>
                         </div>
 
-                        <div class="bg-amber-50/60 border border-amber-200/80 p-3.5 rounded-xl">
-                            <label class="text-[11px] font-bold uppercase text-amber-700 block mb-1">Potenza Soglia (W)</label>
-                            <input type="number" id="soglia-w" value="360" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-amber-200 rounded-lg px-3 py-1.5">
-                            <span class="text-[11px] text-slate-500 mt-1 block">Running Power FTP</span>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-emerald-300 transition" onclick="switchTab('scarpe')">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-[11px] font-semibold uppercase text-slate-400" id="kpi-shoe1-name">Scarpa 1</p>
+                                    <h3 class="text-xl font-bold text-emerald-600 mt-1" id="kpi-shoe1-rem">-- km</h3>
+                                </div>
+                                <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-shoe-prints"></i></span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-2" id="kpi-shoe1-sub">-- / -- km · Rimanenti</p>
                         </div>
 
-                        <div class="bg-emerald-50/60 border border-emerald-200/80 p-3.5 rounded-xl">
-                            <label class="text-[11px] font-bold uppercase text-emerald-700 block mb-1">Potenza Relativa (W/kg)</label>
-                            <input type="number" step="0.01" id="soglia-wkg" value="5.26" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-emerald-200 rounded-lg px-3 py-1.5">
-                            <span class="text-[11px] text-slate-500 mt-1 block" id="soglia-wkg-calc">Su 69 kg: 5.22 W/kg</span>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-blue-300 transition" onclick="switchTab('scarpe')">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-[11px] font-semibold uppercase text-slate-400" id="kpi-shoe2-name">Scarpa 2</p>
+                                    <h3 class="text-xl font-bold text-blue-600 mt-1" id="kpi-shoe2-rem">-- km</h3>
+                                </div>
+                                <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-bolt"></i></span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-2" id="kpi-shoe2-sub">-- / -- km · Rimanenti</p>
                         </div>
 
-                        <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
-                            <label class="text-[11px] font-bold uppercase text-slate-600 block mb-1">Data Rilevamento</label>
-                            <input type="date" id="soglia-data" value="2026-11-18" onchange="saveThresholdInline()" class="w-full font-mono font-semibold text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-2">
-                            <span class="text-[11px] text-slate-500 mt-1 block">Ultimo test Garmin</span>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-[11px] font-semibold uppercase text-slate-400">Mezza Maratona '27</p>
+                                    <h3 class="text-xl font-bold text-indigo-600 mt-1" id="kpi-cd-21k">-- gg</h3>
+                                </div>
+                                <span class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-flag-checkered"></i></span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-2" id="kpi-cd-sub">Test 10k tra -- gg</p>
                         </div>
                     </div>
 
-                    <div id="threshold-history-box" class="mt-4 hidden">
-                        <div class="text-xs font-bold text-slate-600 mb-2">Storico Soglie Rilevate:</div>
-                        <div id="threshold-history-list" class="flex flex-wrap gap-2"></div>
-                    </div>
-                </div>
+                    <!-- FASCIA SOGLIA CORRENTE GARMIN -->
+                    <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-5 rounded-xl shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-fire-flame-curved"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-base">Soglia Anaerobica Corrente (Garmin)</h3>
+                                    <span class="text-[11px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-mono" id="pan-soglia-date">--</span>
+                                </div>
+                                <p class="text-xs text-slate-400">Valori utilizzati per calibrare passo, battiti e Watt delle tue zone.</p>
+                            </div>
+                        </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-slate-900">Gare Obiettivo & Test</h3>
-                            <button onclick="openAddRaceModal()" class="text-xs bg-blue-50 text-blue-600 font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-100">
-                                + Aggiungi Gara
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
+                                <div class="text-[10px] uppercase text-slate-400">FC Soglia</div>
+                                <div class="font-mono font-bold text-base text-rose-400" id="pan-soglia-fc">-- bpm</div>
+                            </div>
+                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
+                                <div class="text-[10px] uppercase text-slate-400">Passo Soglia</div>
+                                <div class="font-mono font-bold text-base text-blue-400" id="pan-soglia-passo">--/km</div>
+                            </div>
+                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
+                                <div class="text-[10px] uppercase text-slate-400">Potenza</div>
+                                <div class="font-mono font-bold text-base text-amber-400" id="pan-soglia-w">-- W</div>
+                            </div>
+                            <div class="bg-slate-800/90 border border-slate-700 px-3.5 py-2 rounded-lg">
+                                <div class="text-[10px] uppercase text-slate-400">Rapporto W/kg</div>
+                                <div class="font-mono font-bold text-base text-emerald-400" id="pan-soglia-wkg">-- W/kg</div>
+                            </div>
+                        </div>
+
+                        <button onclick="openThresholdModal()" class="shrink-0 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition shadow">
+                            <i class="fa-solid fa-pen mr-1"></i> Aggiorna Soglia
+                        </button>
+                    </div>
+
+                    <!-- SEMAFORO READINESS + PROSSIMA SEDUTA -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-heart-pulse text-rose-500"></i> Semaforo Readiness Mattutino (Garmin & Corpo)
+                                </h3>
+                                <span id="readiness-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                                    SEMAFORO VERDE — OK PER CORRERE
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                                <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                                    <label class="text-xs text-slate-500 block mb-1">FC a riposo oggi (baseline <span id="lbl-base-fc">60</span>)</label>
+                                    <input type="number" id="input-fc-riposo" value="60" oninput="updateReadiness(true)" class="w-full font-bold text-lg bg-white border border-slate-300 rounded px-2.5 py-1">
+                                </div>
+                                <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                                    <label class="text-xs text-slate-500 block mb-1">Stato Schiena / Lombare</label>
+                                    <select id="input-schiena" onchange="updateReadiness(true)" class="w-full font-semibold text-sm bg-white border border-slate-300 rounded px-2.5 py-2">
+                                        <option value="ok">Nessun fastidio (OK)</option>
+                                        <option value="lieve">Leggera rigidità</option>
+                                        <option value="dolore">Fastidio / Dolore</option>
+                                    </select>
+                                </div>
+                                <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                                    <label class="text-xs text-slate-500 block mb-1">Polpaccio Sx & Tendine</label>
+                                    <select id="input-polpaccio" onchange="updateReadiness(true)" class="w-full font-semibold text-sm bg-white border border-slate-300 rounded px-2.5 py-2">
+                                        <option value="ok">Primi passi OK</option>
+                                        <option value="affaticato">Un po' carico</option>
+                                        <option value="dolore">Dolore ai primi passi</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="readiness-advice" class="text-sm bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-lg">
+                                Parametri nella norma: FC a riposo regolare. Puoi svolgere regolarmente la seduta prevista.
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                                        <i class="fa-solid fa-calendar-day text-blue-600"></i> Prossime Sedute Piano
+                                    </h3>
+                                    <span class="text-[11px] font-mono text-slate-400" id="upcoming-today-lbl">--</span>
+                                </div>
+                                <div id="upcoming-list" class="space-y-2.5"></div>
+                            </div>
+                            <button onclick="switchTab('diario')" class="mt-4 w-full text-center text-xs font-semibold text-blue-600 hover:text-blue-800 py-2 border border-blue-200 rounded-lg hover:bg-blue-50 transition">
+                                Apri Diario Completo <i class="fa-solid fa-arrow-right ml-1"></i>
                             </button>
                         </div>
-                        <div id="races-list" class="space-y-3"></div>
                     </div>
 
+                    <!-- RIEPILOGO SETTIMANALE -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-slate-900 mb-1">Personal Best (PB) & Previsioni Garmin</h3>
-                        <p class="text-xs text-slate-500 mb-4">Ogni modifica viene salvata automaticamente e confrontata con la soglia.</p>
-                        <div class="grid grid-cols-3 gap-3 text-xs font-semibold text-slate-500 mb-2">
-                            <div>Distanza</div>
-                            <div>Tuo PB (mm:ss)</div>
-                            <div>Stima Garmin</div>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                            <h3 class="font-bold text-slate-900">Riepilogo Chilometraggio Settimanale (Corsa & Rulli)</h3>
+                            <span class="text-xs font-semibold text-cyan-700 bg-cyan-50 border border-cyan-200 px-3 py-1 rounded-full" id="weekly-rulli-badge">
+                                Totale Rulli Accumulati: 0.0 km
+                            </span>
                         </div>
-                        <div class="space-y-3">
-                            <div class="grid grid-cols-3 gap-3 items-center">
-                                <span class="font-bold text-sm">5 km</span>
-                                <input type="text" id="pb-5k" value="21:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                <input type="text" id="garmin-5k" value="21:10" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
-                            </div>
-                            <div class="grid grid-cols-3 gap-3 items-center">
-                                <span class="font-bold text-sm">10 km</span>
-                                <input type="text" id="pb-10k" value="44:45" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                <input type="text" id="garmin-10k" value="44:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
-                            </div>
-                            <div class="grid grid-cols-3 gap-3 items-center">
-                                <span class="font-bold text-sm">21.1 km (Ortona)</span>
-                                <input type="text" id="pb-21k" value="1:41:38" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                <input type="text" id="garmin-21k" value="1:38:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
-                            </div>
-                        </div>
-                        <div id="endurance-index-box" class="mt-4 p-3.5 rounded-lg bg-indigo-50 border border-indigo-100 text-xs text-indigo-900"></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-slate-900 mb-3" id="zones-table-title">Zone Dinamiche (Calibrate su Soglia Garmin)</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
-                                <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+                                <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
                                     <tr>
-                                        <th class="p-2.5">Zona</th>
-                                        <th class="p-2.5">Passo Target</th>
-                                        <th class="p-2.5">FC Target</th>
-                                        <th class="p-2.5">Potenza (W)</th>
+                                        <th class="p-3">Settimana</th>
+                                        <th class="p-3">Fase</th>
+                                        <th class="p-3">Corsa Prev.</th>
+                                        <th class="p-3">Corsa Fatta</th>
+                                        <th class="p-3 text-cyan-700">Km Rulli</th>
+                                        <th class="p-3">Avanzamento Corsa</th>
                                     </tr>
                                 </thead>
-                                <tbody id="pace-zones-tbody" class="divide-y divide-slate-100"></tbody>
+                                <tbody id="weekly-summary-body" class="divide-y divide-slate-100"></tbody>
+                                <tfoot id="weekly-summary-foot" class="bg-slate-800 text-white font-semibold text-xs"></tfoot>
                             </table>
                         </div>
                     </div>
+                </div>
+
+                <!-- ==================== TAB 2: DIARIO & COACH DINAMICO ==================== -->
+                <div id="tab-diario" class="hidden space-y-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterDiario('all')" id="flt-all" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white">Tutte le date</button>
+                            <button onclick="filterDiario('nov_rientro')" id="flt-nov_rientro" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">9–15 Nov (Rientro)</button>
+                            <button onclick="filterDiario('nov_base')" id="flt-nov_base" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">16–21 Nov (Inizio Base)</button>
+                            <button onclick="filterDiario('storico')" id="flt-storico" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">25 Ott – 8 Nov</button>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200" id="diario-tot-corsa">
+                                Totale Corsa: 0.0 km
+                            </span>
+                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200" id="diario-tot-rulli">
+                                <i class="fa-solid fa-bicycle mr-1"></i> Totale Km Rulli: 0.0 km
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-slate-800 text-slate-200 text-xs uppercase">
+                                    <tr>
+                                        <th class="p-3.5">Data</th>
+                                        <th class="p-3.5">Attività & Dettaglio</th>
+                                        <th class="p-3.5">Corsa Prev.</th>
+                                        <th class="p-3.5">Corsa Fatta</th>
+                                        <th class="p-3.5 text-cyan-300">Km Rulli</th>
+                                        <th class="p-3.5">Scarpe</th>
+                                        <th class="p-3.5">Stato</th>
+                                        <th class="p-3.5 text-right">Azioni Coach</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="diario-tbody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== TAB 3: GARE, SOGLIA & ZONE RITMO ==================== -->
+                <div id="tab-gare" class="hidden space-y-6">
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+                            <div>
+                                <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-fire-flame-curved text-amber-500"></i> Soglia Corrente Garmin (Modificabile)
+                                </h3>
+                                <p class="text-xs text-slate-500">Aggiorna qui i parametri rilevati dal Garmin: ogni modifica si salva nel cloud e ricalcola le Zone.</p>
+                            </div>
+                            <button onclick="archiveThresholdSnapshot()" class="shrink-0 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 text-xs font-semibold px-3 py-2 rounded-lg transition">
+                                <i class="fa-solid fa-clock-rotate-left mr-1"></i> Salva nello storico
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                            <div class="bg-rose-50/60 border border-rose-200/80 p-3.5 rounded-xl">
+                                <label class="text-[11px] font-bold uppercase text-rose-700 block mb-1">FC Soglia (bpm)</label>
+                                <input type="number" id="soglia-fc" value="180" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-rose-200 rounded-lg px-3 py-1.5">
+                            </div>
+
+                            <div class="bg-blue-50/60 border border-blue-200/80 p-3.5 rounded-xl">
+                                <label class="text-[11px] font-bold uppercase text-blue-700 block mb-1">Passo Soglia (min:sec)</label>
+                                <input type="text" id="soglia-passo" value="4:30" oninput="saveThresholdInline()" placeholder="4:23" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-blue-200 rounded-lg px-3 py-1.5">
+                            </div>
+
+                            <div class="bg-amber-50/60 border border-amber-200/80 p-3.5 rounded-xl">
+                                <label class="text-[11px] font-bold uppercase text-amber-700 block mb-1">Potenza Soglia (W)</label>
+                                <input type="number" id="soglia-w" value="350" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-amber-200 rounded-lg px-3 py-1.5">
+                            </div>
+
+                            <div class="bg-emerald-50/60 border border-emerald-200/80 p-3.5 rounded-xl">
+                                <label class="text-[11px] font-bold uppercase text-emerald-700 block mb-1">Potenza Relativa (W/kg)</label>
+                                <input type="number" step="0.01" id="soglia-wkg" value="5.00" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-emerald-200 rounded-lg px-3 py-1.5">
+                                <span class="text-[11px] text-slate-500 mt-1 block" id="soglia-wkg-calc">--</span>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
+                                <label class="text-[11px] font-bold uppercase text-slate-600 block mb-1">Data Rilevamento</label>
+                                <input type="date" id="soglia-data" value="2026-11-18" onchange="saveThresholdInline()" class="w-full font-mono font-semibold text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-2">
+                            </div>
+                        </div>
+
+                        <div id="threshold-history-box" class="mt-4 hidden">
+                            <div class="text-xs font-bold text-slate-600 mb-2">Storico Soglie Rilevate:</div>
+                            <div id="threshold-history-list" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-slate-900">Gare Obiettivo & Test</h3>
+                                <button onclick="openAddRaceModal()" class="text-xs bg-blue-50 text-blue-600 font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-100">
+                                    + Aggiungi Gara
+                                </button>
+                            </div>
+                            <div id="races-list" class="space-y-3"></div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-slate-900 mb-1">Personal Best (PB) & Previsioni Garmin</h3>
+                            <p class="text-xs text-slate-500 mb-4">Ogni modifica viene salvata nel cloud.</p>
+                            <div class="grid grid-cols-3 gap-3 text-xs font-semibold text-slate-500 mb-2">
+                                <div>Distanza</div>
+                                <div>Tuo PB (mm:ss)</div>
+                                <div>Stima Garmin</div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-3 gap-3 items-center">
+                                    <span class="font-bold text-sm">5 km</span>
+                                    <input type="text" id="pb-5k" value="22:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                    <input type="text" id="garmin-5k" value="21:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
+                                </div>
+                                <div class="grid grid-cols-3 gap-3 items-center">
+                                    <span class="font-bold text-sm">10 km</span>
+                                    <input type="text" id="pb-10k" value="45:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                    <input type="text" id="garmin-10k" value="44:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
+                                </div>
+                                <div class="grid grid-cols-3 gap-3 items-center">
+                                    <span class="font-bold text-sm">21.1 km</span>
+                                    <input type="text" id="pb-21k" value="1:42:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                    <input type="text" id="garmin-21k" value="1:39:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
+                                </div>
+                            </div>
+                            <div id="endurance-index-box" class="mt-4 p-3.5 rounded-lg bg-indigo-50 border border-indigo-100 text-xs text-indigo-900"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-slate-900 mb-3" id="zones-table-title">Zone Dinamiche (Calibrate su Soglia Garmin)</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+                                        <tr>
+                                            <th class="p-2.5">Zona</th>
+                                            <th class="p-2.5">Passo Target</th>
+                                            <th class="p-2.5">FC Target</th>
+                                            <th class="p-2.5">Potenza (W)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pace-zones-tbody" class="divide-y divide-slate-100"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-slate-900 mb-2"><i class="fa-solid fa-bottle-water text-blue-500 mr-1"></i> Strategia Lunghi (<span id="nutr-weight-lbl">70</span> kg)</h3>
+                            <p class="text-xs text-slate-500 mb-4">Calcolata sul tuo peso attuale per uscite oltre i 75–90 minuti:</p>
+                            <ul class="space-y-3 text-sm" id="nutrition-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== TAB 4: FORZA GAMBE & UPPER ==================== -->
+                <div id="tab-forza" class="hidden space-y-6">
+                    <div class="bg-amber-50 border border-amber-200 text-amber-900 p-4 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <strong>Regole Forza:</strong> Sforzo facile/moderato con <strong>3 ripetizioni di riserva (RIR 3)</strong>. Clicca sull'illustrazione di qualsiasi esercizio per ingrandirla, spunta gli esercizi svolti e annota i chili.
+                        </div>
+                        <button onclick="resetStrengthChecks()" class="shrink-0 bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 font-semibold px-3 py-1.5 rounded-lg transition">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Azzera spunte seduta
+                        </button>
+                    </div>
+
+                    <div id="strength-cards-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+                </div>
+
+                <!-- ==================== TAB 5: PARCO SCARPE & REGOLE ==================== -->
+                <div id="tab-scarpe" class="hidden space-y-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm">Gestione Libera Parco Scarpe</h3>
+                            <p class="text-xs text-slate-500">Modifica direttamente i km percorsi o il limite massimo di ogni scarpa: ogni corsa registrata nel Diario aggiorna i totali in automatico.</p>
+                        </div>
+                        <button onclick="openAddShoeModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi Scarpa
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="shoes-container"></div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-slate-900 mb-2"><i class="fa-solid fa-bottle-water text-blue-500 mr-1"></i> Strategia Lunghi (<span id="nutr-weight-lbl">69</span> kg)</h3>
-                        <p class="text-xs text-slate-500 mb-4">Calcolata sul tuo peso attuale per uscite oltre i 75–90 minuti:</p>
-                        <ul class="space-y-3 text-sm" id="nutrition-list"></ul>
+                        <h3 class="font-bold text-slate-900 mb-4">Protocollo & Regole del Piano</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="rules-container"></div>
                     </div>
                 </div>
+
             </div>
+        </main>
+    </div>
 
-            <!-- ==================== TAB 4: FORZA GAMBE & UPPER ==================== -->
-            <div id="tab-forza" class="hidden space-y-6">
-                <div class="bg-amber-50 border border-amber-200 text-amber-900 p-4 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                        <strong>Regole Forza:</strong> Sforzo facile/moderato con <strong>3 ripetizioni di riserva (RIR 3)</strong>. Clicca sull'illustrazione di qualsiasi esercizio per ingrandirla, spunta gli esercizi svolti e annota i chili.
-                    </div>
-                    <button onclick="resetStrengthChecks()" class="shrink-0 bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 font-semibold px-3 py-1.5 rounded-lg transition">
-                        <i class="fa-solid fa-rotate-left mr-1"></i> Azzera spunte seduta
-                    </button>
-                </div>
-
-                <div id="strength-cards-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
-            </div>
-
-            <!-- ==================== TAB 5: PARCO SCARPE & REGOLE ==================== -->
-            <div id="tab-scarpe" class="hidden space-y-6">
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-sm">Gestione Libera Parco Scarpe</h3>
-                        <p class="text-xs text-slate-500">Modifica direttamente i km percorsi o il limite massimo di ogni scarpa: ogni corsa registrata nel Diario aggiorna i totali in automatico e salva tutto.</p>
-                    </div>
-                    <button onclick="openAddShoeModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition">
-                        <i class="fa-solid fa-plus mr-1"></i> Aggiungi Scarpa
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="shoes-container"></div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-900 mb-4">Protocollo & Regole del Piano</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="rules-container"></div>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- MODALE MODIFICA RAPIDA SOGLIA GARMIN -->
+    <!-- MODALI (SOGLIA, ESERCIZI, SCARPE, COMPLETA, SALTA, PROFILO, NUOVA SEDUTA, NUOVA GARA) -->
     <div id="modal-threshold" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Aggiorna Soglia Corrente Garmin</h3>
-            <p class="text-xs text-slate-500 mb-4">Modifica i valori rilevati dall'orologio: le zone di allenamento si aggiorneranno subito.</p>
+            <p class="text-xs text-slate-500 mb-4">Modifica i valori rilevati dall'orologio.</p>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -512,7 +553,6 @@
         </div>
     </div>
 
-    <!-- MODALE SCHEDA VISIVA ESERCIZIO -->
     <div id="modal-exercise" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
             <div class="flex justify-between items-start mb-3">
@@ -522,8 +562,7 @@
                 </div>
                 <button onclick="closeModals()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-center my-3" id="ex-modal-svg">
-            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-center my-3" id="ex-modal-svg"></div>
             <div class="space-y-2 text-sm text-slate-700">
                 <div class="flex gap-4 text-xs font-mono bg-blue-50 text-blue-800 px-3 py-2 rounded-lg">
                     <span><strong>Serie/Rip:</strong> <span id="ex-modal-serie">--</span></span>
@@ -540,20 +579,19 @@
         </div>
     </div>
 
-    <!-- MODALE MODIFICA / AGGIUNGI SCARPA -->
     <div id="modal-shoe" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1" id="modal-shoe-title">Modifica Scarpa</h3>
-            <p class="text-xs text-slate-500 mb-4">Imposta i km già percorsi e la vita utile massima (es. 130 su 650 km).</p>
+            <p class="text-xs text-slate-500 mb-4">Imposta i km già percorsi e la vita utile massima.</p>
             <input type="hidden" id="modal-shoe-idx" value="-1">
             <div class="space-y-3 text-sm">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Modello Scarpa</label>
-                    <input type="text" id="shoe-input-nome" placeholder="es. Adidas Evo SL" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-semibold">
+                    <input type="text" id="shoe-input-nome" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-semibold">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Utilizzo / Ruolo</label>
-                    <input type="text" id="shoe-input-ruolo" placeholder="es. Gare e lavori di qualità" class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                    <input type="text" id="shoe-input-ruolo" class="w-full border border-slate-300 rounded-lg px-3 py-2">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -565,13 +603,13 @@
                         <input type="number" step="10" id="shoe-input-max" oninput="previewShoeCalc()" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold">
                     </div>
                 </div>
-                <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-2 rounded-lg text-xs font-semibold flex justify-between" id="shoe-preview-box">
+                <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-2 rounded-lg text-xs font-semibold flex justify-between">
                     <span>Rimanenti stimati:</span>
-                    <span id="shoe-preview-rem">520 km</span>
+                    <span id="shoe-preview-rem">-- km</span>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Note</label>
-                    <input type="text" id="shoe-input-note" placeholder="Note su ammortizzazione o rotazione..." class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                    <input type="text" id="shoe-input-note" class="w-full border border-slate-300 rounded-lg px-3 py-2">
                 </div>
             </div>
             <div class="flex justify-between items-center mt-6">
@@ -584,7 +622,6 @@
         </div>
     </div>
 
-    <!-- MODALE REGISTRA / COMPLETA ALLENAMENTO (CORSA + KM RULLI) -->
     <div id="modal-complete" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Registra Seduta Garmin</h3>
@@ -613,12 +650,11 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Usate (solo per corsa)</label>
-                    <select id="modal-comp-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                    </select>
+                    <select id="modal-comp-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Note & Sensazioni (Schiena / Polpaccio)</label>
-                    <input type="text" id="modal-comp-note" placeholder="Gambe sciolte, schiena ok..." class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Note & Sensazioni</label>
+                    <input type="text" id="modal-comp-note" class="w-full border border-slate-300 rounded-lg px-3 py-2">
                 </div>
             </div>
             <div class="flex justify-end gap-2 mt-6">
@@ -628,7 +664,6 @@
         </div>
     </div>
 
-    <!-- MODALE SALTA & RIMODULA -->
     <div id="modal-skip" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Coach Dinamico — Rimodulazione</h3>
@@ -639,10 +674,10 @@
                 <select id="modal-skip-reason" class="w-full border border-slate-300 rounded-lg px-3 py-2">
                     <option value="imprevisto">Imprevisto lavorativo / meteo (nessun problema fisico)</option>
                     <option value="stanchezza">Stanchezza / FC alta / Sonno scarso</option>
-                    <option value="schiena">Fastidio alla schiena o al polpaccio sinistro</option>
+                    <option value="schiena">Fastidio fisico / Affaticamento muscolare</option>
                 </select>
                 <div class="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg">
-                    <strong>Azione automatica:</strong> I chilometri non corsi oggi verranno azzerati senza accumularli nei giorni successivi. Se segnali fastidio fisico o stanchezza, la prossima corsa verrà convertita in recupero attivo.
+                    <strong>Azione automatica:</strong> I chilometri non corsi oggi verranno azzerati senza accumularli nei giorni successivi.
                 </div>
             </div>
             <div class="flex justify-end gap-2 mt-6">
@@ -652,7 +687,6 @@
         </div>
     </div>
 
-    <!-- MODALE PROFILO ATLETA -->
     <div id="modal-profile" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Profilo Atleta</h3>
@@ -677,7 +711,6 @@
         </div>
     </div>
 
-    <!-- MODALE NUOVA SEDUTA -->
     <div id="modal-add-workout" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Aggiungi Seduta al Diario</h3>
@@ -702,7 +735,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Dettaglio seduta</label>
-                    <input type="text" id="new-w-dettaglio" placeholder="es. 10 km facili a 125-145 bpm" class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                    <input type="text" id="new-w-dettaglio" class="w-full border border-slate-300 rounded-lg px-3 py-2">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -711,8 +744,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Previste</label>
-                        <select id="new-w-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2">
-                        </select>
+                        <select id="new-w-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select>
                     </div>
                 </div>
             </div>
@@ -723,14 +755,13 @@
         </div>
     </div>
 
-    <!-- MODALE NUOVA GARA -->
     <div id="modal-add-race" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Aggiungi Gara o Test</h3>
             <div class="space-y-3 text-sm">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nome Gara</label>
-                    <input type="text" id="new-r-nome" placeholder="es. Trofeo 10 km" class="w-full border border-slate-300 rounded-lg px-3 py-2">
+                    <input type="text" id="new-r-nome" class="w-full border border-slate-300 rounded-lg px-3 py-2">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -763,7 +794,218 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'runcoach_db_v2';
+        // =========================================================================
+        // INCOLLA QUI IL TUO BLOCCO firebaseConfig COPIATO DALLA CONSOLE FIREBASE:
+        // =========================================================================
+        const firebaseConfig = {
+            apiKey: "INCOLLA_QUI_LA_TUA_API_KEY",
+            authDomain: "INCOLLA_QUI_IL_TUO_AUTH_DOMAIN",
+            projectId: "INCOLLA_QUI_IL_TUO_PROJECT_ID",
+            storageBucket: "INCOLLA_QUI_IL_TUO_STORAGE_BUCKET",
+            messagingSenderId: "INCOLLA_QUI_IL_TUO_SENDER_ID",
+            appId: "INCOLLA_QUI_LA_TUA_APP_ID"
+        };
+        // =========================================================================
+
+        let auth = null;
+        let firestore = null;
+        let currentUser = null;
+        let db = null;
+        let cloudSaveTimer = null;
+
+        const isConfigured = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("INCOLLA_QUI");
+        if (isConfigured) {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            firestore = firebase.firestore();
+        } else {
+            document.getElementById('config-warning').classList.remove('hidden');
+        }
+
+        // TEMPLATE NEUTRO (ZERO DATI PERSONALI NEL CODICE PUBBLICO SU GITHUB)
+        const NEUTRAL_TEMPLATE_DB = {
+            ui: {
+                activeTab: "panoramica",
+                diarioFilter: "all",
+                readiness: { fc: 60, schiena: "ok", polpaccio: "ok" }
+            },
+            atleta: {
+                peso_kg: 70.0,
+                altezza_cm: 175,
+                bmi: 22.86,
+                fc_riposo: 60
+            },
+            soglia: {
+                fc_bpm: 180,
+                passo: "4:30",
+                potenza_w: 350,
+                potenza_w_kg: 5.00,
+                data_rilevamento: "2026-11-18",
+                storico: []
+            },
+            pb: {
+                "5k": "22:00", "10k": "45:00", "21k": "1:42:00",
+                garmin_5k: "21:30", garmin_10k: "44:30", garmin_21k: "1:39:00"
+            },
+            scarpe: [
+                { id: "shoe-1", nome: "Scarpa Lenti", ruolo: "Corse facili e recupero", km_percorsi: 0, vita_utile: 600, note: "Importa il tuo backup .json per caricare i tuoi dati." },
+                { id: "shoe-2", nome: "Scarpa Qualità", ruolo: "Gare e lavori veloci", km_percorsi: 0, vita_utile: 650, note: "" }
+            ],
+            gare: [
+                { nome: "Test / Gara 10 km", data: "2027-02-14", distanza: "10 km", tipo: "Gara Test" },
+                { nome: "Mezza Maratona Obiettivo", data: "2027-04-18", distanza: "21.1 km", tipo: "Gara Principale" }
+            ],
+            allenamenti_settimana: [],
+            forza: [
+                {
+                    titolo: "Core Leggero (Mobilità & Schiena)",
+                    badge: "Giorni Rulli / Riposo",
+                    esercizi: [
+                        { nome: "Gatto-cammello", imgKey: "cat_cow", muscoli: "Mobilità colonna & lombare", serie: "1x10 lente", rec: "30\"", note: "In quadrupedia, inarca e arrotonda la schiena piano, senza forzare.", carico: "Corpo libero", fatto: false },
+                        { nome: "Ponte glutei", imgKey: "glute_bridge", muscoli: "Grande gluteo & ischiocrurali", serie: "2x10", rec: "45\"", note: "Supino, ginocchia piegate, spingi sui talloni senza inarcare la schiena.", carico: "Corpo libero", fatto: false },
+                        { nome: "Bird-dog", imgKey: "bird_dog", muscoli: "Core profondo & stabilizzatori schiena", serie: "2x10/lato (pausa 3\")", rec: "45\"", note: "Estendi braccio e gamba opposti tenendo il bacino fermo.", carico: "Corpo libero", fatto: false },
+                        { nome: "Plank frontale", imgKey: "plank", muscoli: "Trasverso addominale & retto", serie: "2x20-30\"", rec: "45\"", note: "Corpo in linea dai talloni alle spalle, schiena neutra.", carico: "Corpo libero", fatto: false },
+                        { nome: "Dead bug", imgKey: "dead_bug", muscoli: "Core profondo & controllo pelvico", serie: "2x10/lato", rec: "45\"", note: "Schiena sempre aderente al pavimento.", carico: "Corpo libero", fatto: false }
+                    ]
+                },
+                {
+                    titolo: "Forza A: Gambe & Core (Lunedì)",
+                    badge: "Sett. 1-2: 2 serie | Da Sett. 3: 3 serie",
+                    esercizi: [
+                        { nome: "Squat o Goblet Squat leggero", imgKey: "squat", muscoli: "Quadricipiti, glutei, core", serie: "2-3 x 10", rec: "60-90\"", note: "Schiena neutra, ginocchia in linea con i piedi.", carico: "", fatto: false },
+                        { nome: "Affondi indietro", imgKey: "lunge", muscoli: "Glutei, quadricipiti, stabilità bacino", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Passo indietro controllato, busto dritto.", carico: "", fatto: false },
+                        { nome: "Ponte glutei su una gamba", imgKey: "single_bridge", muscoli: "Gluteo monolaterale & femorali", serie: "2-3 x 10/gamba", rec: "60\"", note: "Bacino alto e fermo, senza ruotare l'anca.", carico: "", fatto: false },
+                        { nome: "Alzate polpacci su una gamba", imgKey: "calf_raise", muscoli: "Gastrocnemio, soleo & tendine d'Achille", serie: "2-3 x 12/gamba", rec: "60\"", note: "Sul bordo di un gradino, discesa lenta in 3 secondi.", carico: "", fatto: false },
+                        { nome: "Plank frontale + Bird-dog", imgKey: "plank", muscoli: "Core & tenuta posturale", serie: "2-3 x 35\" / 8 lato", rec: "45\"", note: "Controllo posturale lento.", carico: "Corpo libero", fatto: false }
+                    ]
+                },
+                {
+                    titolo: "Forza B: Stabilità & Catena Posteriore (Venerdì)",
+                    badge: "Sett. 1-2: 2 serie | Da Sett. 3: 3 serie",
+                    esercizi: [
+                        { nome: "Step-up su gradino (30-40 cm)", imgKey: "step_up", muscoli: "Glutei, quadricipiti, spinta di corsa", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Spingi con il tallone della gamba sul gradino.", carico: "", fatto: false },
+                        { nome: "Camminata laterale con elastico", imgKey: "band_walk", muscoli: "Medio gluteo (stabilità ginocchio/anca)", serie: "2 x 12 passi/lato", rec: "45\"", note: "Elastico sopra le ginocchia, ginocchia semiflesse.", carico: "Elastico", fatto: false },
+                        { nome: "Stacco rumeno con manubri leggeri", imgKey: "rdl", muscoli: "Ischiocrurali, glutei, erettori spinali", serie: "Solo da Sett. 3 (3x8)", rec: "60-90\"", note: "Solo dalla 3ª settimana se la schiena è senza fastidi.", carico: "", fatto: false },
+                        { nome: "Plank laterale + Dead bug", imgKey: "side_plank", muscoli: "Obliqui, quadrato dei lombi & core", serie: "2-3 x 30\" / 8 lato", rec: "45\"", note: "Corpo allineato, fianchi alti.", carico: "Corpo libero", fatto: false }
+                    ]
+                },
+                {
+                    titolo: "Forza C: Upper Body & Postura Runner",
+                    badge: "Giorni Facili / Rulli (2x/sett.)",
+                    esercizi: [
+                        { nome: "Piegamenti (Push-up) o Panca Manubri", imgKey: "pushup", muscoli: "Pettorali, deltoidi anteriori, tricipiti", serie: "3 x 10-12", rec: "60\"", note: "Spinta controllata, RIR 3 (lascia 3 ripetizioni di margine).", carico: "", fatto: false },
+                        { nome: "Rematore con manubrio / elastico", imgKey: "row", muscoli: "Gran dorsale, romboidi, bicipiti", serie: "3 x 10/lato", rec: "60\"", note: "Rinforza il dorso per mantenere il busto aperto.", carico: "", fatto: false },
+                        { nome: "Military Press / Alzate manubri", imgKey: "overhead_press", muscoli: "Deltoidi & stabilizzatori scapola", serie: "3 x 10", rec: "60\"", note: "Addome attivo per non inarcare la zona lombare.", carico: "", fatto: false },
+                        { nome: "Face-pull con elastico / Tirate", imgKey: "face_pull", muscoli: "Deltoidi posteriori & cuffia rotatori", serie: "3 x 12-15", rec: "45\"", note: "Tira l'elastico verso il viso avvicinando le scapole.", carico: "Elastico", fatto: false }
+                    ]
+                }
+            ],
+            regole: [
+                { tema: "Rientro graduale", desc: "Solo volume facile e rulli finché non hai 7-10 giorni senza intoppi. I km saltati non si recuperano." },
+                { tema: "Schiena", desc: "Se una seduta dà fastidio, fermati o passa ai rulli. Niente stacco rumeno nelle prime 2 settimane." },
+                { tema: "Ritmo corse facili", desc: "125-145 bpm, ritmo conversazionale. Non guardare l'orologio." },
+                { tema: "Frequenza a riposo", desc: "Se per più giorni è 7-10 bpm sopra il valore normale, aggiungi un giorno di riposo." },
+                { tema: "Polpaccio & tendini", desc: "Controlla i primi passi del mattino. Se qualcosa fa male, niente corsa finché non passa." },
+                { tema: "Rotazione scarpe", desc: "Alterna scarpe protettive per i fondi lenti e scarpe reattive per qualità e gare." }
+            ]
+        };
+
+        // GESTIONE LOGIN / LOGOUT FIREBASE
+        async function handleLogin(e) {
+            e.preventDefault();
+            if (!isConfigured) return;
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errBox = document.getElementById('login-error');
+            const btn = document.getElementById('login-btn');
+
+            errBox.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Accesso in corso...`;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (err) {
+                errBox.textContent = "Credenziali non valide o utente non trovato (" + err.code + ").";
+                errBox.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-lock-open mr-1.5"></i> Accedi alla Dashboard`;
+            }
+        }
+
+        async function handleLogout() {
+            if (auth) await auth.signOut();
+            location.reload();
+        }
+
+        if (auth) {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('auth-screen').classList.add('hidden');
+                    document.getElementById('app-shell').classList.remove('hidden');
+                    document.getElementById('app-shell').classList.add('flex');
+                    document.getElementById('side-user-email').textContent = user.email;
+                    await loadUserFromCloud(user.uid);
+                } else {
+                    currentUser = null;
+                    document.getElementById('auth-screen').classList.remove('hidden');
+                    document.getElementById('app-shell').classList.add('hidden');
+                    document.getElementById('app-shell').classList.remove('flex');
+                }
+            });
+        }
+
+        async function loadUserFromCloud(uid) {
+            const localCacheKey = 'runcoach_cloud_' + uid;
+            const badge = document.getElementById('sync-badge');
+            badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Caricamento Cloud...`;
+
+            try {
+                const docRef = firestore.collection('users').doc(uid);
+                const docSnap = await docRef.get();
+                if (docSnap.exists) {
+                    db = normalizeDb(docSnap.data());
+                    localStorage.setItem(localCacheKey, JSON.stringify(db));
+                } else {
+                    // Primo accesso: controlla se hai dati salvati in locale, altrimenti usa template vuoto
+                    const prevLocal = localStorage.getItem(localCacheKey) || localStorage.getItem('runcoach_db_v2');
+                    db = prevLocal ? normalizeDb(JSON.parse(prevLocal)) : structuredClone(NEUTRAL_TEMPLATE_DB);
+                    await docRef.set(db);
+                }
+            } catch (err) {
+                console.error("Errore lettura Firestore:", err);
+                const fallback = localStorage.getItem(localCacheKey) || localStorage.getItem('runcoach_db_v2');
+                db = fallback ? normalizeDb(JSON.parse(fallback)) : structuredClone(NEUTRAL_TEMPLATE_DB);
+            }
+
+            restoreSavedInputs();
+            renderAll();
+            switchTab(db.ui.activeTab || 'panoramica', false);
+            badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Sincronizzato`;
+        }
+
+        function saveLocal() {
+            if (!db || !currentUser) return;
+            const localCacheKey = 'runcoach_cloud_' + currentUser.uid;
+            db.lastSaved = new Date().toISOString();
+            localStorage.setItem(localCacheKey, JSON.stringify(db));
+
+            const badge = document.getElementById('sync-badge');
+            if (badge) badge.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin mr-1"></i> Salvataggio Cloud...`;
+
+            clearTimeout(cloudSaveTimer);
+            cloudSaveTimer = setTimeout(async () => {
+                try {
+                    await firestore.collection('users').doc(currentUser.uid).set(db);
+                    const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    if (badge) badge.innerHTML = `<i class="fa-solid fa-cloud-check mr-1"></i> Cloud Salvato · ${now}`;
+                } catch (err) {
+                    console.error("Errore salvataggio Firestore:", err);
+                    if (badge) badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1"></i> Salvato in locale`;
+                }
+            }, 500);
+        }
 
         // ILLUSTRAZIONI ANATOMICHE PER OGNI ESERCIZIO
         function getExerciseSVG(key, large = false) {
@@ -771,247 +1013,30 @@
             const base = `<svg viewBox="0 0 160 110" class="${cls} rounded-lg bg-white border border-slate-200 shadow-xs" fill="none" xmlns="http://www.w3.org/2000/svg">`;
             const floor = `<line x1="10" y1="96" x2="150" y2="96" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>`;
             const shapes = {
-                cat_cow: `${floor}
-                    <circle cx="122" cy="54" r="7" fill="#334155"/>
-                    <path d="M52 60 Q84 36 115 58" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
-                    <path d="M52 60 Q84 74 115 58" stroke="#93c5fd" stroke-width="3" stroke-dasharray="3 3"/>
-                    <line x1="54" y1="60" x2="54" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="54" y1="95" x2="36" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="112" y1="59" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <path d="M84 30 L84 20 M80 24 L84 20 L88 24" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
-                glute_bridge: `${floor}
-                    <circle cx="30" cy="88" r="7" fill="#334155"/>
-                    <line x1="38" y1="90" x2="55" y2="90" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="55" y1="90" x2="92" y2="62" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="92" y1="62" x2="116" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <path d="M88 52 L88 40 M84 44 L88 40 L92 44" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
-                bird_dog: `${floor}
-                    <circle cx="114" cy="54" r="7" fill="#334155"/>
-                    <line x1="64" y1="60" x2="108" y2="60" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="106" y1="60" x2="144" y2="54" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="64" y1="60" x2="22" y2="54" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="64" y1="60" x2="64" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="104" y1="60" x2="104" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
-                plank: `${floor}
-                    <circle cx="128" cy="64" r="7" fill="#334155"/>
-                    <line x1="34" y1="84" x2="120" y2="68" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="116" y1="70" x2="116" y2="94" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="116" y1="94" x2="132" y2="94" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="34" y1="84" x2="28" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
-                dead_bug: `${floor}
-                    <circle cx="34" cy="88" r="7" fill="#334155"/>
-                    <line x1="42" y1="90" x2="96" y2="90" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="56" y1="88" x2="32" y2="66" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
-                    <line x1="56" y1="88" x2="60" y2="52" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
-                    <polyline points="96,90 96,64 120,64" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
-                    <line x1="96" y1="90" x2="134" y2="78" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>`,
-                squat: `${floor}
-                    <circle cx="88" cy="28" r="7" fill="#334155"/>
-                    <line x1="86" y1="36" x2="72" y2="64" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="84" y1="44" x2="106" y2="48" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/>
-                    <circle cx="109" cy="48" r="4" fill="#10b981"/>
-                    <polyline points="72,64 102,68 92,95" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>`,
-                lunge: `${floor}
-                    <circle cx="78" cy="24" r="7" fill="#334155"/>
-                    <line x1="78" y1="32" x2="78" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
-                    <polyline points="78,62 110,62 110,95" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <polyline points="78,62 52,82 40,95" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
-                single_bridge: `${floor}
-                    <circle cx="30" cy="88" r="7" fill="#334155"/>
-                    <line x1="38" y1="90" x2="55" y2="90" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="55" y1="90" x2="90" y2="62" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="90" y1="62" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="90" y1="62" x2="128" y2="34" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/>`,
-                calf_raise: `${floor}
-                    <rect x="64" y="84" width="32" height="12" rx="2" fill="#94a3b8"/>
-                    <circle cx="80" cy="18" r="7" fill="#334155"/>
-                    <line x1="80" y1="26" x2="80" y2="54" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="80" y1="54" x2="82" y2="82" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-                    <path d="M98 76 L98 62 M94 66 L98 62 L102 66" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
-                step_up: `${floor}
-                    <rect x="92" y="72" width="44" height="24" rx="2" fill="#94a3b8"/>
-                    <circle cx="96" cy="18" r="7" fill="#334155"/>
-                    <line x1="96" y1="26" x2="94" y2="50" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
-                    <polyline points="94,50 112,54 112,72" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <line x1="94" y1="50" x2="76" y2="95" stroke="#64748b" stroke-width="4.5" stroke-linecap="round"/>`,
-                band_walk: `${floor}
-                    <circle cx="80" cy="22" r="7" fill="#334155"/>
-                    <line x1="80" y1="30" x2="78" y2="56" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
-                    <polyline points="78,56 64,74 60,95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <polyline points="78,56 98,74 104,95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="63" y1="73" x2="99" y2="73" stroke="#10b981" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M112 60 L126 60 M122 56 L126 60 L122 64" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>`,
-                rdl: `${floor}
-                    <circle cx="114" cy="46" r="7" fill="#334155"/>
-                    <line x1="66" y1="56" x2="106" y2="48" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="66" y1="56" x2="62" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="100" y1="50" x2="100" y2="76" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
-                    <rect x="94" y="75" width="12" height="5" rx="1" fill="#10b981"/>`,
-                side_plank: `${floor}
-                    <circle cx="126" cy="54" r="7" fill="#334155"/>
-                    <line x1="34" y1="92" x2="118" y2="60" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="112" y1="64" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
-                pushup: `${floor}
-                    <circle cx="128" cy="58" r="7" fill="#334155"/>
-                    <line x1="32" y1="88" x2="120" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="114" y1="65" x2="114" y2="95" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
-                    <path d="M138 66 L138 80 M134 76 L138 80 L142 76" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
-                row: `${floor}
-                    <rect x="44" y="72" width="54" height="24" rx="3" fill="#e2e8f0" stroke="#94a3b8"/>
-                    <circle cx="114" cy="48" r="7" fill="#334155"/>
-                    <line x1="64" y1="58" x2="106" y2="50" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="64" y1="58" x2="54" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <polyline points="100,52 92,66 96,80" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
-                    <rect x="90" y="79" width="12" height="5" rx="1" fill="#10b981"/>`,
-                overhead_press: `${floor}
-                    <circle cx="80" cy="34" r="7" fill="#334155"/>
-                    <line x1="80" y1="42" x2="80" y2="68" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="76" y1="68" x2="72" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="84" y1="68" x2="88" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="74" y1="46" x2="66" y2="20" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
-                    <line x1="86" y1="46" x2="94" y2="20" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
-                    <rect x="61" y="16" width="10" height="4" fill="#10b981"/>
-                    <rect x="89" y="16" width="10" height="4" fill="#10b981"/>`,
-                face_pull: `${floor}
-                    <circle cx="88" cy="24" r="7" fill="#334155"/>
-                    <line x1="88" y1="32" x2="88" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="88" y1="62" x2="84" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="88" y1="62" x2="96" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
-                    <line x1="20" y1="32" x2="76" y2="30" stroke="#10b981" stroke-width="3" stroke-dasharray="3 2"/>
-                    <polyline points="88,38 74,30 82,24" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>`
+                cat_cow: `${floor}<circle cx="122" cy="54" r="7" fill="#334155"/><path d="M52 60 Q84 36 115 58" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><path d="M52 60 Q84 74 115 58" stroke="#93c5fd" stroke-width="3" stroke-dasharray="3 3"/><line x1="54" y1="60" x2="54" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="54" y1="95" x2="36" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="112" y1="59" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><path d="M84 30 L84 20 M80 24 L84 20 L88 24" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
+                glute_bridge: `${floor}<circle cx="30" cy="88" r="7" fill="#334155"/><line x1="38" y1="90" x2="55" y2="90" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="55" y1="90" x2="92" y2="62" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="92" y1="62" x2="116" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><path d="M88 52 L88 40 M84 44 L88 40 L92 44" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
+                bird_dog: `${floor}<circle cx="114" cy="54" r="7" fill="#334155"/><line x1="64" y1="60" x2="108" y2="60" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="106" y1="60" x2="144" y2="54" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="60" x2="22" y2="54" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="60" x2="64" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="104" y1="60" x2="104" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
+                plank: `${floor}<circle cx="128" cy="64" r="7" fill="#334155"/><line x1="34" y1="84" x2="120" y2="68" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="116" y1="70" x2="116" y2="94" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="116" y1="94" x2="132" y2="94" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="34" y1="84" x2="28" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
+                dead_bug: `${floor}<circle cx="34" cy="88" r="7" fill="#334155"/><line x1="42" y1="90" x2="96" y2="90" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="56" y1="88" x2="32" y2="66" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/><line x1="56" y1="88" x2="60" y2="52" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/><polyline points="96,90 96,64 120,64" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/><line x1="96" y1="90" x2="134" y2="78" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>`,
+                squat: `${floor}<circle cx="88" cy="28" r="7" fill="#334155"/><line x1="86" y1="36" x2="72" y2="64" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="84" y1="44" x2="106" y2="48" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/><circle cx="109" cy="48" r="4" fill="#10b981"/><polyline points="72,64 102,68 92,95" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+                lunge: `${floor}<circle cx="78" cy="24" r="7" fill="#334155"/><line x1="78" y1="32" x2="78" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/><polyline points="78,62 110,62 110,95" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="78,62 52,82 40,95" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
+                single_bridge: `${floor}<circle cx="30" cy="88" r="7" fill="#334155"/><line x1="38" y1="90" x2="55" y2="90" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="55" y1="90" x2="90" y2="62" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="90" y1="62" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="62" x2="128" y2="34" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/>`,
+                calf_raise: `${floor}<rect x="64" y="84" width="32" height="12" rx="2" fill="#94a3b8"/><circle cx="80" cy="18" r="7" fill="#334155"/><line x1="80" y1="26" x2="80" y2="54" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="80" y1="54" x2="82" y2="82" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><path d="M98 76 L98 62 M94 66 L98 62 L102 66" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
+                step_up: `${floor}<rect x="92" y="72" width="44" height="24" rx="2" fill="#94a3b8"/><circle cx="96" cy="18" r="7" fill="#334155"/><line x1="96" y1="26" x2="94" y2="50" stroke="#334155" stroke-width="6" stroke-linecap="round"/><polyline points="94,50 112,54 112,72" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><line x1="94" y1="50" x2="76" y2="95" stroke="#64748b" stroke-width="4.5" stroke-linecap="round"/>`,
+                band_walk: `${floor}<circle cx="80" cy="22" r="7" fill="#334155"/><line x1="80" y1="30" x2="78" y2="56" stroke="#334155" stroke-width="6" stroke-linecap="round"/><polyline points="78,56 64,74 60,95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><polyline points="78,56 98,74 104,95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="63" y1="73" x2="99" y2="73" stroke="#10b981" stroke-width="4" stroke-linecap="round"/><path d="M112 60 L126 60 M122 56 L126 60 L122 64" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>`,
+                rdl: `${floor}<circle cx="114" cy="46" r="7" fill="#334155"/><line x1="66" y1="56" x2="106" y2="48" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="66" y1="56" x2="62" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="100" y1="50" x2="100" y2="76" stroke="#334155" stroke-width="4" stroke-linecap="round"/><rect x="94" y="75" width="12" height="5" rx="1" fill="#10b981"/>`,
+                side_plank: `${floor}<circle cx="126" cy="54" r="7" fill="#334155"/><line x1="34" y1="92" x2="118" y2="60" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><line x1="112" y1="64" x2="112" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/>`,
+                pushup: `${floor}<circle cx="128" cy="58" r="7" fill="#334155"/><line x1="32" y1="88" x2="120" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="114" y1="65" x2="114" y2="95" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/><path d="M138 66 L138 80 M134 76 L138 80 L142 76" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>`,
+                row: `${floor}<rect x="44" y="72" width="54" height="24" rx="3" fill="#e2e8f0" stroke="#94a3b8"/><circle cx="114" cy="48" r="7" fill="#334155"/><line x1="64" y1="58" x2="106" y2="50" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="64" y1="58" x2="54" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><polyline points="100,52 92,66 96,80" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/><rect x="90" y="79" width="12" height="5" rx="1" fill="#10b981"/>`,
+                overhead_press: `${floor}<circle cx="80" cy="34" r="7" fill="#334155"/><line x1="80" y1="42" x2="80" y2="68" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="76" y1="68" x2="72" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="84" y1="68" x2="88" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="74" y1="46" x2="66" y2="20" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/><line x1="86" y1="46" x2="94" y2="20" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/><rect x="61" y="16" width="10" height="4" fill="#10b981"/><rect x="89" y="16" width="10" height="4" fill="#10b981"/>`,
+                face_pull: `${floor}<circle cx="88" cy="24" r="7" fill="#334155"/><line x1="88" y1="32" x2="88" y2="62" stroke="#334155" stroke-width="6" stroke-linecap="round"/><line x1="88" y1="62" x2="84" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="88" y1="62" x2="96" y2="95" stroke="#334155" stroke-width="5" stroke-linecap="round"/><line x1="20" y1="32" x2="76" y2="30" stroke="#10b981" stroke-width="3" stroke-dasharray="3 2"/><polyline points="88,38 74,30 82,24" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>`
             };
             return base + (shapes[key] || shapes.squat) + `</svg>`;
         }
 
-        const DEFAULT_DB = {
-            ui: {
-                activeTab: "panoramica",
-                diarioFilter: "all",
-                readiness: { fc: 60, schiena: "ok", polpaccio: "ok" }
-            },
-            atleta: {
-                peso_kg: 69.0,
-                altezza_cm: 170,
-                bmi: 23.88,
-                fc_riposo: 60
-            },
-            soglia: {
-                fc_bpm: 187,
-                passo: "4:23",
-                potenza_w: 360,
-                potenza_w_kg: 5.26,
-                data_rilevamento: "2026-11-18",
-                storico: []
-            },
-            pb: {
-                "5k": "21:30", "10k": "44:45", "21k": "1:41:38",
-                garmin_5k: "21:10", garmin_10k: "44:00", garmin_21k: "1:38:30"
-            },
-            scarpe: [
-                {
-                    id: "neo-zen",
-                    nome: "Mizuno Neo Zen",
-                    ruolo: "Corse facili, lunghi lenti e recupero",
-                    km_percorsi: 458,
-                    vita_utile: 600,
-                    note: "458 / 600 km percorsi → 142 km rimanenti (riferimento 150 km al 29/10 meno 8 km del 3/11)."
-                },
-                {
-                    id: "evo-sl",
-                    nome: "Adidas Evo SL",
-                    ruolo: "Gare e lavori di qualità",
-                    km_percorsi: 130,
-                    vita_utile: 650,
-                    note: "130 / 650 km percorsi → 520 km rimanenti. Preservala per ripetute, medi e gare (10k Febbraio / Mezza Aprile)."
-                }
-            ],
-            gare: [
-                { nome: "Mezza Maratona Ortona-Fossacesia", data: "2026-10-25", distanza: "21.1 km", tipo: "Storico (1h41'38\")" },
-                { nome: "Test / Gara 10 km", data: "2027-02-14", distanza: "10 km", tipo: "Gara Test" },
-                { nome: "Mezza Maratona Obiettivo", data: "2027-04-18", distanza: "21.1 km", tipo: "Gara Principale" }
-            ],
-            allenamenti_settimana: [
-                { data: "2026-10-25", giorno: "Dom", tipo: "GARA", dettaglio: "Mezza maratona Ortona-Fossacesia Marina, 1h41'38\"", km_previsti: 21.1, km_fatti: 21.21, km_rulli: 0, passo: "4'48\"/km", scarpa: "Adidas Evo SL", stato: "completato", note: "Già fatto" },
-                { data: "2026-10-29", giorno: "Gio", tipo: "Corsa facile", dettaglio: "5 km facili (primo allenamento dopo la gara)", km_previsti: 5.0, km_fatti: 5.0, km_rulli: 0, passo: "5'33\"/km", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Riferimento iniziale scarpe" },
-                { data: "2026-11-02", giorno: "Lun", tipo: "Rulli", dettaglio: "30' Z1 (105-124 bpm)", km_previsti: 0, km_fatti: 0, km_rulli: null, passo: "-", scarpa: "-", stato: "completato", note: "Fatto: 30' rulli (inserisci i km se vuoi)" },
-                { data: "2026-11-03", giorno: "Mar", tipo: "Corsa facile", dettaglio: "8 km facili", km_previsti: 8.0, km_fatti: 8.0, km_rulli: 0, passo: "-", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Fatto" },
-                { data: "2026-11-04", giorno: "Mer-Dom", tipo: "Stop / Recupero", dettaglio: "Fermo 4–8 Nov sostituito dal rientro del 9/11", km_previsti: 0, km_fatti: 0, km_rulli: 0, passo: "-", scarpa: "-", stato: "saltato", note: "Non recuperare i km saltati" },
-                { data: "2026-11-09", giorno: "Lun", tipo: "Corsa facile", dettaglio: "Corsa facile 125-145 bpm + 800m camminata", km_previsti: 10.0, km_fatti: 10.0, km_rulli: 0, passo: "5'42\"/km", scarpa: "Mizuno Neo Zen", stato: "completato", note: "Ascesa 105m" },
-                { data: "2026-11-10", giorno: "Mar", tipo: "Riposo", dettaglio: "Riposo totale", km_previsti: 0, km_fatti: 0, km_rulli: 0, passo: "-", scarpa: "-", stato: "completato", note: "" },
-                { data: "2026-11-11", giorno: "Mer", tipo: "Rulli + Core leggero", dettaglio: "Rulli Z1-Z2 40' (105-145 bpm) + 10' core leggero", km_previsti: 0, km_fatti: 0, km_rulli: null, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-12", giorno: "Gio", tipo: "Corsa facile", dettaglio: "8 km facili a 125-145 bpm", km_previsti: 8.0, km_fatti: null, km_rulli: 0, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
-                { data: "2026-11-13", giorno: "Ven", tipo: "Riposo + Core leggero", dettaglio: "20' core leggero e mobilità (solo se schiena OK)", km_previsti: 0, km_fatti: 0, km_rulli: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-14", giorno: "Sab", tipo: "Corsa facile", dettaglio: "10 km facili a 125-145 bpm, senza guardare il passo", km_previsti: 10.0, km_fatti: null, km_rulli: 0, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
-                { data: "2026-11-15", giorno: "Dom", tipo: "Rulli", dettaglio: "Z1-Z2 60' (fino a 90' se stai bene)", km_previsti: 0, km_fatti: 0, km_rulli: null, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-16", giorno: "Lun", tipo: "Forza A + Rulli", dettaglio: "Forza A gambe e core (30-35', 2 serie) + Rulli Z1 20-30'", km_previsti: 0, km_fatti: 0, km_rulli: null, passo: "-", scarpa: "-", stato: "da_fare", note: "Settimana 1 Forza" },
-                { data: "2026-11-17", giorno: "Mar", tipo: "Corsa facile", dettaglio: "8 km facili a 125-145 bpm", km_previsti: 8.0, km_fatti: null, km_rulli: 0, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
-                { data: "2026-11-18", giorno: "Mer", tipo: "Rulli", dettaglio: "Z2 40' (125-145 bpm), recupero attivo", km_previsti: 0, km_fatti: 0, km_rulli: null, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-19", giorno: "Gio", tipo: "Corsa facile + Allunghi", dettaglio: "9 km a 125-145 bpm + 4-5 allunghi da 80m negli ultimi 2 km", km_previsti: 9.0, km_fatti: null, km_rulli: 0, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" },
-                { data: "2026-11-20", giorno: "Ven", tipo: "Forza B", dettaglio: "Forza B stabilità e core (30') — niente carichi pesanti", km_previsti: 0, km_fatti: 0, km_rulli: 0, passo: "-", scarpa: "-", stato: "da_fare", note: "" },
-                { data: "2026-11-21", giorno: "Sab", tipo: "Lungo facile", dettaglio: "12 km facili a 125-145 bpm, passo regolare (primo lungo base)", km_previsti: 12.0, km_fatti: null, km_rulli: 0, passo: "", scarpa: "Mizuno Neo Zen", stato: "da_fare", note: "" }
-            ],
-            forza: [
-                {
-                    titolo: "Core Leggero (Mobilità & Schiena)",
-                    badge: "Giorni Rulli / Riposo",
-                    esercizi: [
-                        { nome: "Gatto-cammello", imgKey: "cat_cow", muscoli: "Mobilità colonna & lombare", serie: "1x10 lente", rec: "30\"", note: "In quadrupedia, inarca e arrotonda la schiena piano, senza forzare. Serve a sciogliere la zona lombare.", carico: "Corpo libero", fatto: false },
-                        { nome: "Ponte glutei", imgKey: "glute_bridge", muscoli: "Grande gluteo & ischiocrurali", serie: "2x10", rec: "45\"", note: "Supino, ginocchia piegate, spingi sui talloni e solleva il bacino senza inarcare la schiena.", carico: "Corpo libero", fatto: false },
-                        { nome: "Bird-dog", imgKey: "bird_dog", muscoli: "Core profondo & stabilizzatori schiena", serie: "2x10/lato (pausa 3\")", rec: "45\"", note: "In quadrupedia, estendi braccio e gamba opposti tenendo il bacino fermo e allineato.", carico: "Corpo libero", fatto: false },
-                        { nome: "Plank frontale", imgKey: "plank", muscoli: "Trasverso addominale & retto", serie: "2x20-30\"", rec: "45\"", note: "Corpo in linea dai talloni alle spalle, addome contratto, schiena neutra.", carico: "Corpo libero", fatto: false },
-                        { nome: "Dead bug", imgKey: "dead_bug", muscoli: "Core profondo & controllo pelvico", serie: "2x10/lato", rec: "45\"", note: "Supino, schiena sempre aderente al pavimento, muovi braccio e gamba opposti lentamente.", carico: "Corpo libero", fatto: false }
-                    ]
-                },
-                {
-                    titolo: "Forza A: Gambe & Core (Lunedì)",
-                    badge: "Sett. 1-2: 2 serie | Da Sett. 3: 3 serie",
-                    esercizi: [
-                        { nome: "Squat o Goblet Squat leggero", imgKey: "squat", muscoli: "Quadricipiti, glutei, core", serie: "2-3 x 10", rec: "60-90\"", note: "Schiena neutra, ginocchia in linea con i piedi. Il goblet si fa tenendo un manubrio o kettlebell al petto.", carico: "", fatto: false },
-                        { nome: "Affondi indietro", imgKey: "lunge", muscoli: "Glutei, quadricipiti, stabilità bacino", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Passo indietro controllato, busto dritto, ginocchio anteriore allineato alla caviglia.", carico: "", fatto: false },
-                        { nome: "Ponte glutei su una gamba", imgKey: "single_bridge", muscoli: "Gluteo monolaterale & femorali", serie: "2-3 x 10/gamba", rec: "60\"", note: "Bacino alto e fermo, senza ruotare l'anca né inarcare la schiena.", carico: "", fatto: false },
-                        { nome: "Alzate polpacci su una gamba", imgKey: "calf_raise", muscoli: "Gastrocnemio, soleo & tendine d'Achille", serie: "2-3 x 12/gamba", rec: "60\"", note: "Sul bordo di un gradino con una mano d'appoggio: sali esplosivo e scendi lento in 3 secondi. Protegge polpaccio e tendine.", carico: "", fatto: false },
-                        { nome: "Plank frontale + Bird-dog", imgKey: "plank", muscoli: "Core & tenuta posturale", serie: "2-3 x 35\" / 8 lato", rec: "45\"", note: "Controllo posturale lento, zero fretta.", carico: "Corpo libero", fatto: false }
-                    ]
-                },
-                {
-                    titolo: "Forza B: Stabilità & Catena Posteriore (Venerdì)",
-                    badge: "Sett. 1-2: 2 serie | Da Sett. 3: 3 serie",
-                    esercizi: [
-                        { nome: "Step-up su gradino (30-40 cm)", imgKey: "step_up", muscoli: "Glutei, quadricipiti, spinta di corsa", serie: "2-3 x 8/gamba", rec: "60-90\"", note: "Gradino di 30-40 cm: spingi con il tallone della gamba sul gradino, senza darti slancio con quella a terra.", carico: "", fatto: false },
-                        { nome: "Camminata laterale con elastico", imgKey: "band_walk", muscoli: "Medio gluteo (stabilità ginocchio/anca)", serie: "2 x 12 passi/lato", rec: "45\"", note: "Elastico sopra le ginocchia, ginocchia semiflesse, passi laterali controllati mantenendo tensione.", carico: "Elastico", fatto: false },
-                        { nome: "Stacco rumeno con manubri leggeri", imgKey: "rdl", muscoli: "Ischiocrurali, glutei, erettori spinali", serie: "Solo da Sett. 3 (3x8)", rec: "60-90\"", note: "NON fare nelle settimane 1-2. Introducilo dalla 3ª solo se la schiena è senza fastidi, con carico leggero.", carico: "", fatto: false },
-                        { nome: "Plank laterale + Dead bug", imgKey: "side_plank", muscoli: "Obliqui, quadrato dei lombi & core", serie: "2-3 x 30\" / 8 lato", rec: "45\"", note: "Corpo allineato, fianchi alti nel plank laterale e schiena piatta nel dead bug.", carico: "Corpo libero", fatto: false }
-                    ]
-                },
-                {
-                    titolo: "Forza C: Upper Body & Postura Runner",
-                    badge: "Giorni Facili / Rulli (2x/sett.)",
-                    esercizi: [
-                        { nome: "Piegamenti (Push-up) o Panca Manubri", imgKey: "pushup", muscoli: "Pettorali, deltoidi anteriori, tricipiti", serie: "3 x 10-12", rec: "60\"", note: "Spinta controllata, gomiti a 45° rispetto al busto, RIR 3 (lascia 3 ripetizioni di margine).", carico: "", fatto: false },
-                        { nome: "Rematore con manubrio / elastico", imgKey: "row", muscoli: "Gran dorsale, romboidi, bicipiti", serie: "3 x 10/lato", rec: "60\"", note: "Rinforza il dorso per mantenere il busto aperto e non chiuderti in avanti negli ultimi km di gara.", carico: "", fatto: false },
-                        { nome: "Military Press / Alzate manubri", imgKey: "overhead_press", muscoli: "Deltoidi & stabilizzatori scapola", serie: "3 x 10", rec: "60\"", note: "Spinta verso l'alto tenendo l'addome attivo per non inarcare la zona lombare.", carico: "", fatto: false },
-                        { nome: "Face-pull con elastico / Tirate", imgKey: "face_pull", muscoli: "Deltoidi posteriori & cuffia rotatori", serie: "3 x 12-15", rec: "45\"", note: "Tira l'elastico verso il viso aprendo i gomiti e avvicinando le scapole.", carico: "Elastico", fatto: false }
-                    ]
-                }
-            ],
-            regole: [
-                { tema: "Rientro graduale", desc: "Solo volume facile e rulli finché non hai 7-10 giorni senza intoppi. I km saltati non si recuperano." },
-                { tema: "Schiena", desc: "Se una seduta dà fastidio, fermati o passa ai rulli. Niente stacco rumeno nelle prime 2 settimane." },
-                { tema: "Ritmo corse facili", desc: "125-145 bpm, ritmo conversazionale (circa 5'30\"-6'00\"/km). Non guardare l'orologio." },
-                { tema: "Frequenza a riposo", desc: "Se per più giorni è 7-10 bpm sopra il valore normale (60 bpm), aggiungi un giorno di riposo." },
-                { tema: "Polpaccio sx & dita", desc: "Controlla il tendine ai primi passi del mattino. Se fa male, niente corsa finché non passa." },
-                { tema: "Rotazione scarpe", desc: "Neo Zen per i fondi lenti (142 km rimanenti); Evo SL (130/650 km, 520 rimanenti) riservate a lavori veloci e gare." }
-            ]
-        };
-
-        let db = null;
-
         function getLocalTodayISO() {
             const now = new Date();
-            const y = now.getFullYear();
-            const m = String(now.getMonth() + 1).padStart(2, '0');
-            const d = String(now.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         }
 
         function addDaysISO(isoStr, days) {
@@ -1021,38 +1046,17 @@
         }
 
         function normalizeDb(raw) {
-            const merged = structuredClone(DEFAULT_DB);
+            const merged = structuredClone(NEUTRAL_TEMPLATE_DB);
             if (!raw || typeof raw !== 'object') return merged;
 
             if (raw.ui) merged.ui = { ...merged.ui, ...raw.ui, readiness: { ...merged.ui.readiness, ...(raw.ui.readiness || {}) } };
             if (raw.atleta) merged.atleta = { ...merged.atleta, ...raw.atleta };
-            if (raw.soglia) {
-                merged.soglia = {
-                    ...merged.soglia,
-                    ...raw.soglia,
-                    storico: Array.isArray(raw.soglia.storico) ? raw.soglia.storico : []
-                };
-            }
+            if (raw.soglia) merged.soglia = { ...merged.soglia, ...raw.soglia, storico: Array.isArray(raw.soglia.storico) ? raw.soglia.storico : [] };
             if (raw.pb) merged.pb = { ...merged.pb, ...raw.pb };
             if (Array.isArray(raw.gare) && raw.gare.length) merged.gare = raw.gare;
-            if (Array.isArray(raw.allenamenti_settimana) && raw.allenamenti_settimana.length) {
-                merged.allenamenti_settimana = raw.allenamenti_settimana.map(item => ({
-                    km_rulli: null,
-                    ...item
-                }));
-            }
+            if (Array.isArray(raw.allenamenti_settimana)) merged.allenamenti_settimana = raw.allenamenti_settimana.map(item => ({ km_rulli: null, ...item }));
             if (Array.isArray(raw.regole) && raw.regole.length) merged.regole = raw.regole;
-
-            if (Array.isArray(raw.scarpe) && raw.scarpe.length) {
-                merged.scarpe = raw.scarpe;
-            } else if (raw.scarpe && typeof raw.scarpe === 'object') {
-                if (raw.scarpe.mizuno_neo_zen && typeof raw.scarpe.mizuno_neo_zen.km_residui === 'number') {
-                    merged.scarpe[0].km_percorsi = Math.max(0, 600 - raw.scarpe.mizuno_neo_zen.km_residui);
-                }
-                if (raw.scarpe.adidas_evo_sl && typeof raw.scarpe.adidas_evo_sl.km_totali_percorsi === 'number') {
-                    merged.scarpe[1].km_percorsi = raw.scarpe.adidas_evo_sl.km_totali_percorsi;
-                }
-            }
+            if (Array.isArray(raw.scarpe) && raw.scarpe.length) merged.scarpe = raw.scarpe;
 
             if (Array.isArray(raw.forza) && raw.forza.length) {
                 merged.forza.forEach((scheda, sIdx) => {
@@ -1067,92 +1071,28 @@
                     }
                 });
             }
-
-            merged.allenamenti_settimana.forEach(a => {
-                if (a.scarpa === 'Neo Zen') a.scarpa = 'Mizuno Neo Zen';
-                if (a.scarpa === 'Evo SL') a.scarpa = 'Adidas Evo SL';
-            });
-
             return merged;
         }
 
-        function saveLocal() {
-            if (!db) return;
-            try {
-                db.lastSaved = new Date().toISOString();
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-                const badge = document.getElementById('sync-badge');
-                if (badge) {
-                    const now = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    badge.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i> Salvato · ${now}`;
-                    badge.classList.add('ring-2', 'ring-emerald-400');
-                    setTimeout(() => badge.classList.remove('ring-2', 'ring-emerald-400'), 600);
-                }
-            } catch (e) {
-                console.error("Errore salvataggio localStorage:", e);
-            }
-        }
-
-        window.addEventListener('beforeunload', saveLocal);
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') saveLocal();
-        });
-
-        async function initApp() {
-            const savedRaw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('runcoach_db');
-            if (savedRaw) {
-                try {
-                    db = normalizeDb(JSON.parse(savedRaw));
-                    saveLocal();
-                } catch (e) {
-                    db = structuredClone(DEFAULT_DB);
-                    saveLocal();
-                }
-            } else {
-                db = structuredClone(DEFAULT_DB);
-                try {
-                    const res = await fetch('dati.json?t=' + Date.now());
-                    if (res.ok) {
-                        const remoteData = await res.json();
-                        db = normalizeDb(remoteData);
-                    }
-                } catch (e) {
-                    console.log("Avvio con database predefinito.");
-                }
-                saveLocal();
-            }
-
-            restoreSavedInputs();
-            renderAll();
-            switchTab(db.ui.activeTab || 'panoramica', false);
-        }
-
         function restoreSavedInputs() {
-            document.getElementById('pb-5k').value = db.pb["5k"] || "21:30";
-            document.getElementById('pb-10k').value = db.pb["10k"] || "44:45";
-            document.getElementById('pb-21k').value = db.pb["21k"] || "1:41:38";
-            document.getElementById('garmin-5k').value = db.pb.garmin_5k || "21:10";
-            document.getElementById('garmin-10k').value = db.pb.garmin_10k || "44:00";
-            document.getElementById('garmin-21k').value = db.pb.garmin_21k || "1:38:30";
+            document.getElementById('pb-5k').value = db.pb["5k"] || "22:00";
+            document.getElementById('pb-10k').value = db.pb["10k"] || "45:00";
+            document.getElementById('pb-21k').value = db.pb["21k"] || "1:42:00";
+            document.getElementById('garmin-5k').value = db.pb.garmin_5k || "21:30";
+            document.getElementById('garmin-10k').value = db.pb.garmin_10k || "44:30";
+            document.getElementById('garmin-21k').value = db.pb.garmin_21k || "1:39:00";
 
             const r = db.ui.readiness || { fc: db.atleta.fc_riposo || 60, schiena: "ok", polpaccio: "ok" };
             document.getElementById('input-fc-riposo').value = r.fc;
             document.getElementById('input-schiena').value = r.schiena;
             document.getElementById('input-polpaccio').value = r.polpaccio;
 
-            const s = db.soglia || DEFAULT_DB.soglia;
+            const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
             document.getElementById('soglia-fc').value = s.fc_bpm;
             document.getElementById('soglia-passo').value = s.passo;
             document.getElementById('soglia-w').value = s.potenza_w;
             document.getElementById('soglia-wkg').value = s.potenza_w_kg;
             document.getElementById('soglia-data').value = s.data_rilevamento || "2026-11-18";
-        }
-
-        function resetToGitHub() {
-            if (!confirm("Vuoi ripristinare i dati iniziali dal file dati.json? Le modifiche locali non esportate verranno sovrascritte.")) return;
-            localStorage.removeItem(STORAGE_KEY);
-            localStorage.removeItem('runcoach_db');
-            location.reload();
         }
 
         function switchTab(tabId, persist = true) {
@@ -1249,13 +1189,13 @@
         }
 
         function renderThresholdDisplays() {
-            const s = db.soglia || DEFAULT_DB.soglia;
+            const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
             const formattedPace = s.passo.includes(':') ? s.passo.replace(':', "'") + '"/km' : s.passo;
             document.getElementById('pan-soglia-fc').textContent = `${s.fc_bpm} bpm`;
             document.getElementById('pan-soglia-passo').textContent = formattedPace;
             document.getElementById('pan-soglia-w').textContent = `${s.potenza_w} W`;
             document.getElementById('pan-soglia-wkg').textContent = `${Number(s.potenza_w_kg).toFixed(2)} W/kg`;
-            document.getElementById('pan-soglia-date').textContent = `Agg. ${s.data_rilevamento || '2026-11-18'}`;
+            document.getElementById('pan-soglia-date').textContent = `Agg. ${s.data_rilevamento || ''}`;
 
             const calcWkg = (Number(s.potenza_w) / db.atleta.peso_kg).toFixed(2);
             document.getElementById('soglia-wkg-calc').textContent = `Su ${db.atleta.peso_kg} kg: ${calcWkg} W/kg`;
@@ -1267,7 +1207,7 @@
                 histList.innerHTML = s.storico.map((item, idx) => `
                     <span class="inline-flex items-center gap-2 text-xs bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg font-mono text-slate-700">
                         <span><strong>${item.data}</strong>: ${item.fc_bpm} bpm · ${item.passo}/km · ${item.potenza_w}W (${item.potenza_w_kg} W/kg)</span>
-                        <button onclick="deleteThresholdHistory(${idx})" class="text-slate-400 hover:text-rose-600" title="Rimuovi"><i class="fa-solid fa-xmark"></i></button>
+                        <button onclick="deleteThresholdHistory(${idx})" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-xmark"></i></button>
                     </span>
                 `).join('');
             } else {
@@ -1276,11 +1216,11 @@
         }
 
         function saveThresholdInline() {
-            db.soglia.fc_bpm = parseInt(document.getElementById('soglia-fc').value) || 187;
-            db.soglia.passo = document.getElementById('soglia-passo').value.trim() || "4:23";
-            db.soglia.potenza_w = parseInt(document.getElementById('soglia-w').value) || 360;
-            db.soglia.potenza_w_kg = parseFloat(document.getElementById('soglia-wkg').value) || 5.26;
-            db.soglia.data_rilevamento = document.getElementById('soglia-data').value || "2026-11-18";
+            db.soglia.fc_bpm = parseInt(document.getElementById('soglia-fc').value) || 180;
+            db.soglia.passo = document.getElementById('soglia-passo').value.trim() || "4:30";
+            db.soglia.potenza_w = parseInt(document.getElementById('soglia-w').value) || 350;
+            db.soglia.potenza_w_kg = parseFloat(document.getElementById('soglia-wkg').value) || 5.00;
+            db.soglia.data_rilevamento = document.getElementById('soglia-data').value || getLocalTodayISO();
             saveLocal();
             renderThresholdDisplays();
             recalcZones();
@@ -1308,22 +1248,22 @@
         }
 
         function openThresholdModal() {
-            const s = db.soglia || DEFAULT_DB.soglia;
+            const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
             document.getElementById('m-soglia-fc').value = s.fc_bpm;
             document.getElementById('m-soglia-passo').value = s.passo;
             document.getElementById('m-soglia-w').value = s.potenza_w;
             document.getElementById('m-soglia-wkg').value = s.potenza_w_kg;
-            document.getElementById('m-soglia-data').value = s.data_rilevamento || "2026-11-18";
+            document.getElementById('m-soglia-data').value = s.data_rilevamento || getLocalTodayISO();
             const m = document.getElementById('modal-threshold');
             m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function saveThresholdModal() {
-            db.soglia.fc_bpm = parseInt(document.getElementById('m-soglia-fc').value) || 187;
-            db.soglia.passo = document.getElementById('m-soglia-passo').value.trim() || "4:23";
-            db.soglia.potenza_w = parseInt(document.getElementById('m-soglia-w').value) || 360;
-            db.soglia.potenza_w_kg = parseFloat(document.getElementById('m-soglia-wkg').value) || 5.26;
-            db.soglia.data_rilevamento = document.getElementById('m-soglia-data').value || "2026-11-18";
+            db.soglia.fc_bpm = parseInt(document.getElementById('m-soglia-fc').value) || 180;
+            db.soglia.passo = document.getElementById('m-soglia-passo').value.trim() || "4:30";
+            db.soglia.potenza_w = parseInt(document.getElementById('m-soglia-w').value) || 350;
+            db.soglia.potenza_w_kg = parseFloat(document.getElementById('m-soglia-wkg').value) || 5.00;
+            db.soglia.data_rilevamento = document.getElementById('m-soglia-data').value || getLocalTodayISO();
             restoreSavedInputs();
             saveLocal();
             closeModals();
@@ -1348,36 +1288,33 @@
                 badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800";
                 badge.textContent = "SEMAFORO ROSSO — RIPOSO / RULLI";
                 advice.className = "text-sm bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-lg";
-                advice.innerHTML = `<strong>Stop precauzionale attivo:</strong> Hai segnalato dolore o un aumento della FC a riposo di +${fc - baseFc} bpm. Niente corsa oggi: riposo completo o rulli leggerissimi Z1 solo se assenti fastidi.`;
+                advice.innerHTML = `<strong>Stop precauzionale attivo:</strong> Hai segnalato dolore o un aumento della FC a riposo di +${fc - baseFc} bpm. Niente corsa oggi.`;
             } else if (schiena === 'lieve' || polpaccio === 'affaticato' || fc >= baseFc + 5) {
                 badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800";
                 badge.textContent = "SEMAFORO GIALLO — CAUTELA";
                 advice.className = "text-sm bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-lg";
-                advice.innerHTML = `<strong>Attenzione al carico:</strong> Leggero affaticamento rilevato. Mantieni la frequenza cardiaca rigorosamente sotto i <strong>135 bpm</strong> ed evita gli allunghi finali.`;
+                advice.innerHTML = `<strong>Attenzione al carico:</strong> Leggero affaticamento rilevato. Mantieni i battiti sotto i <strong>135 bpm</strong> ed evita gli allunghi.`;
             } else {
                 badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800";
                 badge.textContent = "SEMAFORO VERDE — OK PER CORRERE";
                 advice.className = "text-sm bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-lg";
-                advice.innerHTML = `Parametri nella norma: FC a riposo regolare (${fc} bpm) e nessun segnale da schiena o polpaccio sinistro. Puoi svolgere regolarmente la seduta prevista mantenendo i battiti tra <strong>125 e 145 bpm</strong>.`;
+                advice.innerHTML = `Parametri nella norma (${fc} bpm). Puoi svolgere regolarmente la seduta prevista mantenendo i battiti tra <strong>125 e 145 bpm</strong> nelle corse facili.`;
             }
         }
 
-        // SINCRONIZZATO CON IL GIORNO ODIERNO (OGGI, DOMANI, TRA 2 GIORNI)
         function renderUpcoming() {
             const oggiIso = getLocalTodayISO();
             const domaniIso = addDaysISO(oggiIso, 1);
             const dopoDomaniIso = addDaysISO(oggiIso, 2);
-
             document.getElementById('upcoming-today-lbl').textContent = `Oggi: ${oggiIso}`;
 
-            // Prende esattamente le sedute di oggi, domani e fra 2 giorni
             const windowItems = db.allenamenti_settimana
                 .map((a, idx) => ({ ...a, idx }))
                 .filter(a => a.data >= oggiIso && a.data <= dopoDomaniIso);
 
             const container = document.getElementById('upcoming-list');
             if (!windowItems.length) {
-                container.innerHTML = `<p class="text-xs text-slate-400">Nessuna seduta programmata per oggi (${oggiIso}) e i prossimi 2 giorni. Aggiungi il blocco successivo dal pulsante "+ Nuova Seduta".</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400">Nessuna seduta per oggi (${oggiIso}) e i prossimi 2 giorni. Clicca su <strong>Importa Backup (.json)</strong> nella sidebar se stai facendo il primo accesso.</p>`;
                 return;
             }
 
@@ -1392,19 +1329,19 @@
                 }
 
                 const statusIcon = a.stato === 'completato'
-                    ? `<i class="fa-solid fa-circle-check text-emerald-600 ml-1" title="Completato"></i>`
-                    : (a.stato === 'saltato' ? `<i class="fa-solid fa-circle-xmark text-rose-500 ml-1" title="Saltato"></i>` : '');
+                    ? `<i class="fa-solid fa-circle-check text-emerald-600 ml-1"></i>`
+                    : (a.stato === 'saltato' ? `<i class="fa-solid fa-circle-xmark text-rose-500 ml-1"></i>` : '');
 
                 const targetBadge = a.km_previsti > 0
                     ? `${a.km_previsti} km`
                     : (Number(a.km_rulli) > 0 ? `${a.km_rulli} km rulli` : 'Cross/Forza');
 
                 return `
-                    <div onclick="openCompleteModal(${a.idx})" class="p-3 rounded-lg border ${cardStyle} flex justify-between items-center cursor-pointer hover:shadow-xs transition" title="Clicca per registrare i dati di questa seduta">
+                    <div onclick="openCompleteModal(${a.idx})" class="p-3 rounded-lg border ${cardStyle} flex justify-between items-center cursor-pointer hover:shadow-xs transition">
                         <div class="min-w-0 pr-2">
                             <div class="flex items-center gap-1.5 mb-0.5">
                                 ${dayTag}
-                                <span class="text-[11px] font-mono text-slate-500">${a.data} (${a.giorno})</span>
+                                <span class="text-[11px] font-mono text-slate-500">${a.data} (${a.giorno || ''})</span>
                                 ${statusIcon}
                             </div>
                             <div class="font-bold text-sm text-slate-900 truncate">${a.tipo}</div>
@@ -1424,16 +1361,11 @@
                 { label: "16 Nov – 22 Nov", fase: "Inizio Base", da: "2026-11-16", a: "2026-11-22" }
             ];
 
-            let grandPrev = 0, grandFatti = 0, grandRulli = 0;
-
             document.getElementById('weekly-summary-body').innerHTML = weeks.map(w => {
                 const items = db.allenamenti_settimana.filter(x => x.data >= w.da && x.data <= w.a);
                 const prev = items.reduce((s, x) => s + (Number(x.km_previsti) || 0), 0);
                 const fatti = items.reduce((s, x) => s + (Number(x.km_fatti) || 0), 0);
                 const rulli = items.reduce((s, x) => s + (Number(x.km_rulli) || 0), 0);
-                grandPrev += prev;
-                grandFatti += fatti;
-                grandRulli += rulli;
                 const pct = prev > 0 ? Math.min(100, Math.round((fatti / prev) * 100)) : 100;
                 return `
                     <tr>
@@ -1451,7 +1383,6 @@
                 `;
             }).join('');
 
-            // Include anche eventuali sedute fuori dalle 4 settimane base nel totale generale
             const allPrev = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_previsti) || 0), 0);
             const allFatti = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_fatti) || 0), 0);
             const allRulli = db.allenamenti_settimana.reduce((s, x) => s + (Number(x.km_rulli) || 0), 0);
@@ -1504,6 +1435,11 @@
                 return true;
             });
 
+            if (!rows.length) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-sm text-slate-400">Nessuna seduta presente. Usa <strong>Importa Backup (.json)</strong> nella sidebar oppure <strong>+ Nuova Seduta</strong>.</td></tr>`;
+                return;
+            }
+
             tbody.innerHTML = rows.map(a => {
                 let badge = `<span class="px-2 py-1 rounded text-xs font-semibold bg-amber-100 text-amber-800">DA FARE</span>`;
                 if (a.stato === 'completato') badge = `<span class="px-2 py-1 rounded text-xs font-semibold bg-emerald-100 text-emerald-800">FATTO</span>`;
@@ -1534,17 +1470,17 @@
                         </td>
                         <td class="p-3.5 whitespace-nowrap">
                             <div class="flex items-center gap-1">
-                                <input type="number" step="0.1" value="${rulliVal}" oninput="updateRulliKm(${a.idx}, this.value)" placeholder="${isRulliRow ? 'km' : '-'}" class="w-16 text-xs font-mono font-bold text-right border ${isRulliRow ? 'border-cyan-300 bg-cyan-50/50 text-cyan-900' : 'border-slate-200 bg-white text-slate-700'} rounded px-2 py-1 focus:outline-none focus:border-cyan-500">
+                                <input type="number" step="0.1" value="${rulliVal}" oninput="updateRulliKm(${a.idx}, this.value)" placeholder="${isRulliRow ? 'km' : '-'}" class="w-16 text-xs font-mono font-bold text-right border ${isRulliRow ? 'border-cyan-300 bg-cyan-50/50 text-cyan-900' : 'border-slate-200 bg-white text-slate-700'} rounded px-2 py-1">
                                 <span class="text-[11px] text-slate-400">km</span>
                             </div>
                         </td>
                         <td class="p-3.5 text-xs font-medium">${a.scarpa || '-'}</td>
                         <td class="p-3.5">${badge}</td>
                         <td class="p-3.5 text-right whitespace-nowrap space-x-1">
-                            <button onclick="openCompleteModal(${a.idx})" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded text-xs font-semibold transition" title="Registra dati Garmin">
+                            <button onclick="openCompleteModal(${a.idx})" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded text-xs font-semibold transition">
                                 <i class="fa-solid fa-check"></i> Sync
                             </button>
-                            <button onclick="openSkipModal(${a.idx})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-xs font-semibold transition" title="Salta e rimodula">
+                            <button onclick="openSkipModal(${a.idx})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-xs font-semibold transition">
                                 <i class="fa-solid fa-xmark"></i> Salta
                             </button>
                         </td>
@@ -1574,7 +1510,7 @@
             const parts = str.trim().split(':').map(Number);
             if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
             if (parts.length === 2) return parts[0]*60 + parts[1];
-            return 263;
+            return 270;
         }
 
         function secToPace(secPerKm) {
@@ -1609,45 +1545,20 @@
                 <strong>Indice di Resistenza (Passo 21k / Passo 10k): ${ratio}</strong> (Passo 10k: ${secToPace(pace10)} vs Passo 21k: ${secToPace(pace21)}).<br>${profileMsg}
             `;
 
-            const s = db.soglia || DEFAULT_DB.soglia;
-            const lthr = Number(s.fc_bpm) || 187;
-            const ltSec = timeToSec(s.passo || "4:23");
-            const ltW = Number(s.potenza_w) || 360;
+            const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
+            const lthr = Number(s.fc_bpm) || 180;
+            const ltSec = timeToSec(s.passo || "4:30");
+            const ltW = Number(s.potenza_w) || 350;
 
             const titleEl = document.getElementById('zones-table-title');
             if (titleEl) titleEl.textContent = `Zone Dinamiche (Calibrate su Soglia ${lthr} bpm · ${s.passo}/km · ${ltW} W)`;
 
             const zones = [
-                {
-                    z: "Z1 — Recupero Attivo",
-                    passo: `> ${secToPace(ltSec * 1.25)}`,
-                    fc: `< ${Math.round(lthr * 0.80)} bpm`,
-                    watt: `< ${Math.round(ltW * 0.75)} W`
-                },
-                {
-                    z: "Z2 — Fondo Lento (Base)",
-                    passo: `${secToPace(ltSec * 1.15)} – ${secToPace(ltSec * 1.25)}`,
-                    fc: `${Math.round(lthr * 0.80)}–${Math.round(lthr * 0.88)} bpm (rientro 125–145)`,
-                    watt: `${Math.round(ltW * 0.75)}–${Math.round(ltW * 0.86)} W`
-                },
-                {
-                    z: "Z3 — Medio / Ritmo Mezza",
-                    passo: `${secToPace(ltSec * 1.06)} – ${secToPace(ltSec * 1.14)}`,
-                    fc: `${Math.round(lthr * 0.89)}–${Math.round(lthr * 0.94)} bpm`,
-                    watt: `${Math.round(ltW * 0.87)}–${Math.round(ltW * 0.95)} W`
-                },
-                {
-                    z: "Z4 — Soglia Anaerobica",
-                    passo: `${secToPace(ltSec * 0.99)} – ${secToPace(ltSec * 1.05)}`,
-                    fc: `${Math.round(lthr * 0.95)}–${lthr} bpm`,
-                    watt: `${Math.round(ltW * 0.96)}–${Math.round(ltW * 1.02)} W`
-                },
-                {
-                    z: "Z5 — VO2max / Ripetute Brevi",
-                    passo: `< ${secToPace(ltSec * 0.98)}`,
-                    fc: `> ${lthr} bpm`,
-                    watt: `> ${Math.round(ltW * 1.02)} W`
-                }
+                { z: "Z1 — Recupero Attivo", passo: `> ${secToPace(ltSec * 1.25)}`, fc: `< ${Math.round(lthr * 0.80)} bpm`, watt: `< ${Math.round(ltW * 0.75)} W` },
+                { z: "Z2 — Fondo Lento (Base)", passo: `${secToPace(ltSec * 1.15)} – ${secToPace(ltSec * 1.25)}`, fc: `${Math.round(lthr * 0.80)}–${Math.round(lthr * 0.88)} bpm (rientro 125–145)`, watt: `${Math.round(ltW * 0.75)}–${Math.round(ltW * 0.86)} W` },
+                { z: "Z3 — Medio / Ritmo Mezza", passo: `${secToPace(ltSec * 1.06)} – ${secToPace(ltSec * 1.14)}`, fc: `${Math.round(lthr * 0.89)}–${Math.round(lthr * 0.94)} bpm`, watt: `${Math.round(ltW * 0.87)}–${Math.round(ltW * 0.95)} W` },
+                { z: "Z4 — Soglia Anaerobica", passo: `${secToPace(ltSec * 0.99)} – ${secToPace(ltSec * 1.05)}`, fc: `${Math.round(lthr * 0.95)}–${lthr} bpm`, watt: `${Math.round(ltW * 0.96)}–${Math.round(ltW * 1.02)} W` },
+                { z: "Z5 — VO2max / Ripetute Brevi", passo: `< ${secToPace(ltSec * 0.98)}`, fc: `> ${lthr} bpm`, watt: `> ${Math.round(ltW * 1.02)} W` }
             ];
 
             document.getElementById('pace-zones-tbody').innerHTML = zones.map(z => `
@@ -1689,8 +1600,8 @@
                         ${scheda.esercizi.map((ex, eIdx) => `
                             <div class="p-3 rounded-xl ${ex.fatto ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 border-slate-200/80'} border flex items-center justify-between gap-3 hover:border-blue-300 transition">
                                 <div class="flex items-center gap-3 min-w-0">
-                                    <input type="checkbox" ${ex.fatto ? 'checked' : ''} onchange="toggleExerciseDone(${sIdx}, ${eIdx}, this.checked)" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0" title="Segna esercizio svolto">
-                                    <button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="group relative shrink-0 focus:outline-none" title="Clicca per ingrandire l'illustrazione">
+                                    <input type="checkbox" ${ex.fatto ? 'checked' : ''} onchange="toggleExerciseDone(${sIdx}, ${eIdx}, this.checked)" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0">
+                                    <button type="button" onclick="openExerciseModal(${sIdx}, ${eIdx})" class="group relative shrink-0 focus:outline-none">
                                         ${getExerciseSVG(ex.imgKey || 'squat', false)}
                                         <span class="absolute bottom-0.5 right-0.5 bg-slate-900/75 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 transition">
                                             <i class="fa-solid fa-magnifying-glass-plus"></i>
@@ -1846,12 +1757,8 @@
                     db.allenamenti_settimana.forEach(a => { if (a.scarpa === oldName) a.scarpa = nome; });
                 }
             } else {
-                db.scarpe.push({
-                    id: 'shoe-' + Date.now(),
-                    nome, ruolo, km_percorsi, vita_utile, note
-                });
+                db.scarpe.push({ id: 'shoe-' + Date.now(), nome, ruolo, km_percorsi, vita_utile, note });
             }
-
             saveLocal();
             closeModals();
             renderAll();
@@ -1871,9 +1778,7 @@
             const sel = document.getElementById(selectId);
             const options = db.scarpe.map(s => `<option value="${s.nome}">${s.nome}</option>`).join('') + `<option value="-">Nessuna (Rulli / Forza)</option>`;
             sel.innerHTML = options;
-            if (selectedVal && [...sel.options].some(o => o.value === selectedVal)) {
-                sel.value = selectedVal;
-            }
+            if (selectedVal && [...sel.options].some(o => o.value === selectedVal)) sel.value = selectedVal;
         }
 
         function closeModals() {
@@ -1951,7 +1856,7 @@
             const labels = {
                 imprevisto: "Saltato per imprevisto. Km non recuperati.",
                 stanchezza: "Saltato per stanchezza/FC alta. Prossima uscita alleggerita.",
-                schiena: "Saltato per fastidio schiena/polpaccio. Priorità recupero."
+                schiena: "Saltato per fastidio fisico. Priorità recupero."
             };
             item.note = labels[reason];
 
@@ -1960,12 +1865,11 @@
                     if (db.allenamenti_settimana[i].km_previsti > 0 && db.allenamenti_settimana[i].stato === 'da_fare') {
                         db.allenamenti_settimana[i].tipo = "Corsa rigenerante (Rimodulata)";
                         db.allenamenti_settimana[i].km_previsti = Math.max(6, Math.round(db.allenamenti_settimana[i].km_previsti * 0.75));
-                        db.allenamenti_settimana[i].dettaglio = "Rimodulata dal Coach: ritmo facilissimo < 135 bpm, fermarsi al minimo fastidio.";
+                        db.allenamenti_settimana[i].dettaglio = "Rimodulata dal Coach: ritmo facilissimo < 135 bpm.";
                         break;
                     }
                 }
             }
-
             saveLocal();
             closeModals();
             renderAll();
@@ -1980,8 +1884,8 @@
         }
 
         function saveProfile() {
-            db.atleta.peso_kg = parseFloat(document.getElementById('prof-peso').value) || 69.0;
-            db.atleta.altezza_cm = parseInt(document.getElementById('prof-altezza').value) || 170;
+            db.atleta.peso_kg = parseFloat(document.getElementById('prof-peso').value) || 70.0;
+            db.atleta.altezza_cm = parseInt(document.getElementById('prof-altezza').value) || 175;
             db.atleta.fc_riposo = parseInt(document.getElementById('prof-fc').value) || 60;
             saveLocal();
             closeModals();
@@ -2060,8 +1964,6 @@
             };
             reader.readAsText(file);
         }
-
-        initApp();
     </script>
 </body>
 </html>
