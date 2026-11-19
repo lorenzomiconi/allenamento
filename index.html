@@ -883,6 +883,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const firestore = firebase.firestore();
+        auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(() => {});
 
         let currentUser = null;
         let db = null;
@@ -981,6 +982,7 @@
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Accesso...`;
             try {
+                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (err) {
                 errBox.textContent = "Credenziali non valide (" + err.code + ").";
