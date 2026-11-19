@@ -92,6 +92,9 @@
                     <button onclick="switchTab('scarpe')" id="btn-scarpe" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive">
                         <i class="fa-solid fa-shoe-prints w-5"></i> Parco Scarpe & Regole
                     </button>
+                    <button onclick="switchTab('convertitore')" id="btn-convertitore" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive text-cyan-400 hover:text-cyan-300">
+                        <i class="fa-solid fa-cloud-showers-heavy w-5"></i> Convertitore Rulli
+                    </button>
                 </nav>
             </div>
 
@@ -522,6 +525,68 @@
                     </div>
                 </div>
 
+                <!-- TAB 6: CONVERTITORE -->
+                <div id="tab-convertitore" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
+                            <div class="w-11 h-11 rounded-xl bg-cyan-50 border border-cyan-100 text-cyan-600 flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-cloud-showers-heavy"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-lg">Piano B (Pioggia): Da Corsa a Rulli</h3>
+                                <p class="text-xs text-slate-500">Oggi diluvia e non puoi uscire? Calcola la seduta equivalente per non perdere il lavoro aerobico.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- INPUTS -->
+                            <div class="space-y-4 bg-slate-50 p-5 rounded-xl border border-slate-200">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Cosa prevedeva il piano oggi?</label>
+                                    <select id="conv-tipo" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-800 bg-white">
+                                        <option value="lento">Fondo Lento / Corsa Facile (Z2)</option>
+                                        <option value="medio">Medio / Tempo Run / Variazioni lunghe (Z3)</option>
+                                        <option value="ripetute">Ripetute Brevi / Lavori di Soglia (Z4/Z5)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Durata stimata della corsa (in minuti)</label>
+                                    <input type="number" id="conv-minuti" placeholder="Es. 50" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono font-bold text-slate-800 bg-white">
+                                    <p class="text-[10px] text-slate-500 mt-1">Es. Se avevi 8 km a 5'30", inserisci <strong>44</strong>.</p>
+                                </div>
+                                <button onclick="calcolaConvertitore()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2.5 rounded-lg transition shadow-sm flex justify-center items-center gap-2">
+                                    <i class="fa-solid fa-calculator"></i> Genera Seduta Equivalente
+                                </button>
+                            </div>
+
+                            <!-- OUTPUTS -->
+                            <div id="conv-output" class="hidden flex-col justify-center space-y-4">
+                                <div class="bg-cyan-50/50 border border-cyan-200 p-5 rounded-xl">
+                                    <h4 class="font-bold text-cyan-900 text-sm mb-3" id="out-titolo">--</h4>
+                                    <div class="grid grid-cols-2 gap-3 mb-4">
+                                        <div class="bg-white p-3 rounded-lg border border-cyan-200 shadow-sm text-center">
+                                            <div class="text-[10px] uppercase font-bold text-cyan-600">Tempo Rulli</div>
+                                            <div class="font-mono font-bold text-2xl text-slate-800 mt-0.5" id="out-tempo">--'</div>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-lg border border-cyan-200 shadow-sm text-center">
+                                            <div class="text-[10px] uppercase font-bold text-cyan-600">Cadenza (RPM)</div>
+                                            <div class="font-mono font-bold text-2xl text-slate-800 mt-0.5" id="out-rpm">--</div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white p-4 rounded-lg border border-cyan-200 shadow-sm">
+                                        <div class="text-[10px] uppercase font-bold text-cyan-600 mb-2"><i class="fa-solid fa-bullseye mr-1"></i> Struttura & Target (Su tua Soglia)</div>
+                                        <div class="text-xs text-slate-700 leading-relaxed space-y-1.5" id="out-desc">--</div>
+                                    </div>
+                                    
+                                    <p class="text-[10px] text-cyan-700 mt-4 leading-tight">
+                                        <i class="fa-solid fa-circle-info mr-0.5"></i> Nel Diario salva la seduta modificando "Tipo Attività" in "Rulli", impostando i km fatti pari a zero, e indicando i km segnati dal rullo (o inserendo i minuti nelle note).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -671,6 +736,32 @@
             <div class="flex justify-end gap-2 mt-6">
                 <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
                 <button onclick="saveProfile()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Aggiorna</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-edit-workout" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-900 mb-1">Modifica o Sposta Seduta</h3>
+            <p class="text-xs text-slate-500 mb-4">Cambia giorno, distanza, scarpe o trasforma l'uscita in rulli.</p>
+            <input type="hidden" id="edit-w-idx">
+            <div class="space-y-3 text-sm">
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data</label><input type="date" id="edit-w-data" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Tipo Attività</label><input type="text" id="edit-w-tipo" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                </div>
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Dettaglio seduta</label><input type="text" id="edit-w-dettaglio" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Previsti</label><input type="number" step="0.1" id="edit-w-km" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Previste</label><select id="edit-w-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select></div>
+                </div>
+            </div>
+            <div class="flex justify-between items-center mt-6">
+                <button type="button" onclick="deleteWorkout()" class="text-xs text-rose-600 hover:underline font-semibold"><i class="fa-solid fa-trash mr-1"></i> Elimina</button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
+                    <button type="button" onclick="saveEditedWorkout()" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Salva Modifiche</button>
+                </div>
             </div>
         </div>
     </div>
@@ -994,7 +1085,64 @@
             }, 400);
         }
 
-        function getExerciseSVG(key, large = false) {
+
+        function calcolaConvertitore() {
+            const tipo = document.getElementById('conv-tipo').value;
+            const minStr = document.getElementById('conv-minuti').value;
+            if(!minStr || isNaN(minStr) || minStr <= 0) {
+                alert("Inserisci i minuti stimati della corsa (es. 45).");
+                return;
+            }
+            const minCorsa = parseInt(minStr);
+            const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
+            const fcSoglia = Number(s.fc_bpm) || 187;
+            const wSoglia = Number(s.potenza_w) || 360;
+
+            let minRulli = 0;
+            let rpm = "";
+            let titolo = "";
+            let desc = "";
+
+            if (tipo === 'lento') {
+                minRulli = Math.round(minCorsa * 1.15); // +15% time on easy runs to compensate lack of impact
+                titolo = "Fondo Lento Trasformato in Z2 Bike";
+                rpm = "85 - 95";
+                const fcTarget = Math.round(fcSoglia * 0.70) + " - " + Math.round(fcSoglia * 0.78);
+                const wTarget = Math.round(wSoglia * 0.65) + " - " + Math.round(wSoglia * 0.75);
+                desc = `<div><strong>Riscaldamento:</strong> Primi 10' leggerissimi (Z1).</div>
+                        <div><strong>Fase Centrale:</strong> ${minRulli - 10}' costanti in Zona 2 bassa (FC: <strong class="text-blue-600">${fcTarget} bpm</strong> | Pot: <strong class="text-amber-600">${wTarget} W</strong>).</div>
+                        <div class="mt-2 text-cyan-700 bg-cyan-50 p-2 rounded"><strong>Regola d'oro:</strong> Nessun fiatone, pedala sempre agile e rotondo per simulare la corsa facile.</div>`;
+            } else if (tipo === 'medio') {
+                minRulli = Math.round(minCorsa * 1.10); // +10% time
+                titolo = "Medio Trasformato in Tempo Ride (Z3)";
+                rpm = "80 - 90";
+                const fcTarget = Math.round(fcSoglia * 0.86) + " - " + Math.round(fcSoglia * 0.92);
+                const wTarget = Math.round(wSoglia * 0.85) + " - " + Math.round(wSoglia * 0.93);
+                desc = `<div><strong>Riscaldamento:</strong> 15' in Z1/Z2 in progressione.</div>
+                        <div><strong>Lavoro (Medio):</strong> ${Math.max(10, minRulli - 25)}' costanti in Zona 3 (FC: <strong class="text-blue-600">${fcTarget} bpm</strong> | Pot: <strong class="text-amber-600">${wTarget} W</strong>).</div>
+                        <div><strong>Defaticamento:</strong> 10' facili in Z1.</div>
+                        <div class="mt-2 text-cyan-700 bg-cyan-50 p-2 rounded">Cerca una pedalata un filo più di forza (80-85 rpm) per simulare l'impegno muscolare del Medio.</div>`;
+            } else if (tipo === 'ripetute') {
+                minRulli = minCorsa; // Same total duration approx
+                titolo = "Lavoro di Qualità / Intervalli (Z4/Z5)";
+                rpm = "95 - 105+";
+                const fcTarget = Math.round(fcSoglia * 0.94) + " - " + fcSoglia;
+                const wTarget = Math.round(wSoglia * 0.96) + " - " + Math.round(wSoglia * 1.05);
+                desc = `<div><strong>Riscaldamento:</strong> 15' facili + 3 o 4 allunghi di 30" ad altissima frequenza (100+ rpm).</div>
+                        <div><strong>Blocco Centrale:</strong> Mantenendo la struttura di tempo delle tue ripetute (es. 5x4' forti / 2' lenti), esegui le frazioni forti in Zona 4/5 (FC: <strong class="text-rose-600">${fcTarget} bpm</strong> | Pot: <strong class="text-amber-600">${wTarget} W</strong>).</div>
+                        <div><strong>Defaticamento:</strong> Restante tempo in Z1 agilissimo.</div>`;
+            }
+
+            document.getElementById('out-titolo').textContent = titolo;
+            document.getElementById('out-tempo').textContent = minRulli + "'";
+            document.getElementById('out-rpm').textContent = rpm;
+            document.getElementById('out-desc').innerHTML = desc;
+            document.getElementById('conv-output').classList.remove('hidden');
+            document.getElementById('conv-output').classList.add('flex');
+        }
+        
+        function getExerciseSVG
+(key, large = false) {
             const cls = large ? "w-72 h-48" : "w-20 h-14 shrink-0";
             const base = `<svg viewBox="0 0 160 110" class="${cls} rounded-lg bg-white border border-slate-200" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="96" x2="150" y2="96" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>`;
             const shapes = {
@@ -1096,7 +1244,7 @@
         }
 
         function switchTab(tabId, persist = true) {
-            ['panoramica', 'diario', 'gare', 'forza', 'scarpe'].forEach(t => {
+            ['panoramica', 'diario', 'gare', 'forza', 'scarpe', 'convertitore'].forEach(t => {
                 document.getElementById('tab-' + t).classList.add('hidden');
                 const btn = document.getElementById('btn-' + t);
                 btn.classList.remove('tab-active');
@@ -1112,7 +1260,8 @@
                 diario: ["Diario & Coach Dinamico", "Piano giornaliero, Km Rulli e rimodulazione automatica"],
                 gare: ["Gare, Soglia & Zone Ritmo", "Soglia Garmin (FC/Passo/Watt/VO2), obiettivi 10k e Mezza Maratona"],
                 forza: ["Forza Gambe & Upper Body", "Schede progressive con illustrazioni esercizi e tracciamento carichi"],
-                scarpe: ["Parco Scarpe & Regole", "Gestione libera km percorsi/rimanenti e protocollo sicurezza"]
+                scarpe: ["Parco Scarpe & Regole", "Gestione libera km percorsi/rimanenti e protocollo sicurezza"],
+                convertitore: ["Convertitore Corsa → Rulli", "Gestione imprevisti e pioggia: calcola la seduta indoor equivalente"]
             };
             document.getElementById('page-title').textContent = titles[tabId][0];
             document.getElementById('page-subtitle').textContent = titles[tabId][1];
@@ -1584,6 +1733,7 @@
                         <td class="p-3.5 text-xs font-medium">${a.scarpa || '-'}</td>
                         <td class="p-3.5">${badge}</td>
                         <td class="p-3.5 text-right whitespace-nowrap space-x-1">
+                            <button onclick="openEditWorkoutModal(${a.idx})" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-xs font-semibold transition" title="Modifica o Sposta Data"><i class="fa-solid fa-pen"></i></button>
                             <button onclick="openCompleteModal(${a.idx})" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded text-xs font-semibold transition"><i class="fa-solid fa-check"></i> Sync</button>
                             <button onclick="openSkipModal(${a.idx})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-xs font-semibold transition"><i class="fa-solid fa-xmark"></i> Salta</button>
                         </td>
@@ -1817,7 +1967,7 @@
         }
 
         function closeModals() {
-            ['modal-complete', 'modal-skip', 'modal-profile', 'modal-add-workout', 'modal-add-race', 'modal-exercise', 'modal-shoe', 'modal-threshold'].forEach(id => {
+            ['modal-complete', 'modal-skip', 'modal-profile', 'modal-edit-workout', 'modal-add-workout', 'modal-add-race', 'modal-exercise', 'modal-shoe', 'modal-threshold'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
                 document.getElementById(id).classList.remove('flex');
             });
@@ -1922,6 +2072,56 @@
             renderAll();
         }
 
+        function openEditWorkoutModal(idx) {
+            const a = db.allenamenti_settimana[idx];
+            document.getElementById('edit-w-idx').value = idx;
+            document.getElementById('edit-w-data').value = a.data;
+            document.getElementById('edit-w-tipo').value = a.tipo;
+            document.getElementById('edit-w-dettaglio').value = a.dettaglio;
+            document.getElementById('edit-w-km').value = a.km_previsti;
+            populateShoeSelect('edit-w-scarpa', a.scarpa);
+            const m = document.getElementById('modal-edit-workout');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+
+        function saveEditedWorkout() {
+            const idx = parseInt(document.getElementById('edit-w-idx').value);
+            const data = document.getElementById('edit-w-data').value;
+            const tipo = document.getElementById('edit-w-tipo').value;
+            const dettaglio = document.getElementById('edit-w-dettaglio').value;
+            const km = parseFloat(document.getElementById('edit-w-km').value) || 0;
+            const scarpa = document.getElementById('edit-w-scarpa').value;
+            
+            const giorniIt = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
+            let gName = "";
+            if (data) {
+                const [yy, mm, dd] = data.split('-').map(Number);
+                gName = giorniIt[new Date(yy, mm - 1, dd).getDay()];
+            }
+            
+            db.allenamenti_settimana[idx].data = data;
+            db.allenamenti_settimana[idx].giorno = gName;
+            db.allenamenti_settimana[idx].tipo = tipo;
+            db.allenamenti_settimana[idx].dettaglio = dettaglio;
+            db.allenamenti_settimana[idx].km_previsti = km;
+            db.allenamenti_settimana[idx].scarpa = scarpa;
+            
+            db.allenamenti_settimana.sort((a, b) => a.data.localeCompare(b.data));
+            saveLocal();
+            closeModals();
+            renderAll();
+        }
+
+        function deleteWorkout() {
+            const idx = parseInt(document.getElementById('edit-w-idx').value);
+            if (confirm("Vuoi davvero eliminare questa seduta?")) {
+                db.allenamenti_settimana.splice(idx, 1);
+                saveLocal();
+                closeModals();
+                renderAll();
+            }
+        }
+
         function openAddWorkoutModal() {
             populateShoeSelect('new-w-scarpa', db.scarpe[0] ? db.scarpe[0].nome : '-');
             const m = document.getElementById('modal-add-workout');
@@ -1934,8 +2134,12 @@
             const dettaglio = document.getElementById('new-w-dettaglio').value;
             const km = parseFloat(document.getElementById('new-w-km').value) || 0;
             const scarpa = document.getElementById('new-w-scarpa').value;
-            const giorni = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
-            const gName = data ? giorni[new Date(data).getDay()] : "";
+            const giorni = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
+            let gName = "";
+            if (data) {
+                const [yy, mm, dd] = data.split('-').map(Number);
+                gName = giorni[new Date(yy, mm - 1, dd).getDay()];
+            }
             db.allenamenti_settimana.push({ data, giorno: gName, tipo, dettaglio, km_previsti: km, km_fatti: null, km_rulli: null, passo: "", scarpa, stato: "da_fare", note: "" });
             db.allenamenti_settimana.sort((a, b) => a.data.localeCompare(b.data));
             saveLocal();
