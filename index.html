@@ -73,7 +73,7 @@
                     </div>
                     <div class="font-semibold text-sm text-white" id="side-atleta">-- kg · -- cm</div>
                     <div class="text-slate-400 mt-0.5">BMI: <span id="side-bmi" class="text-emerald-400 font-semibold">--</span> · FC Riposo: <span id="side-fc" class="text-slate-200">-- bpm</span></div>
-                    <div class="text-slate-400 mt-1 flex items-center gap-1.5">VO2 Max Garmin: <span id="side-vo2" class="text-purple-400 font-bold font-mono">54</span> <span id="side-vo2-lvl" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-semibold">Superiore</span></div>
+                    <div class="text-slate-400 mt-1 flex items-center gap-1.5">VO2 Max Garmin: <span id="side-vo2" class="text-purple-400 font-bold font-mono">--</span> <span id="side-vo2-lvl" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-semibold">--</span></div>
                 </div>
 
                 <nav class="p-4 space-y-1.5" id="nav-menu">
@@ -236,7 +236,7 @@
                             </div>
                             <div class="bg-slate-800/90 border border-purple-500/40 px-3.5 py-2 rounded-lg">
                                 <div class="text-[10px] uppercase text-purple-300">VO2 Max</div>
-                                <div class="font-mono font-bold text-base text-purple-400"><span id="pan-vo2-val">54</span> <span class="text-[11px] font-sans font-semibold text-purple-300" id="pan-vo2-lvl">Superiore</span></div>
+                                <div class="font-mono font-bold text-base text-purple-400"><span id="pan-vo2-val">--</span> <span class="text-[11px] font-sans font-semibold text-purple-300" id="pan-vo2-lvl">--</span></div>
                             </div>
                         </div>
 
@@ -259,7 +259,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                                 <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
                                     <label class="text-xs text-slate-500 block mb-1">FC a riposo oggi (baseline <span id="lbl-base-fc">60</span>)</label>
-                                    <input type="number" id="input-fc-riposo" value="60" oninput="updateReadiness(true)" class="w-full font-bold text-lg bg-white border border-slate-300 rounded px-2.5 py-1">
+                                    <input type="number" id="input-fc-riposo" value="" placeholder="--" oninput="updateReadiness(true)" class="w-full font-bold text-lg bg-white border border-slate-300 rounded px-2.5 py-1">
                                 </div>
                                 <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
                                     <label class="text-xs text-slate-500 block mb-1">Stato Schiena / Lombare</label>
@@ -399,31 +399,31 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                             <div class="bg-rose-50/60 border border-rose-200/80 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-rose-700 block mb-1">FC Soglia (bpm)</label>
-                                <input type="number" id="soglia-fc" value="180" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-rose-200 rounded-lg px-3 py-1.5">
+                                <input type="number" id="soglia-fc" value="" placeholder="--" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-rose-200 rounded-lg px-3 py-1.5">
                             </div>
                             <div class="bg-blue-50/60 border border-blue-200/80 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-blue-700 block mb-1">Passo Soglia (min:sec)</label>
-                                <input type="text" id="soglia-passo" value="4:30" oninput="saveThresholdInline()" placeholder="4:23" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-blue-200 rounded-lg px-3 py-1.5">
+                                <input type="text" id="soglia-passo" value="" oninput="saveThresholdInline()" placeholder="min:sec" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-blue-200 rounded-lg px-3 py-1.5">
                             </div>
                             <div class="bg-amber-50/60 border border-amber-200/80 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-amber-700 block mb-1">Potenza Soglia (W)</label>
-                                <input type="number" id="soglia-w" value="350" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-amber-200 rounded-lg px-3 py-1.5">
+                                <input type="number" id="soglia-w" value="" placeholder="--" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-amber-200 rounded-lg px-3 py-1.5">
                             </div>
                             <div class="bg-emerald-50/60 border border-emerald-200/80 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-emerald-700 block mb-1">Potenza Relativa (W/kg)</label>
-                                <input type="number" step="0.01" id="soglia-wkg" value="5.00" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-emerald-200 rounded-lg px-3 py-1.5">
+                                <input type="number" step="0.01" id="soglia-wkg" value="" placeholder="--" oninput="saveThresholdInline()" class="w-full font-mono font-extrabold text-xl text-slate-900 bg-white border border-emerald-200 rounded-lg px-3 py-1.5">
                                 <span class="text-[11px] text-slate-500 mt-1 block" id="soglia-wkg-calc">--</span>
                             </div>
                             <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-slate-600 block mb-1">Data Rilevamento</label>
-                                <input type="date" id="soglia-data" value="2026-11-18" onchange="saveThresholdInline()" class="w-full font-mono font-semibold text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-2">
+                                <input type="date" id="soglia-data" value="" onchange="saveThresholdInline()" class="w-full font-mono font-semibold text-sm text-slate-900 bg-white border border-slate-300 rounded-lg px-2.5 py-2">
                             </div>
                             <div class="bg-purple-50/70 border border-purple-200 p-3.5 rounded-xl">
                                 <label class="text-[11px] font-bold uppercase text-purple-700 block mb-1">VO2 Max Garmin</label>
                                 <div class="flex gap-1.5">
-                                    <input type="number" step="1" min="20" max="95" id="vo2-val" value="54" oninput="saveVo2Inline()" class="w-16 font-mono font-extrabold text-xl text-slate-900 bg-white border border-purple-200 rounded-lg px-2 py-1.5">
+                                    <input type="number" step="1" min="20" max="95" id="vo2-val" value="" placeholder="--" oninput="saveVo2Inline()" class="w-16 font-mono font-extrabold text-xl text-slate-900 bg-white border border-purple-200 rounded-lg px-2 py-1.5">
                                     <select id="vo2-lvl" onchange="saveVo2Inline()" class="flex-1 text-[11px] font-bold text-purple-800 bg-white border border-purple-200 rounded-lg px-1 py-1.5">
-                                        <option value="Superiore" selected>Superiore</option>
+                                        <option value="Superiore">Superiore</option>
                                         <option value="Eccellente">Eccellente</option>
                                         <option value="Buono">Buono</option>
                                         <option value="Discreto">Discreto</option>
@@ -457,18 +457,18 @@
                             <div class="space-y-3">
                                 <div class="grid grid-cols-3 gap-3 items-center">
                                     <span class="font-bold text-sm">5 km</span>
-                                    <input type="text" id="pb-5k" value="22:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                    <input type="text" id="garmin-5k" value="21:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
+                                    <input type="text" id="pb-5k" value="" placeholder="mm:ss" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                    <input type="text" id="garmin-5k" value="" placeholder="mm:ss" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
                                 </div>
                                 <div class="grid grid-cols-3 gap-3 items-center">
                                     <span class="font-bold text-sm">10 km</span>
-                                    <input type="text" id="pb-10k" value="45:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                    <input type="text" id="garmin-10k" value="44:30" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
+                                    <input type="text" id="pb-10k" value="" placeholder="mm:ss" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                    <input type="text" id="garmin-10k" value="" placeholder="mm:ss" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
                                 </div>
                                 <div class="grid grid-cols-3 gap-3 items-center">
                                     <span class="font-bold text-sm">21.1 km</span>
-                                    <input type="text" id="pb-21k" value="1:42:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
-                                    <input type="text" id="garmin-21k" value="1:39:00" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
+                                    <input type="text" id="pb-21k" value="" placeholder="h:mm:ss" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono">
+                                    <input type="text" id="garmin-21k" value="" placeholder="h:mm:ss" oninput="savePbAndRecalc()" class="border border-slate-300 rounded px-2.5 py-1.5 text-sm font-mono bg-blue-50/40">
                                 </div>
                             </div>
                             <div id="endurance-index-box" class="mt-4 p-3.5 rounded-lg bg-indigo-50 border border-indigo-100 text-xs text-indigo-900"></div>
@@ -489,7 +489,7 @@
                         </div>
 
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                            <h3 class="font-bold text-slate-900 mb-2"><i class="fa-solid fa-bottle-water text-blue-500 mr-1"></i> Strategia Lunghi (<span id="nutr-weight-lbl">70</span> kg)</h3>
+                            <h3 class="font-bold text-slate-900 mb-2"><i class="fa-solid fa-bottle-water text-blue-500 mr-1"></i> Strategia Lunghi (<span id="nutr-weight-lbl">--</span> kg)</h3>
                             <p class="text-xs text-slate-500 mb-4">Calcolata sul tuo peso attuale per uscite oltre i 75–90 minuti:</p>
                             <ul class="space-y-3 text-sm" id="nutrition-list"></ul>
                         </div>
@@ -541,9 +541,9 @@
                             <div class="bg-slate-900 text-white px-4 py-2.5 rounded-xl flex items-center gap-3 shrink-0">
                                 <div>
                                     <label class="text-[10px] uppercase tracking-wider text-cyan-300 font-bold block">FTP Bici / Rulli (W)</label>
-                                    <span class="text-[11px] text-slate-400 font-mono" id="conv-ftp-wkg">3.12 W/kg</span>
+                                    <span class="text-[11px] text-slate-400 font-mono" id="conv-ftp-wkg">-- W/kg</span>
                                 </div>
-                                <input type="number" id="conv-ftp" value="215" min="80" max="500" oninput="saveFtpInline()" class="w-20 font-mono font-extrabold text-lg text-slate-900 bg-white rounded-lg px-2.5 py-1 text-right">
+                                <input type="number" id="conv-ftp" value="" placeholder="W" min="80" max="500" oninput="saveFtpInline()" class="w-20 font-mono font-extrabold text-lg text-slate-900 bg-white rounded-lg px-2.5 py-1 text-right">
                             </div>
                         </div>
 
@@ -588,7 +588,7 @@
                                 <div class="bg-cyan-50/60 border border-cyan-200 p-5 rounded-xl space-y-4">
                                     <div class="flex items-center justify-between gap-2">
                                         <h4 class="font-bold text-cyan-950 text-base" id="out-titolo">--</h4>
-                                        <span class="text-[11px] font-mono font-bold px-2.5 py-1 rounded bg-white border border-cyan-200 text-cyan-800" id="out-ftp-badge">FTP 215 W</span>
+                                        <span class="text-[11px] font-mono font-bold px-2.5 py-1 rounded bg-white border border-cyan-200 text-cyan-800" id="out-ftp-badge">FTP -- W</span>
                                     </div>
 
                                     <div class="grid grid-cols-3 gap-2.5">
@@ -632,7 +632,7 @@
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">FC Soglia (bpm)</label><input type="number" id="m-soglia-fc" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Passo Soglia (min:sec)</label><input type="text" id="m-soglia-passo" placeholder="4:23" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Passo Soglia (min:sec)</label><input type="text" id="m-soglia-passo" placeholder="min:sec" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">Potenza Soglia (W)</label><input type="number" id="m-soglia-w" class="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold"></div>
@@ -817,7 +817,7 @@
             <h3 class="text-lg font-bold text-slate-900 mb-4">Aggiungi Seduta al Diario</h3>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data</label><input type="date" id="new-w-data" value="2026-11-22" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Data</label><input type="date" id="new-w-data" value="" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">Tipo Attività</label>
                         <select id="new-w-tipo" class="w-full border border-slate-300 rounded-lg px-3 py-2">
                             <option value="Corsa facile">Corsa facile</option>
@@ -832,7 +832,7 @@
                 </div>
                 <div><label class="block text-xs font-semibold text-slate-600 mb-1">Dettaglio seduta</label><input type="text" id="new-w-dettaglio" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Previsti</label><input type="number" step="0.5" id="new-w-km" value="10" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Km Corsa Previsti</label><input type="number" step="0.5" id="new-w-km" value="" placeholder="km" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Previste</label><select id="new-w-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select></div>
                 </div>
             </div>
@@ -890,19 +890,16 @@
         let unsubscribeSnapshot = null;
 
         const NEUTRAL_TEMPLATE_DB = {
-            ui: { activeTab: "panoramica", diarioFilter: "current", dateFrom: "", dateTo: "", readiness: { fc: 60, schiena: "ok", polpaccio: "ok" } },
-            atleta: { peso_kg: 69.0, altezza_cm: 170, bmi: 23.88, fc_riposo: 60 },
-            soglia: { fc_bpm: 187, passo: "4:23", potenza_w: 360, potenza_w_kg: 5.22, ftp_bici: 215, data_rilevamento: "2026-11-18", storico: [] },
-            vo2max: { valore: 54, livello: "Superiore" },
-            pb: { "5k": "22:00", "10k": "46:22", "21k": "1:41:38", garmin_5k: "21:30", garmin_10k: "44:30", garmin_21k: "1:39:00" },
+            ui: { activeTab: "panoramica", diarioFilter: "current", dateFrom: "", dateTo: "", readiness: { fc: 0, schiena: "ok", polpaccio: "ok" } },
+            atleta: { peso_kg: 0, altezza_cm: 0, bmi: 0, fc_riposo: 0 },
+            soglia: { fc_bpm: 0, passo: "", potenza_w: 0, potenza_w_kg: 0, ftp_bici: 0, data_rilevamento: "", storico: [] },
+            vo2max: { valore: 0, livello: "--" },
+            pb: { "5k": "", "10k": "", "21k": "", garmin_5k: "", garmin_10k: "", garmin_21k: "" },
             scarpe: [
-                { id: "shoe-1", nome: "Mizuno Neo Zen", ruolo: "Corse facili e recupero", km_percorsi: 134, vita_utile: 800, note: "Importa backup .json" },
-                { id: "shoe-2", nome: "Adidas Evo SL", ruolo: "Gare e lavori veloci", km_percorsi: 520, vita_utile: 650, note: "" }
+                { id: "shoe-1", nome: "Scarpa 1", ruolo: "Corse facili", km_percorsi: 0, vita_utile: 600, note: "" },
+                { id: "shoe-2", nome: "Scarpa 2", ruolo: "Gare e lavori", km_percorsi: 0, vita_utile: 600, note: "" }
             ],
-            gare: [
-                { nome: "Test / Gara 10 km", data: "2027-02-14", distanza: "10 km", tipo: "Gara Test" },
-                { nome: "Mezza Maratona Obiettivo", data: "2027-04-18", distanza: "21.1 km", tipo: "Gara Principale" }
-            ],
+            gare: [],
             allenamenti_settimana: [],
             forza: [
                 {
@@ -1137,7 +1134,7 @@
         function saveFtpInline() {
             if (!db) return;
             db.soglia = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
-            db.soglia.ftp_bici = parseInt(document.getElementById('conv-ftp').value) || 215;
+            db.soglia.ftp_bici = parseInt(document.getElementById('conv-ftp').value) || 0;
             saveLocal();
             calcolaConvertitore();
         }
@@ -1215,12 +1212,12 @@
             }
             const minCorsa = parseInt(minStr);
             const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
-            const fcSoglia = Number(s.fc_bpm) || 187;
-            const ftpBici = parseInt(document.getElementById('conv-ftp').value) || Number(s.ftp_bici) || 215;
-            const peso = Number(db.atleta.peso_kg) || 69.0;
+            const fcSoglia = Number(s.fc_bpm) || 0;
+            const ftpBici = parseInt(document.getElementById('conv-ftp').value) || Number(s.ftp_bici) || 0;
+            const peso = Number(db.atleta.peso_kg) || 0;
 
             const wkgEl = document.getElementById('conv-ftp-wkg');
-            if (wkgEl) wkgEl.textContent = `${(ftpBici / peso).toFixed(2)} W/kg`;
+            if (wkgEl) wkgEl.textContent = (ftpBici > 0 && peso > 0) ? `${(ftpBici / peso).toFixed(2)} W/kg` : `-- W/kg`;
 
             let minRulli = 0;
             let rpm = "";
@@ -1389,30 +1386,30 @@
         }
 
         function restoreSavedInputs() {
-            document.getElementById('pb-5k').value = db.pb["5k"] || "22:00";
-            document.getElementById('pb-10k').value = db.pb["10k"] || "46:22";
-            document.getElementById('pb-21k').value = db.pb["21k"] || "1:41:38";
-            document.getElementById('garmin-5k').value = db.pb.garmin_5k || "21:30";
-            document.getElementById('garmin-10k').value = db.pb.garmin_10k || "44:30";
-            document.getElementById('garmin-21k').value = db.pb.garmin_21k || "1:39:00";
+            document.getElementById('pb-5k').value = db.pb["5k"] || "";
+            document.getElementById('pb-10k').value = db.pb["10k"] || "";
+            document.getElementById('pb-21k').value = db.pb["21k"] || "";
+            document.getElementById('garmin-5k').value = db.pb.garmin_5k || "";
+            document.getElementById('garmin-10k').value = db.pb.garmin_10k || "";
+            document.getElementById('garmin-21k').value = db.pb.garmin_21k || "";
 
-            const r = db.ui.readiness || { fc: db.atleta.fc_riposo || 60, schiena: "ok", polpaccio: "ok" };
-            document.getElementById('input-fc-riposo').value = r.fc;
+            const r = db.ui.readiness || { fc: db.atleta.fc_riposo || 0, schiena: "ok", polpaccio: "ok" };
+            document.getElementById('input-fc-riposo').value = r.fc || db.atleta.fc_riposo || "";
             document.getElementById('input-schiena').value = r.schiena;
             document.getElementById('input-polpaccio').value = r.polpaccio;
 
             const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
-            document.getElementById('soglia-fc').value = s.fc_bpm;
-            document.getElementById('soglia-passo').value = s.passo;
-            document.getElementById('soglia-w').value = s.potenza_w;
-            document.getElementById('soglia-wkg').value = s.potenza_w_kg;
-            document.getElementById('soglia-data').value = s.data_rilevamento || "2026-11-18";
+            document.getElementById('soglia-fc').value = s.fc_bpm || "";
+            document.getElementById('soglia-passo').value = s.passo || "";
+            document.getElementById('soglia-w').value = s.potenza_w || "";
+            document.getElementById('soglia-wkg').value = s.potenza_w_kg || "";
+            document.getElementById('soglia-data').value = s.data_rilevamento || "";
 
-            const v = db.vo2max || { valore: 54, livello: "Superiore" };
-            document.getElementById('vo2-val').value = v.valore;
-            document.getElementById('vo2-lvl').value = v.livello;
+            const v = db.vo2max || { valore: 0, livello: "--" };
+            document.getElementById('vo2-val').value = v.valore || "";
+            if (v.livello && v.livello !== "--") document.getElementById('vo2-lvl').value = v.livello;
             const ftpInp = document.getElementById('conv-ftp');
-            if (ftpInp) ftpInp.value = s.ftp_bici || 215;
+            if (ftpInp) ftpInp.value = s.ftp_bici || "";
         }
 
         function switchTab(tabId, persist = true) {
@@ -1461,13 +1458,15 @@
         }
 
         function renderAll() {
-            const bmi = (db.atleta.peso_kg / Math.pow(db.atleta.altezza_cm / 100, 2)).toFixed(2);
-            db.atleta.bmi = parseFloat(bmi);
-            document.getElementById('side-atleta').textContent = `${db.atleta.peso_kg} kg · ${db.atleta.altezza_cm} cm`;
+            const bmi = (db.atleta.peso_kg > 0 && db.atleta.altezza_cm > 0)
+                ? (db.atleta.peso_kg / Math.pow(db.atleta.altezza_cm / 100, 2)).toFixed(2)
+                : "--";
+            db.atleta.bmi = bmi === "--" ? 0 : parseFloat(bmi);
+            document.getElementById('side-atleta').textContent = db.atleta.peso_kg > 0 ? `${db.atleta.peso_kg} kg · ${db.atleta.altezza_cm} cm` : `-- kg · -- cm`;
             document.getElementById('side-bmi').textContent = bmi;
-            document.getElementById('side-fc').textContent = `${db.atleta.fc_riposo || 60} bpm`;
-            document.getElementById('lbl-base-fc').textContent = db.atleta.fc_riposo || 60;
-            document.getElementById('nutr-weight-lbl').textContent = db.atleta.peso_kg;
+            document.getElementById('side-fc').textContent = db.atleta.fc_riposo > 0 ? `${db.atleta.fc_riposo} bpm` : `-- bpm`;
+            document.getElementById('lbl-base-fc').textContent = db.atleta.fc_riposo || "--";
+            document.getElementById('nutr-weight-lbl').textContent = db.atleta.peso_kg || "--";
 
             renderThresholdDisplays();
 
@@ -1487,10 +1486,21 @@
             }
 
             const today = new Date();
-            const d10k = Math.max(0, Math.ceil((new Date("2027-02-14") - today) / (1000 * 60 * 60 * 24)));
-            const d21k = Math.max(0, Math.ceil((new Date("2027-04-18") - today) / (1000 * 60 * 60 * 24)));
-            document.getElementById('kpi-cd-21k').textContent = `${d21k} gg`;
-            document.getElementById('kpi-cd-sub').textContent = `Test 10k tra ${d10k} gg`;
+            const futureRaces = (db.gare || []).filter(g => g.data && new Date(g.data) >= today).sort((a, b) => a.data.localeCompare(b.data));
+            const mainRace = futureRaces.find(g => (g.tipo || '').includes('Principale')) || futureRaces[futureRaces.length - 1];
+            const nextTest = futureRaces.find(g => g !== mainRace) || futureRaces[0];
+            if (mainRace) {
+                const dMain = Math.max(0, Math.ceil((new Date(mainRace.data) - today) / (1000 * 60 * 60 * 24)));
+                document.getElementById('kpi-cd-21k').textContent = `${dMain} gg`;
+            } else {
+                document.getElementById('kpi-cd-21k').textContent = `-- gg`;
+            }
+            if (nextTest && nextTest !== mainRace) {
+                const dTest = Math.max(0, Math.ceil((new Date(nextTest.data) - today) / (1000 * 60 * 60 * 24)));
+                document.getElementById('kpi-cd-sub').textContent = `${nextTest.nome} tra ${dTest} gg`;
+            } else {
+                document.getElementById('kpi-cd-sub').textContent = mainRace ? mainRace.nome : `Nessuna gara in calendario`;
+            }
 
             updateTotalsUI();
             updateReadiness(false);
@@ -1506,21 +1516,21 @@
 
         function renderThresholdDisplays() {
             const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
-            const v = db.vo2max || { valore: 54, livello: "Superiore" };
-            const formattedPace = s.passo.includes(':') ? s.passo.replace(':', "'") + '"/km' : s.passo;
-            document.getElementById('pan-soglia-fc').textContent = `${s.fc_bpm} bpm`;
+            const v = db.vo2max || { valore: 0, livello: "--" };
+            const formattedPace = (s.passo && s.passo.includes(':')) ? s.passo.replace(':', "'") + '"/km' : (s.passo || '--/km');
+            document.getElementById('pan-soglia-fc').textContent = s.fc_bpm ? `${s.fc_bpm} bpm` : `-- bpm`;
             document.getElementById('pan-soglia-passo').textContent = formattedPace;
-            document.getElementById('pan-soglia-w').textContent = `${s.potenza_w} W`;
-            document.getElementById('pan-soglia-wkg').textContent = `${Number(s.potenza_w_kg).toFixed(2)} W/kg`;
-            document.getElementById('pan-soglia-date').textContent = `Agg. ${s.data_rilevamento || ''}`;
+            document.getElementById('pan-soglia-w').textContent = s.potenza_w ? `${s.potenza_w} W` : `-- W`;
+            document.getElementById('pan-soglia-wkg').textContent = s.potenza_w_kg ? `${Number(s.potenza_w_kg).toFixed(2)} W/kg` : `-- W/kg`;
+            document.getElementById('pan-soglia-date').textContent = s.data_rilevamento ? `Agg. ${s.data_rilevamento}` : `--`;
 
-            document.getElementById('pan-vo2-val').textContent = v.valore;
-            document.getElementById('pan-vo2-lvl').textContent = v.livello;
-            document.getElementById('side-vo2').textContent = v.valore;
-            document.getElementById('side-vo2-lvl').textContent = v.livello;
+            document.getElementById('pan-vo2-val').textContent = v.valore || "--";
+            document.getElementById('pan-vo2-lvl').textContent = v.livello || "--";
+            document.getElementById('side-vo2').textContent = v.valore || "--";
+            document.getElementById('side-vo2-lvl').textContent = v.livello || "--";
 
-            const calcWkg = (Number(s.potenza_w) / db.atleta.peso_kg).toFixed(2);
-            document.getElementById('soglia-wkg-calc').textContent = `Su ${db.atleta.peso_kg} kg: ${calcWkg} W/kg`;
+            const calcWkg = (db.atleta.peso_kg > 0 && s.potenza_w > 0) ? (Number(s.potenza_w) / db.atleta.peso_kg).toFixed(2) : "--";
+            document.getElementById('soglia-wkg-calc').textContent = db.atleta.peso_kg > 0 ? `Su ${db.atleta.peso_kg} kg: ${calcWkg} W/kg` : `--`;
 
             const histBox = document.getElementById('threshold-history-box');
             const histList = document.getElementById('threshold-history-list');
@@ -1538,18 +1548,18 @@
         }
 
         function saveVo2Inline() {
-            db.vo2max = db.vo2max || { valore: 54, livello: "Superiore" };
-            db.vo2max.valore = parseInt(document.getElementById('vo2-val').value) || 54;
-            db.vo2max.livello = document.getElementById('vo2-lvl').value || "Superiore";
+            db.vo2max = db.vo2max || { valore: 0, livello: "--" };
+            db.vo2max.valore = parseInt(document.getElementById('vo2-val').value) || 0;
+            db.vo2max.livello = document.getElementById('vo2-lvl').value || "--";
             saveLocal();
             renderThresholdDisplays();
         }
 
         function saveThresholdInline() {
-            db.soglia.fc_bpm = parseInt(document.getElementById('soglia-fc').value) || 180;
-            db.soglia.passo = document.getElementById('soglia-passo').value.trim() || "4:30";
-            db.soglia.potenza_w = parseInt(document.getElementById('soglia-w').value) || 350;
-            db.soglia.potenza_w_kg = parseFloat(document.getElementById('soglia-wkg').value) || 5.00;
+            db.soglia.fc_bpm = parseInt(document.getElementById('soglia-fc').value) || 0;
+            db.soglia.passo = document.getElementById('soglia-passo').value.trim() || "";
+            db.soglia.potenza_w = parseInt(document.getElementById('soglia-w').value) || 0;
+            db.soglia.potenza_w_kg = parseFloat(document.getElementById('soglia-wkg').value) || 0;
             db.soglia.data_rilevamento = document.getElementById('soglia-data').value || getLocalTodayISO();
             saveLocal();
             renderThresholdDisplays();
@@ -1558,7 +1568,7 @@
 
         function archiveThresholdSnapshot() {
             db.soglia.storico = db.soglia.storico || [];
-            const v = db.vo2max || { valore: 54, livello: "Superiore" };
+            const v = db.vo2max || { valore: 0, livello: "--" };
             db.soglia.storico.unshift({
                 data: db.soglia.data_rilevamento || getLocalTodayISO(),
                 fc_bpm: db.soglia.fc_bpm,
@@ -1581,27 +1591,27 @@
 
         function openThresholdModal() {
             const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
-            const v = db.vo2max || { valore: 54, livello: "Superiore" };
-            document.getElementById('m-soglia-fc').value = s.fc_bpm;
-            document.getElementById('m-soglia-passo').value = s.passo;
-            document.getElementById('m-soglia-w').value = s.potenza_w;
-            document.getElementById('m-soglia-wkg').value = s.potenza_w_kg;
+            const v = db.vo2max || { valore: 0, livello: "--" };
+            document.getElementById('m-soglia-fc').value = s.fc_bpm || "";
+            document.getElementById('m-soglia-passo').value = s.passo || "";
+            document.getElementById('m-soglia-w').value = s.potenza_w || "";
+            document.getElementById('m-soglia-wkg').value = s.potenza_w_kg || "";
             document.getElementById('m-soglia-data').value = s.data_rilevamento || getLocalTodayISO();
-            document.getElementById('m-vo2-val').value = v.valore;
-            document.getElementById('m-vo2-lvl').value = v.livello;
+            document.getElementById('m-vo2-val').value = v.valore || "";
+            if (v.livello && v.livello !== "--") document.getElementById('m-vo2-lvl').value = v.livello;
             const m = document.getElementById('modal-threshold');
             m.classList.remove('hidden'); m.classList.add('flex');
         }
 
         function saveThresholdModal() {
-            db.soglia.fc_bpm = parseInt(document.getElementById('m-soglia-fc').value) || 180;
-            db.soglia.passo = document.getElementById('m-soglia-passo').value.trim() || "4:30";
-            db.soglia.potenza_w = parseInt(document.getElementById('m-soglia-w').value) || 350;
-            db.soglia.potenza_w_kg = parseFloat(document.getElementById('m-soglia-wkg').value) || 5.00;
+            db.soglia.fc_bpm = parseInt(document.getElementById('m-soglia-fc').value) || 0;
+            db.soglia.passo = document.getElementById('m-soglia-passo').value.trim() || "";
+            db.soglia.potenza_w = parseInt(document.getElementById('m-soglia-w').value) || 0;
+            db.soglia.potenza_w_kg = parseFloat(document.getElementById('m-soglia-wkg').value) || 0;
             db.soglia.data_rilevamento = document.getElementById('m-soglia-data').value || getLocalTodayISO();
             db.vo2max = {
-                valore: parseInt(document.getElementById('m-vo2-val').value) || 54,
-                livello: document.getElementById('m-vo2-lvl').value || "Superiore"
+                valore: parseInt(document.getElementById('m-vo2-val').value) || 0,
+                livello: document.getElementById('m-vo2-lvl').value || "--"
             };
             restoreSavedInputs();
             saveLocal();
@@ -1916,6 +1926,10 @@
         }
 
         function renderRaces() {
+            if (!db.gare || !db.gare.length) {
+                document.getElementById('races-list').innerHTML = `<p class="text-xs text-slate-400">Nessuna gara inserita.</p>`;
+                return;
+            }
             document.getElementById('races-list').innerHTML = db.gare.map(g => {
                 const isMain = g.tipo.includes('Principale');
                 const isTest = g.tipo.includes('Test');
@@ -1966,9 +1980,9 @@
             document.getElementById('endurance-index-box').innerHTML = `<strong>Indice di Resistenza (Passo 21k / Passo 10k): ${ratio}</strong> (Passo 10k: ${secToPace(pace10)} vs Passo 21k: ${secToPace(pace21)}).<br>${profileMsg}`;
 
             const s = db.soglia || NEUTRAL_TEMPLATE_DB.soglia;
-            const lthr = Number(s.fc_bpm) || 187;
-            const ltSec = timeToSec(s.passo || "4:23");
-            const ltW = Number(s.potenza_w) || 360;
+            const lthr = Number(s.fc_bpm) || 0;
+            const ltSec = s.passo ? timeToSec(s.passo) : 0;
+            const ltW = Number(s.potenza_w) || 0;
 
             const titleEl = document.getElementById('zones-table-title');
             if (titleEl) titleEl.textContent = `Zone Dinamiche (Calibrate su Soglia ${lthr} bpm · ${s.passo}/km · ${ltW} W)`;
@@ -2237,9 +2251,9 @@
         }
 
         function saveProfile() {
-            db.atleta.peso_kg = parseFloat(document.getElementById('prof-peso').value) || 69.0;
-            db.atleta.altezza_cm = parseInt(document.getElementById('prof-altezza').value) || 170;
-            db.atleta.fc_riposo = parseInt(document.getElementById('prof-fc').value) || 60;
+            db.atleta.peso_kg = parseFloat(document.getElementById('prof-peso').value) || 0;
+            db.atleta.altezza_cm = parseInt(document.getElementById('prof-altezza').value) || 0;
+            db.atleta.fc_riposo = parseInt(document.getElementById('prof-fc').value) || 0;
             saveLocal();
             closeModals();
             renderAll();
