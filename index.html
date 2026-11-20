@@ -95,6 +95,10 @@
                     <button onclick="switchTab('convertitore')" id="btn-convertitore" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive text-cyan-400 hover:text-cyan-300">
                         <i class="fa-solid fa-cloud-showers-heavy w-5"></i> Convertitore Rulli
                     </button>
+                    <button onclick="switchTab('coach')" id="btn-coach" class="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition tab-inactive text-amber-300 hover:text-amber-200">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-kit-medical w-5"></i> Coach Fisio & Adatta</span>
+                        <span id="nav-coach-dot" class="hidden w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+                    </button>
                 </nav>
             </div>
 
@@ -139,6 +143,27 @@
                         </button>
                         <button onclick="openAddWorkoutModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm transition">
                             <i class="fa-solid fa-plus mr-1"></i> Nuova Seduta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BANNER COACH DINAMICO -->
+                <div id="coach-live-banner" class="hidden mb-5 p-4 rounded-xl bg-amber-50 border border-amber-300 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+                        <div class="text-xs text-amber-950">
+                            <strong class="text-sm block" id="coach-banner-title">Modalità Recupero & Adattamento Attiva</strong>
+                            <span id="coach-banner-desc" class="text-amber-900">--</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button onclick="switchTab('coach')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition shadow-xs">
+                            <i class="fa-solid fa-kit-medical mr-1"></i> Esercizi & Adatta Piano
+                        </button>
+                        <button onclick="clearCoachAlert()" class="bg-white hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-semibold px-3 py-2 rounded-lg transition" title="Segna come recuperato">
+                            <i class="fa-solid fa-check mr-1"></i> Recuperato
                         </button>
                     </div>
                 </div>
@@ -280,6 +305,14 @@
                             </div>
                             <div id="readiness-advice" class="text-sm bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-lg">
                                 Parametri nella norma: FC a riposo regolare. Puoi svolgere regolarmente la seduta prevista.
+                            </div>
+                            <div id="readiness-actions" class="hidden mt-3 flex flex-wrap items-center gap-2">
+                                <button type="button" onclick="quickAdaptFromReadiness()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition shadow-xs">
+                                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Adatta Prossima Seduta nel Diario
+                                </button>
+                                <button type="button" onclick="openCoachForCurrentReadiness()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition">
+                                    <i class="fa-solid fa-person-walking mr-1"></i> Apri Esercizi & Protocollo
+                                </button>
                             </div>
                         </div>
 
@@ -620,6 +653,117 @@
                     </div>
                 </div>
 
+                <!-- TAB 7: COACH FISIO & ADATTAMENTO DINAMICO -->
+                <div id="tab-coach" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 mb-5 border-b border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center text-xl shrink-0">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-900 text-lg">Coach Adattivo: Riadatta il Piano & Recupera</h3>
+                                    <p class="text-xs text-slate-500">Modifica con 1 clic il prossimo allenamento in base a stanchezza, saliscendi cittadini o fastidi muscolari.</p>
+                                </div>
+                            </div>
+                            <span id="coach-status-pill" class="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 self-start md:self-center">
+                                Condizione Regolare
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                            <div class="lg:col-span-1 bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <div class="text-[11px] font-bold uppercase tracking-wider text-blue-600 mb-1">
+                                        <i class="fa-solid fa-calendar-day mr-1"></i> Prossima Seduta in Programma
+                                    </div>
+                                    <div id="coach-next-workout-box" class="mt-2">
+                                        <p class="text-xs text-slate-400">Nessuna seduta futura trovata.</p>
+                                    </div>
+                                </div>
+                                <button type="button" id="btn-restore-next" onclick="restoreNextWorkoutOriginal()" class="hidden mt-4 w-full bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition">
+                                    <i class="fa-solid fa-rotate-left mr-1"></i> Ripristina Seduta Originale
+                                </button>
+                            </div>
+
+                            <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <button type="button" onclick="adaptNextWorkout('light')" class="text-left p-4 rounded-xl border border-amber-200 bg-amber-50/60 hover:bg-amber-100/70 transition flex flex-col justify-between">
+                                    <div>
+                                        <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center text-sm mb-2.5">
+                                            <i class="fa-solid fa-feather"></i>
+                                        </div>
+                                        <div class="font-bold text-sm text-slate-900">1. Alleggerisci (-25%)</div>
+                                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">Ideale dopo <strong>saliscendi o gambe stanche</strong>: riduce i km del 25% e imposta corsa facilissima in pianura (Z1/Z2 bassa).</p>
+                                    </div>
+                                    <span class="mt-3 text-[11px] font-bold text-amber-800">Applica al Diario <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                                </button>
+
+                                <button type="button" onclick="adaptNextWorkout('rulli')" class="text-left p-4 rounded-xl border border-cyan-200 bg-cyan-50/60 hover:bg-cyan-100/70 transition flex flex-col justify-between">
+                                    <div>
+                                        <div class="w-8 h-8 rounded-lg bg-cyan-600 text-white flex items-center justify-center text-sm mb-2.5">
+                                            <i class="fa-solid fa-bicycle"></i>
+                                        </div>
+                                        <div class="font-bold text-sm text-slate-900">2. Rulli Zero Impatto</div>
+                                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">Ideale se <strong>polpaccio, tendine, ginocchio o schiena</strong> sono carichi: 40' agili sui rulli (85–95 rpm) senza traumi.</p>
+                                    </div>
+                                    <span class="mt-3 text-[11px] font-bold text-cyan-800">Converti in Rulli <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                                </button>
+
+                                <button type="button" onclick="adaptNextWorkout('rest')" class="text-left p-4 rounded-xl border border-rose-200 bg-rose-50/60 hover:bg-rose-100/70 transition flex flex-col justify-between">
+                                    <div>
+                                        <div class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center text-sm mb-2.5">
+                                            <i class="fa-solid fa-bed"></i>
+                                        </div>
+                                        <div class="font-bold text-sm text-slate-900">3. Riposo & Mobilità</div>
+                                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">Ideale se c'è <strong>dolore acuto o FC alta</strong>: azzera i km e dedica 15' agli esercizi di scarico qui sotto.</p>
+                                    </div>
+                                    <span class="mt-3 text-[11px] font-bold text-rose-800">Imposta Riposo <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-lg"><i class="fa-solid fa-person-running text-blue-600 mr-1.5"></i> Protocollo Recupero & Prevenzione Infortuni</h3>
+                                <p class="text-xs text-slate-500">Seleziona la zona affaticata o indolenzita per vedere subito cosa fare, cosa evitare e gli esercizi consigliati.</p>
+                            </div>
+                            <button type="button" onclick="resetCoachExerciseChecks()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg transition self-start">
+                                <i class="fa-solid fa-rotate-left mr-1"></i> Azzera spunte
+                            </button>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 mb-6" id="coach-zone-pills">
+                            <button type="button" onclick="selectCoachZone('gambe')" id="cz-pill-gambe" class="px-3.5 py-2 rounded-xl text-xs font-bold border transition bg-blue-600 text-white border-blue-600">
+                                <i class="fa-solid fa-mountain mr-1"></i> Gambe Stanche / Post-Saliscendi
+                            </button>
+                            <button type="button" onclick="selectCoachZone('polpaccio')" id="cz-pill-polpaccio" class="px-3.5 py-2 rounded-xl text-xs font-bold border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
+                                Polpaccio & Tendine d'Achille
+                            </button>
+                            <button type="button" onclick="selectCoachZone('schiena')" id="cz-pill-schiena" class="px-3.5 py-2 rounded-xl text-xs font-bold border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
+                                Schiena & Zona Lombare
+                            </button>
+                            <button type="button" onclick="selectCoachZone('ginocchio')" id="cz-pill-ginocchio" class="px-3.5 py-2 rounded-xl text-xs font-bold border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
+                                Ginocchio & Bandelletta
+                            </button>
+                            <button type="button" onclick="selectCoachZone('femorali')" id="cz-pill-femorali" class="px-3.5 py-2 rounded-xl text-xs font-bold border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
+                                Femorali, Glutei & Piriforme
+                            </button>
+                            <button type="button" onclick="selectCoachZone('tibia')" id="cz-pill-tibia" class="px-3.5 py-2 rounded-xl text-xs font-bold border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
+                                Tibia & Fascia Plantare
+                            </button>
+                        </div>
+
+                        <div id="coach-zone-guidance" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+
+                        <div class="border-t border-slate-100 pt-5">
+                            <h4 class="font-bold text-sm text-slate-900 mb-3"><i class="fa-solid fa-dumbbell text-emerald-600 mr-1.5"></i> Routine Esercizi Consigliata (10–15 min)</h4>
+                            <div id="coach-zone-exercises" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -726,7 +870,40 @@
                     <div><label class="block text-xs font-semibold text-slate-600 mb-1">FC Media (bpm)</label><input type="number" id="modal-comp-fc" placeholder="es. 138" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
                 </div>
                 <div><label class="block text-xs font-semibold text-slate-600 mb-1">Scarpe Usate (solo per corsa)</label><select id="modal-comp-scarpa" class="w-full border border-slate-300 rounded-lg px-3 py-2"></select></div>
-                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Note & Sensazioni</label><input type="text" id="modal-comp-note" class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
+
+                <div class="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 space-y-2.5">
+                    <div class="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                        <i class="fa-solid fa-heart-pulse text-amber-600"></i> Come hai accusato l'allenamento?
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Sensazione / Fatica</label>
+                            <select id="modal-comp-feeling" onchange="onCompFeelingChange()" class="w-full border border-amber-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold bg-white">
+                                <option value="ok">Bene / Recupero regolare</option>
+                                <option value="saliscendi">Stanco — Saliscendi / Percorso duro</option>
+                                <option value="stanco">Molto affaticato / Gambe pesanti</option>
+                                <option value="fastidio">Fastidio o dolore localizzato</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Zona affaticata (se presente)</label>
+                            <select id="modal-comp-area" class="w-full border border-amber-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold bg-white">
+                                <option value="gambe">Gambe stanche / Nessun dolore</option>
+                                <option value="polpaccio">Polpaccio / Tendine d'Achille</option>
+                                <option value="schiena">Schiena / Zona Lombare</option>
+                                <option value="ginocchio">Ginocchio / Bandelletta</option>
+                                <option value="femorali">Femorali / Glutei / Piriforme</option>
+                                <option value="tibia">Tibia / Fascia Plantare</option>
+                            </select>
+                        </div>
+                    </div>
+                    <label id="modal-comp-adapt-wrap" class="hidden flex items-start gap-2 pt-1 text-xs text-amber-950 cursor-pointer">
+                        <input type="checkbox" id="modal-comp-adapt" checked class="mt-0.5 rounded text-amber-600 focus:ring-amber-500">
+                        <span><strong>Adatta subito la prossima seduta</strong> nel Diario e apri gli esercizi mirati di recupero.</span>
+                    </label>
+                </div>
+
+                <div><label class="block text-xs font-semibold text-slate-600 mb-1">Note & Sensazioni (libere)</label><input type="text" id="modal-comp-note" placeholder="Es. Corsa in città con saliscendi, accusato un po'..." class="w-full border border-slate-300 rounded-lg px-3 py-2"></div>
             </div>
             <div class="flex justify-end gap-2 mt-6">
                 <button onclick="closeModals()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
@@ -891,7 +1068,7 @@
         let unsubscribeSnapshot = null;
 
         const NEUTRAL_TEMPLATE_DB = {
-            ui: { activeTab: "panoramica", diarioFilter: "current", dateFrom: "", dateTo: "", readiness: { fc: 0, schiena: "ok", polpaccio: "ok" } },
+            ui: { activeTab: "panoramica", diarioFilter: "current", dateFrom: "", dateTo: "", readiness: { fc: 0, schiena: "ok", polpaccio: "ok" }, coachState: { active: false, feeling: "ok", area: "gambe", sourceDate: "", sourceTipo: "" }, coachDone: {} },
             atleta: { peso_kg: 0, altezza_cm: 0, bmi: 0, fc_riposo: 0 },
             soglia: { fc_bpm: 0, passo: "", potenza_w: 0, potenza_w_kg: 0, ftp_bici: 0, data_rilevamento: "", storico: [] },
             vo2max: { valore: 0, livello: "--" },
@@ -1331,7 +1508,13 @@
                 pushup: `<circle cx="128" cy="58" r="7" fill="#334155"/><line x1="32" y1="88" x2="120" y2="62" stroke="#334155" stroke-width="6"/><line x1="114" y1="65" x2="114" y2="95" stroke="#2563eb" stroke-width="5"/>`,
                 row: `<rect x="44" y="72" width="54" height="24" rx="3" fill="#e2e8f0" stroke="#94a3b8"/><circle cx="114" cy="48" r="7" fill="#334155"/><line x1="64" y1="58" x2="106" y2="50" stroke="#334155" stroke-width="6"/><line x1="64" y1="58" x2="54" y2="95" stroke="#334155" stroke-width="5"/><polyline points="100,52 92,66 96,80" stroke="#2563eb" stroke-width="4.5"/><rect x="90" y="79" width="12" height="5" fill="#10b981"/>`,
                 overhead_press: `<circle cx="80" cy="34" r="7" fill="#334155"/><line x1="80" y1="42" x2="80" y2="68" stroke="#334155" stroke-width="6"/><line x1="76" y1="68" x2="72" y2="95" stroke="#334155" stroke-width="5"/><line x1="84" y1="68" x2="88" y2="95" stroke="#334155" stroke-width="5"/><line x1="74" y1="46" x2="66" y2="20" stroke="#2563eb" stroke-width="4.5"/><line x1="86" y1="46" x2="94" y2="20" stroke="#2563eb" stroke-width="4.5"/><rect x="61" y="16" width="10" height="4" fill="#10b981"/><rect x="89" y="16" width="10" height="4" fill="#10b981"/>`,
-                face_pull: `<circle cx="88" cy="24" r="7" fill="#334155"/><line x1="88" y1="32" x2="88" y2="62" stroke="#334155" stroke-width="6"/><line x1="88" y1="62" x2="84" y2="95" stroke="#334155" stroke-width="5"/><line x1="88" y1="62" x2="96" y2="95" stroke="#334155" stroke-width="5"/><line x1="20" y1="32" x2="76" y2="30" stroke="#10b981" stroke-width="3" stroke-dasharray="3 2"/><polyline points="88,38 74,30 82,24" stroke="#2563eb" stroke-width="4.5"/>`
+                face_pull: `<circle cx="88" cy="24" r="7" fill="#334155"/><line x1="88" y1="32" x2="88" y2="62" stroke="#334155" stroke-width="6"/><line x1="88" y1="62" x2="84" y2="95" stroke="#334155" stroke-width="5"/><line x1="88" y1="62" x2="96" y2="95" stroke="#334155" stroke-width="5"/><line x1="20" y1="32" x2="76" y2="30" stroke="#10b981" stroke-width="3" stroke-dasharray="3 2"/><polyline points="88,38 74,30 82,24" stroke="#2563eb" stroke-width="4.5"/>`,
+                wall_sit: `<line x1="46" y1="15" x2="46" y2="96" stroke="#94a3b8" stroke-width="4"/><circle cx="56" cy="28" r="7" fill="#334155"/><line x1="54" y1="36" x2="54" y2="64" stroke="#334155" stroke-width="6"/><polyline points="54,64 88,64 88,95" stroke="#2563eb" stroke-width="5.5" stroke-linejoin="round"/>`,
+                quad_stretch: `<circle cx="76" cy="20" r="7" fill="#334155"/><line x1="76" y1="28" x2="76" y2="58" stroke="#334155" stroke-width="6"/><line x1="76" y1="58" x2="76" y2="95" stroke="#334155" stroke-width="5"/><polyline points="76,58 92,76 80,52" stroke="#2563eb" stroke-width="5" stroke-linejoin="round"/>`,
+                hamstring_stretch: `<circle cx="62" cy="44" r="7" fill="#334155"/><line x1="58" y1="52" x2="52" y2="90" stroke="#334155" stroke-width="6"/><line x1="52" y1="90" x2="118" y2="90" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round"/><line x1="60" y1="56" x2="104" y2="82" stroke="#10b981" stroke-width="4"/>`,
+                figure_four: `<circle cx="32" cy="86" r="7" fill="#334155"/><line x1="40" y1="88" x2="86" y2="88" stroke="#334155" stroke-width="6"/><polyline points="86,88 106,62 122,88" stroke="#334155" stroke-width="5"/><line x1="86" y1="88" x2="98" y2="68" stroke="#2563eb" stroke-width="5"/>`,
+                child_pose: `<circle cx="118" cy="82" r="7" fill="#334155"/><path d="M52 86 Q76 66 110 82" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><polyline points="52,86 42,92 64,92" stroke="#334155" stroke-width="5"/><line x1="110" y1="84" x2="140" y2="92" stroke="#2563eb" stroke-width="4.5"/>`,
+                ankle_pump: `<circle cx="54" cy="44" r="7" fill="#334155"/><line x1="50" y1="52" x2="46" y2="90" stroke="#334155" stroke-width="6"/><line x1="46" y1="90" x2="112" y2="90" stroke="#2563eb" stroke-width="5.5"/><line x1="112" y1="90" x2="122" y2="74" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>`
             };
             return base + (shapes[key] || shapes.squat) + `</svg>`;
         }
@@ -1362,7 +1545,7 @@
         function normalizeDb(raw) {
             const merged = structuredClone(NEUTRAL_TEMPLATE_DB);
             if (!raw || typeof raw !== 'object') return merged;
-            if (raw.ui) merged.ui = { ...merged.ui, ...raw.ui, readiness: { ...merged.ui.readiness, ...(raw.ui.readiness || {}) } };
+            if (raw.ui) merged.ui = { ...merged.ui, ...raw.ui, readiness: { ...merged.ui.readiness, ...(raw.ui.readiness || {}) }, coachState: { ...merged.ui.coachState, ...(raw.ui.coachState || {}) }, coachDone: { ...(raw.ui.coachDone || {}) } };
             if (raw.atleta) merged.atleta = { ...merged.atleta, ...raw.atleta };
             if (raw.soglia) merged.soglia = { ...merged.soglia, ...raw.soglia, storico: Array.isArray(raw.soglia.storico) ? raw.soglia.storico : [] };
             if (raw.vo2max) merged.vo2max = { ...merged.vo2max, ...raw.vo2max };
@@ -1415,7 +1598,7 @@
         }
 
         function switchTab(tabId, persist = true) {
-            ['panoramica', 'diario', 'gare', 'forza', 'scarpe', 'convertitore'].forEach(t => {
+            ['panoramica', 'diario', 'gare', 'forza', 'scarpe', 'convertitore', 'coach'].forEach(t => {
                 document.getElementById('tab-' + t).classList.add('hidden');
                 const btn = document.getElementById('btn-' + t);
                 btn.classList.remove('tab-active');
@@ -1432,7 +1615,8 @@
                 gare: ["Gare, Soglia & Zone Ritmo", "Soglia Garmin (FC/Passo/Watt/VO2), obiettivi 10k e Mezza Maratona"],
                 forza: ["Forza Gambe & Upper Body", "Schede progressive con illustrazioni esercizi e tracciamento carichi"],
                 scarpe: ["Parco Scarpe & Regole", "Gestione libera km percorsi/rimanenti e protocollo sicurezza"],
-                convertitore: ["Convertitore Corsa → Rulli", "Gestione imprevisti e pioggia: calcola la seduta indoor equivalente"]
+                convertitore: ["Convertitore Corsa → Rulli", "Gestione imprevisti e pioggia: calcola la seduta indoor equivalente"],
+                coach: ["Coach Fisio & Adattamento", "Recupero post-fatica, prevenzione infortuni e rimodulazione intelligente del piano"]
             };
             document.getElementById('page-title').textContent = titles[tabId][0];
             document.getElementById('page-subtitle').textContent = titles[tabId][1];
@@ -1514,6 +1698,7 @@
             renderStrength();
             renderShoesAndRules();
             populateConverterWorkouts();
+            renderCoachSection();
         }
 
         function renderThresholdDisplays() {
@@ -1650,6 +1835,11 @@
                 badge.textContent = "SEMAFORO VERDE — OK PER CORRERE";
                 advice.className = "text-sm bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-lg";
                 advice.innerHTML = `Parametri nella norma (${fc} bpm). Puoi correre la seduta prevista mantenendo i battiti in Z2.`;
+            }
+            const actBox = document.getElementById('readiness-actions');
+            if (actBox) {
+                const isAlert = (schiena === 'dolore' || polpaccio === 'dolore' || fc >= baseFc + 8 || schiena === 'lieve' || polpaccio === 'affaticato' || fc >= baseFc + 5);
+                actBox.classList.toggle('hidden', !isAlert);
             }
         }
 
@@ -2162,6 +2352,19 @@
             });
         }
 
+        function onCompFeelingChange() {
+            const feeling = document.getElementById('modal-comp-feeling').value;
+            const wrap = document.getElementById('modal-comp-adapt-wrap');
+            const chk = document.getElementById('modal-comp-adapt');
+            if (feeling !== 'ok') {
+                wrap.classList.remove('hidden');
+                chk.checked = true;
+            } else {
+                wrap.classList.add('hidden');
+                chk.checked = false;
+            }
+        }
+
         function openCompleteModal(idx) {
             const a = db.allenamenti_settimana[idx];
             document.getElementById('modal-comp-idx').value = idx;
@@ -2171,6 +2374,9 @@
             document.getElementById('modal-comp-passo').value = a.passo || "";
             document.getElementById('modal-comp-fc').value = "";
             populateShoeSelect('modal-comp-scarpa', a.scarpa);
+            document.getElementById('modal-comp-feeling').value = a.rpe_stato || "ok";
+            document.getElementById('modal-comp-area').value = a.zona_dolore || "gambe";
+            onCompFeelingChange();
             document.getElementById('modal-comp-note').value = a.note || "";
             const m = document.getElementById('modal-complete');
             m.classList.remove('hidden'); m.classList.add('flex');
@@ -2184,6 +2390,9 @@
             const passo = document.getElementById('modal-comp-passo').value;
             const fc = document.getElementById('modal-comp-fc').value;
             const scarpa = document.getElementById('modal-comp-scarpa').value;
+            const feeling = document.getElementById('modal-comp-feeling').value;
+            const area = document.getElementById('modal-comp-area').value;
+            const doAdapt = document.getElementById('modal-comp-adapt').checked;
             const note = document.getElementById('modal-comp-note').value;
             const oldItem = db.allenamenti_settimana[idx];
             const prevKm = (oldItem.stato === 'completato' && oldItem.km_fatti) ? oldItem.km_fatti : 0;
@@ -2197,15 +2406,435 @@
                 const newShoeObj = db.scarpe.find(s => s.nome === scarpa);
                 if (newShoeObj) newShoeObj.km_percorsi = +(newShoeObj.km_percorsi + km).toFixed(1);
             }
+
+            const feelingTags = {
+                saliscendi: "[Accusato saliscendi/percorso]",
+                stanco: "[Molto affaticato / Gambe pesanti]",
+                fastidio: `[Fastidio: ${COACH_PROTOCOLS[area]?.title || area}]`
+            };
+            let finalNote = fc ? `FC media: ${fc} bpm. ${note}` : note;
+            if (feeling !== 'ok' && feelingTags[feeling] && !finalNote.includes(feelingTags[feeling])) {
+                finalNote = `${feelingTags[feeling]} ${finalNote}`.trim();
+            }
+
             oldItem.km_fatti = km;
             oldItem.km_rulli = kmRulli;
             oldItem.passo = passo || "-";
             oldItem.scarpa = scarpa;
             oldItem.stato = 'completato';
-            oldItem.note = fc ? `FC media: ${fc} bpm. ${note}` : note;
+            oldItem.rpe_stato = feeling;
+            oldItem.zona_dolore = area;
+            oldItem.note = finalNote;
+
+            if (feeling !== 'ok') {
+                db.ui.coachState = {
+                    active: true,
+                    feeling,
+                    area,
+                    sourceDate: oldItem.data,
+                    sourceTipo: oldItem.tipo
+                };
+                if (area === 'polpaccio') {
+                    db.ui.readiness.polpaccio = feeling === 'fastidio' ? 'dolore' : 'affaticato';
+                    document.getElementById('input-polpaccio').value = db.ui.readiness.polpaccio;
+                } else if (area === 'schiena') {
+                    db.ui.readiness.schiena = feeling === 'fastidio' ? 'dolore' : 'lieve';
+                    document.getElementById('input-schiena').value = db.ui.readiness.schiena;
+                }
+                if (doAdapt) {
+                    const mode = feeling === 'fastidio' ? 'rulli' : 'light';
+                    applyAdaptationToNextFromIndex(idx, mode, area);
+                }
+            }
+
             saveLocal();
             closeModals();
             renderAll();
+            if (feeling !== 'ok' && doAdapt) {
+                switchTab('coach');
+            }
+        }
+
+        const COACH_PROTOCOLS = {
+            gambe: {
+                title: "Gambe Pesanti / Post-Saliscendi",
+                semaforo: "Semaforo Giallo: sì alla corsa solo se facilissima (Z1/Z2 bassa) in pianura per 30–40', oppure 35' di rulli agili. Evita ripetute e discese per 48 ore.",
+                doList: [
+                    "Preferisci percorsi completamente pianeggianti o asfalto regolare per 24–48 ore.",
+                    "Aumenta leggermente la cadenza (passi più corti e frequenti) per ridurre l'impatto frenante.",
+                    "Idratazione + carboidrati/proteine entro 45' e 10' di gambe sollevate a fine giornata."
+                ],
+                avoidList: [
+                    "Niente ripetute in salita, lavori di soglia o allunghi massimali nei prossimi 2 giorni.",
+                    "Evita discese ripide su asfalto che sovraccaricano quadricipiti e polpacci."
+                ],
+                exercises: [
+                    { id: "g1", nome: "Ponte Glutei (Attivazione & Scarico)", imgKey: "glute_bridge", serie: "2 x 12 lente", rec: '45"', note: "Spingi sui talloni e contrai i glutei in alto 2 secondi per togliere tensione ai flessori e ai quadricipiti affaticati dalle salite." },
+                    { id: "g2", nome: "Allungamento Quadricipiti & Flessori", imgKey: "quad_stretch", serie: '2 x 30"/lato', rec: '20"', note: "In piedi o su un fianco, porta il tallone al gluteo mantenendo le ginocchia unite e il bacino neutro." },
+                    { id: "g3", nome: "Allungamento Ischiocrurali a Terra", imgKey: "hamstring_stretch", serie: '2 x 30"/lato', rec: '20"', note: "Seduto con una gamba distesa, fletti il busto in avanti con schiena dritta finché senti tensione dolce dietro la coscia." },
+                    { id: "g4", nome: "Pompa Caviglie & Mobilità Piede", imgKey: "ankle_pump", serie: "2 x 15/lato", rec: '30"', note: "Seduto, alterna flessione ed estensione lenta della caviglia per favorire il drenaggio muscolare post-saliscendi." }
+                ]
+            },
+            polpaccio: {
+                title: "Polpaccio & Tendine d'Achille",
+                semaforo: "Test dei primi passi al mattino: se scendendo dal letto senti dolore acuto o rigidità che non passa dopo 5 minuti, STOP corsa e passa ai rulli agili (90 rpm, tallone piatto).",
+                doList: [
+                    "Usa scarpe con drop medio-alto e buona ammortizzazione (evita scarpe secche o troppo scariche).",
+                    "Corri solo in pianura; in salita il tendine d'Achille subisce un allungamento forzato.",
+                    "Esegui tenute isometriche sul gradino (30–40 secondi) che hanno effetto analgesico sul tendine."
+                ],
+                avoidList: [
+                    "Mai fare stretching aggressivo sul bordo del gradino nella fase acuta (irrita l'inserzione).",
+                    "Evita scatti, allunghi, balzi e salite finché non sparisce la tensione al mattino."
+                ],
+                exercises: [
+                    { id: "p1", nome: "Isometria Polpaccio su Gradino", imgKey: "calf_raise", serie: '3 x 35"/lato', rec: '60"', note: "Sali sulle punte con entrambi i piedi, poi solleva il piede sano e mantieni la posizione ferma a metà altezza per 35 secondi." },
+                    { id: "p2", nome: "Eccentrica Lenta del Soleo (Ginocchio flesso)", imgKey: "calf_raise", serie: "2 x 10/lato", rec: '60"', note: "Con il ginocchio leggermente piegato, scendi con il tallone fino al livello del gradino in 4 secondi." },
+                    { id: "p3", nome: "Pompa Caviglie & Mobilità", imgKey: "ankle_pump", serie: "2 x 20/lato", rec: '30"', note: "Cerchi lenti con la caviglia e flessione dorsale dolce senza forzare il dolore." },
+                    { id: "p4", nome: "Ponte Glutei su Una Gamba", imgKey: "single_bridge", serie: "2 x 10/lato", rec: '45"', note: "Rinforza la spinta dell'anca così il polpaccio non deve compensare durante la corsa." }
+                ]
+            },
+            schiena: {
+                title: "Schiena & Zona Lombare",
+                semaforo: "Regola Lombare: se il fastidio è una semplice rigidità (< 3/10) che si scioglie correndo piano, OK 30–40' facili. Se scende verso il gluteo/gamba o peggiora, STOP corsa.",
+                doList: [
+                    "10 minuti di mobilità dolce (Gatto-Cammello + Bird-Dog) prima di uscire o a fine giornata.",
+                    "Mantieni il busto leggermente inclinato in avanti dalle caviglie evitando di inarcare la lombare in discesa.",
+                    "Sui rulli alza leggermente il manubrio o pedala con busto rilassato senza spingere rapporti duri."
+                ],
+                avoidList: [
+                    "Evita stacchi rumeni, squat pesanti o addominali crunch finché la schiena non è completamente libera.",
+                    "Evita di stare seduto a lungo subito dopo l'allenamento senza aver fatto 5' di scarico."
+                ],
+                exercises: [
+                    { id: "s1", nome: "Gatto-Cammello (Decompressione)", imgKey: "cat_cow", serie: "2 x 10 lente", rec: '30"', note: "In quadrupedia, respira profondamente inarcando e arrotondando la colonna vertebrale senza fretta." },
+                    { id: "s2", nome: "Bird-Dog con Pausa Isometrica", imgKey: "bird_dog", serie: '2 x 8/lato (pausa 4")', rec: '45"', note: "Estendi braccio e gamba opposti mantenendo l'addome attivo e il bacino parallelo al pavimento." },
+                    { id: "s3", nome: "Posizione del Fanciullo (Scarico Lombare)", imgKey: "child_pose", serie: '2 x 40"', rec: '20"', note: "Siediti sui talloni e allunga le braccia in avanti lasciando rilassare completamente la bassa schiena." },
+                    { id: "s4", nome: "Dead Bug Controllato", imgKey: "dead_bug", serie: "2 x 10/lato", rec: '45"', note: "Schiena sempre incollata al tappetino mentre abbassi lentamente braccio e gamba opposti." }
+                ]
+            },
+            ginocchio: {
+                title: "Ginocchio & Bandelletta Ileotibiale",
+                semaforo: "Regola Ginocchio: dolorabilità anteriore o laterale > 3/10 o che cambia il tuo modo di appoggiare il piede = STOP corsa, passa ai rulli con sella alta e cadenza agile.",
+                doList: [
+                    "Aumenta la cadenza di corsa del 5% (passi più brevi): riduce subito il carico sull'articolazione femoro-rotulea.",
+                    "Attiva il medio gluteo prima di correre per evitare che il ginocchio cada verso l'interno.",
+                    "Sui rulli mantieni 90–95 rpm con resistenza leggera."
+                ],
+                avoidList: [
+                    "Evita discese, gradini e percorsi sconnessi per almeno 48–72 ore.",
+                    "Evita affondi profondi se provocano fastidio nella parte anteriore del ginocchio."
+                ],
+                exercises: [
+                    { id: "k1", nome: "Camminata Laterale con Elastico", imgKey: "band_walk", serie: "3 x 12 passi/lato", rec: '45"', note: "Elastico sopra le ginocchia, attiva l'esterno dell'anca per stabilizzare l'asse del ginocchio." },
+                    { id: "k2", nome: "Wall Sit Isometrico (Analgesia Rotulea)", imgKey: "wall_sit", serie: '3 x 30"', rec: '60"', note: "Schiena al muro, ginocchia piegate a 45–60° (senza dolore): riduce la sensibilità del tendine rotuleo." },
+                    { id: "k3", nome: "Ponte Glutei su Una Gamba", imgKey: "single_bridge", serie: "2 x 10/lato", rec: '45"', note: "Spingi dal tallone mantenendo il ginocchio allineato con il secondo dito del piede." },
+                    { id: "k4", nome: "Allungamento Quadricipiti Dolce", imgKey: "quad_stretch", serie: '2 x 30"/lato', rec: '20"', note: "Riduce la trazione del quadricipite sulla rotula senza forzare la flessione massima." }
+                ]
+            },
+            femorali: {
+                title: "Femorali, Glutei & Piriforme",
+                semaforo: "Regola Femorali: se senti 'tirare' o un senso di crampo dietro la coscia durante l'allungo, ferma subito la corsa veloce e passa a camminata/rulli agili.",
+                doList: [
+                    "Riscaldamento graduale di almeno 12–15 minuti prima di qualsiasi variazione di ritmo.",
+                    "Lavora sul rinforzo controllato dei glutei per scaricare i muscoli ischiocrurali.",
+                    "Applica calore leggero o un bagno caldo se c'è contrattura muscolare senza trauma acuto."
+                ],
+                avoidList: [
+                    "Mai fare stretching balistico o tirare forte il femorale se senti una fitta acuta.",
+                    "Evita scatti brevi, allunghi veloci e falcata troppo ampia."
+                ],
+                exercises: [
+                    { id: "f1", nome: "Figura 4 (Scarico Piriforme & Gluteo)", imgKey: "figure_four", serie: '2 x 35"/lato', rec: '20"', note: "Supino, appoggia la caviglia sul ginocchio opposto e avvicina dolcemente le gambe al petto." },
+                    { id: "f2", nome: "Ponte Glutei Bilaterale", imgKey: "glute_bridge", serie: "3 x 12", rec: '45"', note: "Piedi leggermente più vicini ai glutei per attivare il grande gluteo senza stressare i femorali." },
+                    { id: "f3", nome: "Allungamento Ischiocrurali Dolce", imgKey: "hamstring_stretch", serie: '2 x 25"/lato', rec: '20"', note: "Tensione leggera (3/10), mai dolore." },
+                    { id: "f4", nome: "Dead Bug Stabilizzatore", imgKey: "dead_bug", serie: "2 x 10/lato", rec: '45"', note: "Stabilizza il bacino evitando antiversione eccessiva che mette in tensione i femorali." }
+                ]
+            },
+            tibia: {
+                title: "Tibia & Fascia Plantare",
+                semaforo: "Regola Impatto Osseo/Plantare: se il dolore alla tibia è puntiforme al tatto o peggiora saltellando su un piede solo, STOP corsa per 3–4 giorni e usa solo i rulli.",
+                doList: [
+                    "Corri solo su superfici morbide o asfalto regolare, usando le scarpe più protettive.",
+                    "Massaggia la pianta del piede con una pallina per 3–5 minuti la sera.",
+                    "Rinforza i muscoli intrinseci del piede e il polpaccio."
+                ],
+                avoidList: [
+                    "Evita asfalto duro in discesa, cambi di direzione bruschi e scarpe minimaliste/secche.",
+                    "Non ignorare un dolore tibiale che aumenta chilometro dopo chilometro."
+                ],
+                exercises: [
+                    { id: "t1", nome: "Pompa Caviglie & Flessione Dita", imgKey: "ankle_pump", serie: "3 x 15/lato", rec: '30"', note: "Alterna punta del piede estesa e piede a martello lento per mobilizzare la fascia plantare e il tibiale." },
+                    { id: "t2", nome: "Alzate Polpacci Controllate", imgKey: "calf_raise", serie: "2 x 12", rec: '60"', note: "In pianura (senza scendere sotto il gradino), salita in 2 secondi e discesa in 3 secondi." },
+                    { id: "t3", nome: "Camminata Laterale con Elastico", imgKey: "band_walk", serie: "2 x 12 passi/lato", rec: '45"', note: "Migliora il controllo dell'anca riducendo la pronazione eccessiva in appoggio." },
+                    { id: "t4", nome: "Posizione del Fanciullo / Scarico", imgKey: "child_pose", serie: '2 x 30"', rec: '20"', note: "Rilassa il dorso del piede e la catena posteriore." }
+                ]
+            }
+        };
+
+        function findNextUpcomingWorkoutIndex(afterDateIso = null) {
+            const refDate = afterDateIso || getLocalTodayISO();
+            for (let i = 0; i < db.allenamenti_settimana.length; i++) {
+                const w = db.allenamenti_settimana[i];
+                if (w.data >= refDate && w.stato === 'da_fare') {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        function applyAdaptationToNextFromIndex(completedIdx, mode, area) {
+            const startSearch = completedIdx + 1;
+            let targetIdx = -1;
+            for (let i = startSearch; i < db.allenamenti_settimana.length; i++) {
+                const w = db.allenamenti_settimana[i];
+                if (w.stato === 'da_fare' && ((Number(w.km_previsti) || 0) > 0 || w.tipo.toLowerCase().includes('corsa') || w.tipo.toLowerCase().includes('lungo') || w.tipo.toLowerCase().includes('ripetut'))) {
+                    targetIdx = i;
+                    break;
+                }
+            }
+            if (targetIdx < 0) return -1;
+            applyAdaptationToIndex(targetIdx, mode, area);
+            return targetIdx;
+        }
+
+        function applyAdaptationToIndex(targetIdx, mode, area = "gambe") {
+            const w = db.allenamenti_settimana[targetIdx];
+            if (!w) return;
+            if (w.orig_tipo === undefined) {
+                w.orig_tipo = w.tipo;
+                w.orig_dettaglio = w.dettaglio;
+                w.orig_km_previsti = w.km_previsti;
+                w.orig_scarpa = w.scarpa;
+            }
+            const baseKm = Number(w.orig_km_previsti) || Number(w.km_previsti) || 8;
+            const areaName = COACH_PROTOCOLS[area]?.title || "recupero";
+
+            if (mode === 'light') {
+                const newKm = Math.max(5, Math.round(baseKm * 0.75));
+                w.tipo = "Corsa Rigenerante (Adattata Coach)";
+                w.km_previsti = newKm;
+                w.dettaglio = `[Adattata — ${areaName}] ${newKm} km facilissimi in pianura (Z1/Z2 bassa, passo lento senza forzare).`;
+            } else if (mode === 'rulli') {
+                w.tipo = "Rulli Scarico Zero Impatto (Adattata Coach)";
+                w.km_previsti = 0;
+                w.scarpa = "-";
+                w.dettaglio = `[Adattata — ${areaName}] 40' rulli agili in Z1/Z2 bassa (85–95 rpm) per far girare le gambe senza impatto.`;
+            } else if (mode === 'rest') {
+                w.tipo = "Riposo & Mobilità (Adattata Coach)";
+                w.km_previsti = 0;
+                w.scarpa = "-";
+                w.dettaglio = `[Adattata — ${areaName}] Riposo completo dalla corsa + 15' routine esercizi di scarico.`;
+            }
+        }
+
+        function adaptNextWorkout(mode) {
+            const idx = findNextUpcomingWorkoutIndex(getLocalTodayISO());
+            if (idx < 0) {
+                alert("Non ci sono sedute future 'da fare' nel Diario da adattare.");
+                return;
+            }
+            const area = (db.ui.coachState && db.ui.coachState.area) ? db.ui.coachState.area : "gambe";
+            applyAdaptationToIndex(idx, mode, area);
+            saveLocal();
+            renderAll();
+        }
+
+        function restoreNextWorkoutOriginal() {
+            const idx = findNextUpcomingWorkoutIndex(getLocalTodayISO());
+            if (idx < 0) return;
+            const w = db.allenamenti_settimana[idx];
+            if (w && w.orig_tipo !== undefined) {
+                w.tipo = w.orig_tipo;
+                w.dettaglio = w.orig_dettaglio;
+                w.km_previsti = w.orig_km_previsti;
+                w.scarpa = w.orig_scarpa;
+                delete w.orig_tipo;
+                delete w.orig_dettaglio;
+                delete w.orig_km_previsti;
+                delete w.orig_scarpa;
+                saveLocal();
+                renderAll();
+            }
+        }
+
+        function quickAdaptFromReadiness() {
+            const schiena = document.getElementById('input-schiena').value;
+            const polpaccio = document.getElementById('input-polpaccio').value;
+            const area = polpaccio !== 'ok' ? 'polpaccio' : (schiena !== 'ok' ? 'schiena' : 'gambe');
+            const isRed = schiena === 'dolore' || polpaccio === 'dolore';
+            db.ui.coachState = {
+                active: true,
+                feeling: isRed ? 'fastidio' : 'stanco',
+                area,
+                sourceDate: getLocalTodayISO(),
+                sourceTipo: "Readiness Mattutino"
+            };
+            adaptNextWorkout(isRed ? 'rulli' : 'light');
+            switchTab('coach');
+        }
+
+        function openCoachForCurrentReadiness() {
+            const schiena = document.getElementById('input-schiena').value;
+            const polpaccio = document.getElementById('input-polpaccio').value;
+            const area = polpaccio !== 'ok' ? 'polpaccio' : (schiena !== 'ok' ? 'schiena' : 'gambe');
+            db.ui.coachState = { ...(db.ui.coachState || {}), area };
+            saveLocal();
+            renderCoachSection();
+            switchTab('coach');
+        }
+
+        function clearCoachAlert() {
+            if (!db.ui.coachState) db.ui.coachState = {};
+            db.ui.coachState.active = false;
+            saveLocal();
+            renderCoachSection();
+        }
+
+        function selectCoachZone(zoneKey) {
+            if (!db.ui.coachState) db.ui.coachState = { active: false, feeling: 'ok', area: zoneKey };
+            db.ui.coachState.area = zoneKey;
+            saveLocal();
+            renderCoachSection();
+        }
+
+        function toggleCoachExerciseDone(exId, checked) {
+            db.ui.coachDone = db.ui.coachDone || {};
+            db.ui.coachDone[exId] = checked;
+            saveLocal();
+            renderCoachSection();
+        }
+
+        function resetCoachExerciseChecks() {
+            db.ui.coachDone = {};
+            saveLocal();
+            renderCoachSection();
+        }
+
+        function openCoachExerciseModal(zoneKey, exIdx) {
+            const proto = COACH_PROTOCOLS[zoneKey];
+            if (!proto || !proto.exercises[exIdx]) return;
+            const ex = proto.exercises[exIdx];
+            document.getElementById('ex-modal-muscle').textContent = proto.title;
+            document.getElementById('ex-modal-title').textContent = ex.nome;
+            document.getElementById('ex-modal-svg').innerHTML = getExerciseSVG(ex.imgKey || 'squat', true);
+            document.getElementById('ex-modal-serie').textContent = ex.serie;
+            document.getElementById('ex-modal-rec').textContent = ex.rec;
+            document.getElementById('ex-modal-desc').textContent = ex.note;
+            document.getElementById('ex-modal-yt').href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(ex.nome + " esecuzione corretta");
+            const m = document.getElementById('modal-exercise');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+
+        function renderCoachSection() {
+            const cs = db.ui.coachState || { active: false, feeling: 'ok', area: 'gambe', sourceDate: '', sourceTipo: '' };
+            const activeArea = COACH_PROTOCOLS[cs.area] ? cs.area : 'gambe';
+            const proto = COACH_PROTOCOLS[activeArea];
+
+            const banner = document.getElementById('coach-live-banner');
+            const navDot = document.getElementById('nav-coach-dot');
+            const statusPill = document.getElementById('coach-status-pill');
+
+            if (cs.active) {
+                if (banner) {
+                    banner.classList.remove('hidden');
+                    const fLabels = {
+                        saliscendi: "Affaticamento da percorso collinare / saliscendi",
+                        stanco: "Stanchezza muscolare / gambe pesanti",
+                        fastidio: "Fastidio o dolorabilità segnalata"
+                    };
+                    document.getElementById('coach-banner-title').textContent = `Coach Attivo: ${fLabels[cs.feeling] || 'Recupero consigliato'} (${proto.title})`;
+                    document.getElementById('coach-banner-desc').textContent = `Rilevato il ${cs.sourceDate || getLocalTodayISO()} (${cs.sourceTipo || 'Seduta'}). Controlla l'adattamento del prossimo allenamento e svolgi la routine mirata.`;
+                }
+                if (navDot) navDot.classList.remove('hidden');
+                if (statusPill) {
+                    statusPill.className = "text-xs font-bold px-3 py-1.5 rounded-full bg-amber-100 text-amber-900 self-start md:self-center";
+                    statusPill.textContent = `Recupero Attivo · ${proto.title}`;
+                }
+            } else {
+                if (banner) banner.classList.add('hidden');
+                if (navDot) navDot.classList.add('hidden');
+                if (statusPill) {
+                    statusPill.className = "text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 self-start md:self-center";
+                    statusPill.textContent = "Condizione Regolare";
+                }
+            }
+
+            const nextIdx = findNextUpcomingWorkoutIndex(getLocalTodayISO());
+            const nextBox = document.getElementById('coach-next-workout-box');
+            const restoreBtn = document.getElementById('btn-restore-next');
+            if (nextBox) {
+                if (nextIdx >= 0) {
+                    const nw = db.allenamenti_settimana[nextIdx];
+                    const isAdapted = nw.orig_tipo !== undefined;
+                    nextBox.innerHTML = `
+                        <div class="font-mono text-xs text-slate-500">${nw.data} (${nw.giorno || ''})</div>
+                        <div class="font-bold text-sm text-slate-900 mt-0.5">${nw.tipo}</div>
+                        <div class="text-xs text-slate-600 mt-1">${nw.dettaglio || ''}</div>
+                        <div class="mt-2 inline-block text-xs font-mono font-bold px-2.5 py-1 rounded bg-white border border-slate-200 text-blue-700">
+                            ${nw.km_previsti > 0 ? nw.km_previsti + ' km' : '0 km corsa'}
+                        </div>
+                    `;
+                    if (restoreBtn) restoreBtn.classList.toggle('hidden', !isAdapted);
+                } else {
+                    nextBox.innerHTML = `<p class="text-xs text-slate-400">Nessuna seduta futura da adattare.</p>`;
+                    if (restoreBtn) restoreBtn.classList.add('hidden');
+                }
+            }
+
+            Object.keys(COACH_PROTOCOLS).forEach(k => {
+                const pill = document.getElementById('cz-pill-' + k);
+                if (!pill) return;
+                if (k === activeArea) {
+                    pill.className = "px-3.5 py-2 rounded-xl text-xs font-bold border transition bg-blue-600 text-white border-blue-600 shadow-xs";
+                } else {
+                    pill.className = "px-3.5 py-2 rounded-xl text-xs font-bold border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100";
+                }
+            });
+
+            const guidanceBox = document.getElementById('coach-zone-guidance');
+            if (guidanceBox) {
+                guidanceBox.innerHTML = `
+                    <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
+                        <div class="font-bold text-xs uppercase text-amber-800 mb-1.5"><i class="fa-solid fa-traffic-light mr-1"></i> Regola Decisionale</div>
+                        <p class="text-xs text-amber-950 leading-relaxed">${proto.semaforo}</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                        <div class="font-bold text-xs uppercase text-emerald-800 mb-1.5"><i class="fa-solid fa-circle-check mr-1"></i> Cosa Fare Subito (24–48h)</div>
+                        <ul class="text-xs text-emerald-950 space-y-1 list-disc pl-4">
+                            ${proto.doList.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
+                        <div class="font-bold text-xs uppercase text-rose-800 mb-1.5"><i class="fa-solid fa-ban mr-1"></i> Cosa Evitare</div>
+                        <ul class="text-xs text-rose-950 space-y-1 list-disc pl-4">
+                            ${proto.avoidList.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            const exBox = document.getElementById('coach-zone-exercises');
+            const doneMap = db.ui.coachDone || {};
+            if (exBox) {
+                exBox.innerHTML = proto.exercises.map((ex, eIdx) => {
+                    const isDone = !!doneMap[ex.id];
+                    return `
+                        <div class="p-3.5 rounded-xl border ${isDone ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 border-slate-200'} flex items-start gap-3 hover:border-blue-300 transition">
+                            <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleCoachExerciseDone('${ex.id}', this.checked)" class="mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0">
+                            <button type="button" onclick="openCoachExerciseModal('${activeArea}', ${eIdx})" class="group relative shrink-0 focus:outline-none">
+                                ${getExerciseSVG(ex.imgKey || 'squat', false)}
+                                <span class="absolute bottom-0.5 right-0.5 bg-slate-900/75 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+                            </button>
+                            <div class="min-w-0 flex-1">
+                                <button type="button" onclick="openCoachExerciseModal('${activeArea}', ${eIdx})" class="font-bold text-sm ${isDone ? 'line-through text-slate-400' : 'text-slate-900 hover:text-blue-600'} text-left block">${ex.nome}</button>
+                                <div class="text-xs font-mono text-blue-600 mt-0.5">${ex.serie} · rec ${ex.rec}</div>
+                                <p class="text-xs text-slate-600 leading-relaxed mt-1">${ex.note}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
         }
 
         function openSkipModal(idx) {
